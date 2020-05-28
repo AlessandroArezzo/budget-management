@@ -2,6 +2,8 @@ language: java
 
 jdk: openjdk8
 
+env: ACTIVE_PROFILES="-Pjacoco"
+
 install: true
 
 cache:
@@ -9,4 +11,4 @@ cache:
       - $HOME/.m2
       
 script:
-    - mvn -f budget-management/pom.xml clean verify
+    - mvn -f budget-management/pom.xml $ACTIVE_PROFILES clean verify
