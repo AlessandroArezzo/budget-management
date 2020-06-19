@@ -20,6 +20,11 @@
     <sonarqube.version>3.7.0.1746</sonarqube.version>
     <jacoco.version>0.8.5</jacoco.version>
     <coveralls.version>4.3.0</coveralls.version>
+    
+    <sonar.coverage.exclusions>
+   		**/model/*.*,
+   	</sonar.coverage.exclusions>
+   	
   </properties>
   
   
@@ -129,12 +134,12 @@
 		  		<plugin>
 		  			<groupId>org.sonarsource.scanner.maven</groupId>
 		  			<artifactId>sonar-maven-plugin</artifactId>
-		  			<version>${sonarqube.version</version>
+		  			<version>${sonarqube.version}</version>
 		  		</plugin>
 	  			<plugin>
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>${jacoco.version</version>
+					<version>${jacoco.version}</version>
 					<configuration>
 						<excludes>
 							<exclude>**/model/*.*</exclude>
@@ -152,7 +157,7 @@
 		  		<plugin>
 					<groupId>org.eluder.coveralls</groupId>
 					 <artifactId>coveralls-maven-plugin</artifactId> 
-					 <version>${coveralls.version</version>
+					 <version>${coveralls.version}</version>
 	      		</plugin>
       		</plugins>
      	</pluginManagement>
