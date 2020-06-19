@@ -4,7 +4,7 @@ jdk: openjdk8
 
 env:
    global:
-      - ACTIVE_PROFILES="-Pjacoco" ADDITIONAL_MAVEN_ARGS="coveralls:report sonar:sonar"
+      - ACTIVE_PROFILES="-Pjacoco,mutation-testing" ADDITIONAL_MAVEN_ARGS="coveralls:report sonar:sonar"
    
 addons:
    sonarcloud:

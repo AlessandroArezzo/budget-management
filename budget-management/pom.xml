@@ -24,7 +24,7 @@
     <sonarqube.version>3.7.0.1746</sonarqube.version>
     <jacoco.version>0.8.5</jacoco.version>
     <coveralls.version>4.3.0</coveralls.version>
-    
+    <pittest.version>1.4.10</pittest.version>
     
     <sonar.coverage.exclusions>
    		**/model/*.*,
@@ -196,6 +196,23 @@
 					 <artifactId>coveralls-maven-plugin</artifactId> 
 					 <version>${coveralls.version}</version>
 	      		</plugin>
+	      		<plugin>
+				<groupId>org.pitest</groupId>
+				<artifactId>pitest-maven</artifactId>
+				<version>${pittest.version}</version>
+				<configuration>
+					 <excludedClasses>
+			            <param>com.balance.model.*</param>
+			        </excludedClasses>
+			        <targetTests>
+			            <param>com.balance.*</param>
+			        </targetTests>
+					<mutators>
+						<mutator>DEFAULTS</mutator> 
+					</mutators>
+					<mutationThreshold>98</mutationThreshold>
+				</configuration>
+			</plugin>
       		</plugins>
      	</pluginManagement>
 	</build>
@@ -212,5 +229,24 @@
 		      	</plugins>
 		   	</build>
 		  </profile>
+		  <profile>
+	  	<id>mutation-testing</id> 
+		<build>
+	        <plugins>
+	        	<plugin>
+					<groupId>org.pitest</groupId>
+					<artifactId>pitest-maven</artifactId> 
+					<executions>
+						<execution>
+							<goals>
+								<goal>mutationCoverage</goal>
+							</goals>
+							<phase>verify</phase>
+						</execution>
+					</executions>
+				</plugin>
+	      	</plugins>
+	   	</build>
+	  </profile>
 	 </profiles>
 </project>
