@@ -15,7 +15,13 @@
     <junit.version>4.13</junit.version>
     <mockito.version>3.3.3</mockito.version>
     <assertj-swing.version>3.9.2</assertj-swing.version>
+    
+    <!-- Plugin version -->
+    <sonarqube.version>3.7.0.1746</sonarqube.version>
+    <jacoco.version>0.8.5</jacoco.version>
+    <coveralls.version>4.3.0</coveralls.version>
   </properties>
+  
   
   <dependencies>
  		<dependency>
@@ -123,12 +129,17 @@
 		  		<plugin>
 		  			<groupId>org.sonarsource.scanner.maven</groupId>
 		  			<artifactId>sonar-maven-plugin</artifactId>
-		  			<version>3.7.0.1746</version>
+		  			<version>${sonarqube.version</version>
 		  		</plugin>
 	  			<plugin>
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>0.8.5</version>
+					<version>${jacoco.version</version>
+					<configuration>
+						<excludes>
+							<exclude>**/model/*.*</exclude>
+						</excludes>
+					</configuration>
 					<executions>
 						<execution>
 							<goals>
@@ -141,7 +152,7 @@
 		  		<plugin>
 					<groupId>org.eluder.coveralls</groupId>
 					 <artifactId>coveralls-maven-plugin</artifactId> 
-					 <version>4.3.0</version>
+					 <version>${coveralls.version</version>
 	      		</plugin>
       		</plugins>
      	</pluginManagement>
