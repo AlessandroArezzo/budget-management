@@ -19,7 +19,8 @@ public class ClientMongoRepository implements ClientRepository{
 	private static final String FIELD_PK="_id";
 	private static final String FIELD_IDENTIFIER="identifier";
 
-	public ClientMongoRepository(MongoClient client, ClientSession clientSession, String balanceDbName, String clientCollectionName) {
+	public ClientMongoRepository(MongoClient client, ClientSession clientSession, String balanceDbName, 
+			String clientCollectionName) {
 		clientCollection = client.getDatabase(balanceDbName).getCollection(clientCollectionName);
 		this.clientSession=clientSession;
 	}
