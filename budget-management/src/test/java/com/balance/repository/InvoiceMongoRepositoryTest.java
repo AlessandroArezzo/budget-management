@@ -87,7 +87,7 @@ public class InvoiceMongoRepositoryTest {
 	
 	@Test
 	public void testFindAllInvoicesWhenDatabaseIsEmpty() {
-		assertThat(invoiceRepository.findAll().isEmpty());
+		assertThat(invoiceRepository.findAll()).isEmpty();
 	}
 	
 	@Test

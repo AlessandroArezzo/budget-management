@@ -30,6 +30,16 @@
    		**/model/*.*,
    	</sonar.coverage.exclusions>
    	
+   	<sonar.issue.ignore.multicriteria>e11</sonar.issue.ignore.multicriteria>
+   	<!--Disable rule for "Boolean expressions should not be gratuitous" in 
+   	classes ClientMongoRepository and InvoiceMongoRepository -->
+   	<sonar.issue.ignore.multicriteria.e11.ruleKey>
+		java:S2589
+	</sonar.issue.ignore.multicriteria.e11.ruleKey>
+	<sonar.issue.ignore.multicriteria.e11.resourceKey>
+		**/ClientMongoRepository.java,
+		**/InvoiceMongoRepository.java
+	</sonar.issue.ignore.multicriteria.e11.resourceKey>
   </properties>
   
   

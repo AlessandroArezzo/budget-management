@@ -16,7 +16,9 @@ import com.mongodb.client.model.Filters;
 public class ClientMongoRepository implements ClientRepository{
 	private MongoCollection<Document> clientCollection;
 	private ClientSession clientSession;
-	
+	private static final String FIELD_PK="_id";
+	private static final String FIELD_IDENTIFIER="identifier";
+
 	public ClientMongoRepository(MongoClient client, ClientSession clientSession, String balanceDbName, String clientCollectionName) {
 		clientCollection = client.getDatabase(balanceDbName).getCollection(clientCollectionName);
 		this.clientSession=clientSession;
@@ -27,21 +29,22 @@ public class ClientMongoRepository implements ClientRepository{
 	}
 	
 	private Client fromDocumentToClient(Document d) { 
-		return new Client(""+d.get("_id"), 
-				""+d.get("identifier"));
+		return new Client(""+d.get(FIELD_PK), 
+				""+d.get(FIELD_IDENTIFIER));
 	}
 
 	@Override
 	public List<Client> findAll() {
 		return StreamSupport.
 				stream(clientCollection.find(clientSession).spliterator(), false) 
-				.map(d -> fromDocumentToClient(d))
+				.map(d -> new Client(""+d.get(FIELD_PK), 
+						""+d.get(FIELD_IDENTIFIER)))
 				.collect(Collectors.toList());
 	}
 
 	@Override
 	public Client findById(String id) {
-		Document d = clientCollection.find(clientSession,Filters.eq("_id", new ObjectId(id))).first(); 
+		Document d = clientCollection.find(clientSession,Filters.eq(FIELD_PK, new ObjectId(id))).first(); 
 		if (d != null)
 			return fromDocumentToClient(d); 
 		return null;
@@ -49,12 +52,12 @@ public class ClientMongoRepository implements ClientRepository{
 
 	@Override
 	public void save(Client newClient) {
-	   clientCollection.insertOne(clientSession,new Document().append("identifier", newClient.getIdentifier()));
+	   clientCollection.insertOne(clientSession,new Document().append(FIELD_IDENTIFIER, newClient.getIdentifier()));
 	}
 
 	@Override
 	public void delete(String id) {
-		clientCollection.deleteOne(Filters.eq("_id", new ObjectId(id)));
+		clientCollection.deleteOne(Filters.eq(FIELD_PK, new ObjectId(id)));
 	}
 	
 	
