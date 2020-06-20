@@ -21,7 +21,7 @@ public class InvoiceServiceTransactional implements InvoiceService{
 	public List<Invoice> findAllInvoices() {
 		return transactionManager.doInTransaction(
 				factory -> { 
-					InvoiceRepository invoiceRepository=factory.createRepository(TypeRepository.INVOICE);
+					InvoiceRepository invoiceRepository=(InvoiceRepository) factory.createRepository(TypeRepository.INVOICE);
 				    return invoiceRepository.findAll();
 		});
 	}

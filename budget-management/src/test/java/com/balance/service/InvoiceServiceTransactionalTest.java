@@ -3,6 +3,7 @@ package com.balance.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalAnswers.answer;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -61,7 +62,8 @@ public class InvoiceServiceTransactionalTest {
 		MockitoAnnotations.initMocks(this); 
 		when(transactionManager.doInTransaction(
 				any())).thenAnswer(answer((TransactionCode<?> code) -> code.apply(repositoryFactory)));
-		when(repositoryFactory.createRepository(TypeRepository.INVOICE)).thenReturn(invoiceRepository);
+		doReturn(invoiceRepository).when(repositoryFactory).createRepository(TypeRepository.INVOICE);
+
 	}
 	
 	@Test

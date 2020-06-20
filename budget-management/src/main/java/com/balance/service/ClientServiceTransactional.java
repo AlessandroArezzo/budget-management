@@ -19,7 +19,7 @@ public class ClientServiceTransactional implements ClientService {
 	public List<Client> findAllClients() {
 		return transactionManager.doInTransaction(
 			factory -> { 
-				ClientRepository clientRepository=factory.createRepository(TypeRepository.CLIENT);
+				ClientRepository clientRepository=(ClientRepository) factory.createRepository(TypeRepository.CLIENT);
 			    return clientRepository.findAll();
 			});
 	}
