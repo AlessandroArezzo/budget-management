@@ -1,4 +1,4 @@
-package com.balance.repository;
+package com.balance.repository.mongodb;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,6 +8,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import com.balance.model.Client;
+import com.balance.repository.ClientRepository;
 import com.mongodb.MongoClient;
 import com.mongodb.client.ClientSession;
 import com.mongodb.client.MongoCollection;

@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.testcontainers.containers.GenericContainer;
 
 import com.balance.model.Client;
+import com.balance.repository.mongodb.ClientMongoRepository;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;

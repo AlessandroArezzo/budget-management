@@ -1,4 +1,4 @@
-package com.balance.repository;
+package com.balance.repository.mongodb;
 
 import java.util.Date;
 import java.util.List;
@@ -9,6 +9,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import com.balance.model.Invoice;
+import com.balance.repository.InvoiceRepository;
 import com.mongodb.DBRef;
 import com.mongodb.MongoClient;
 import com.mongodb.client.ClientSession;

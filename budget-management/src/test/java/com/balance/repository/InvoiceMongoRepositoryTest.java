@@ -27,6 +27,8 @@ import org.testcontainers.containers.GenericContainer;
 
 import com.balance.model.Client;
 import com.balance.model.Invoice;
+import com.balance.repository.mongodb.ClientMongoRepository;
+import com.balance.repository.mongodb.InvoiceMongoRepository;
 import com.mongodb.DBRef;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
