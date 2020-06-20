@@ -28,7 +28,8 @@
     
     <sonar.coverage.exclusions>
    		**/model/*.*,
-   		**/app/swing/*.*
+   		**/app/swing/*.*,
+   		**/repository/mongodb/RepositoryMongoFactory.java
    	</sonar.coverage.exclusions>
    	
    	<sonar.issue.ignore.multicriteria>e1 , e2, e3 </sonar.issue.ignore.multicriteria>
@@ -200,6 +201,7 @@
 						<excludes>
 							<exclude>**/model/*.*</exclude>
 							<exclude>**/app/swing/*.*</exclude>
+							<exclude>**/repository/mongodb/RepositoryMongoFactory.java</exclude>
 						</excludes>
 					</configuration>
 					<executions>
@@ -225,6 +227,7 @@
 			            <param>com.balance.model.*</param>
 			            <param>com.balance.app.swing.*</param>
 			            <param>com.balance.view.swing.*</param>
+			            <param>com.balance.repository.mongodb.RepositoryMongoFactory</param>
 			        </excludedClasses>
 			         <targetTests>
 			            <param>com.balance.*</param>
