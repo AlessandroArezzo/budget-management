@@ -6,8 +6,10 @@ import com.balance.model.Invoice;
 
 public interface InvoiceService {
 
-	List<Invoice> findAllInvoicesByYear(int year);
+	public List<Invoice> findAllInvoicesByYear(int year);
 
-	double getTotalRevenueByYear(int year);
+	public double getTotalRevenueByYear(int year);
+	
+	public List<Invoice> findAllInvoices();
 
 }

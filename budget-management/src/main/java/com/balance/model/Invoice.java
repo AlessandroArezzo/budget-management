@@ -78,4 +78,5 @@ public class Invoice extends BaseEntity{
 				+ " data="+date.toString()+","
 				+ " ricavo="+revenue+"€";
 	}
+
 }
