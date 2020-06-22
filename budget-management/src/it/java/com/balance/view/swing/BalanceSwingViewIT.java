@@ -114,7 +114,7 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		invoiceRepository.save(invoice2);
 		invoiceRepository.save(invoice3);
 		GuiActionRunner.execute( 
-				() -> balanceController.allInvoiceByYear(YEAR_FIXTURE) 
+				() -> balanceController.allInvoicesByYear(YEAR_FIXTURE) 
 		);
 		assertThat(window.list("invoicesList").contents())
 			.containsExactly(invoice1.toString(),invoice2.toString());

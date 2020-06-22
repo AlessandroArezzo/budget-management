@@ -53,7 +53,7 @@ public class BalanceControllerTest {
 	public void testAllInvoicesByYear() {
 		List<Invoice> invoices = Arrays.asList(new Invoice());
 		when(invoiceService.findAllInvoicesByYear(YEAR_FIXTURE)).thenReturn(invoices);
-		balanceController.allInvoiceByYear(YEAR_FIXTURE);
+		balanceController.allInvoicesByYear(YEAR_FIXTURE);
 		verify(balanceView).showInvoices(invoices);
 	}
 	

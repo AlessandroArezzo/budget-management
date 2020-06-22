@@ -19,7 +19,7 @@ public class BalanceController {
 		balanceView.showClients(clientService.findAllClients());
 	}
 
-	public void allInvoiceByYear(int year) {
+	public void allInvoicesByYear(int year) {
 		balanceView.showInvoices(invoiceService.findAllInvoicesByYear(year));
 	}
 
