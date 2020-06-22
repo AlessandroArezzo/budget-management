@@ -35,7 +35,7 @@ public class BalanceSwingApp implements Callable<Void>{
 	@Option(names= { "--collection-clients-name" }, description= "Collection clients name")
 	private String collectionClientsName = "client";
 	
-	@Option(names= { "--collection-invoces-name" }, description= "Collection invoices name")
+	@Option(names= { "--collection-invoices-name" }, description= "Collection invoices name")
 	private String collectionInvoicesName = "invoices";
 	
 	

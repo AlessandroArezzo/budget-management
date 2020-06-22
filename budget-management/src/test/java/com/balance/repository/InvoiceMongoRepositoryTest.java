@@ -197,7 +197,6 @@ public class InvoiceMongoRepositoryTest {
 	}
 	
 	private List<Invoice> readAllInvoicesFromDatabase() {
-		
 		return StreamSupport.stream(invoiceCollection.find().spliterator(), false).
 				map(d -> new Invoice((""+d.get(FIELD_PK)),
 						clientRepository.findById(((DBRef) d.get(FIELD_CLIENT)).getId().toString()),
