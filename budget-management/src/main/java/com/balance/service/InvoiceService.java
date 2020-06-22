@@ -8,7 +8,7 @@ public interface InvoiceService {
 
 	public List<Invoice> findAllInvoicesByYear(int year);
 
-	public double getTotalRevenueByYear(int year);
+	public double getTotalRevenueOfAnYear(int year);
 	
 	public List<Invoice> findAllInvoices();
 

@@ -61,7 +61,7 @@ public class BalanceControllerTest {
 	
 	@Test
 	public void testAnnualRevenue() {
-		when(invoiceService.getTotalRevenueByYear(YEAR_FIXTURE)).thenReturn(TOTAL_REVENUE_FIXTURE);
+		when(invoiceService.getTotalRevenueOfAnYear(YEAR_FIXTURE)).thenReturn(TOTAL_REVENUE_FIXTURE);
 		balanceController.annualRevenue(YEAR_FIXTURE);
 		verify(balanceView).setAnnualTotalRevenue(YEAR_FIXTURE,TOTAL_REVENUE_FIXTURE);
 	}

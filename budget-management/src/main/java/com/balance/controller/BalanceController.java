@@ -25,6 +25,6 @@ public class BalanceController {
 
 	public void annualRevenue(int year) {
 		balanceView.setAnnualTotalRevenue(year, 
-				invoiceService.getTotalRevenueByYear(year));
+				invoiceService.getTotalRevenueOfAnYear(year));
 	}
 }
