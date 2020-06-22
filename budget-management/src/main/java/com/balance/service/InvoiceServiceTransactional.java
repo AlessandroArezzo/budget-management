@@ -14,15 +14,6 @@ public class InvoiceServiceTransactional implements InvoiceService{
 	public InvoiceServiceTransactional(TransactionManager transactionManager) {
 		this.transactionManager=transactionManager;
 	}
-
-	@Override
-	public List<Invoice> findAllInvoices() {
-		return transactionManager.doInTransaction(
-				factory -> { 
-					InvoiceRepository invoiceRepository=(InvoiceRepository) factory.createRepository(TypeRepository.INVOICE);
-				    return invoiceRepository.findAll();
-		});
-	}
 	
 	@Override
 	public List<Invoice> findAllInvoicesByYear(int year) {

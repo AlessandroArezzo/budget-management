@@ -37,6 +37,11 @@ public class InvoiceMongoRepositoryTest {
 	private static final String CLIENT_COLLECTION_NAME = "client";
 	private static final String INVOICE_COLLECTION_NAME = "invoice";
 
+	private static final String FIELD_PK="_id";
+	private static final String FIELD_CLIENT="client";
+	private static final String FIELD_DATE="date";
+	private static final String FIELD_REVENUE="revenue";
+	
 	private static final Client CLIENT_FIXTURE_1=
 			new Client(new ObjectId().toString(), "test identifier 1"); 
 	private static final Client CLIENT_FIXTURE_2=
@@ -52,7 +57,7 @@ public class InvoiceMongoRepositoryTest {
 	@ClassRule
 	public static final GenericContainer mongo = new GenericContainer("mongo:4.2.3") .withExposedPorts(27017) .withCommand("--replSet rs0");
 	
-	private MongoClient client;
+	private MongoClient mongoClient;
 	private MongoCollection<Document> invoiceCollection;
 
 
@@ -72,18 +77,18 @@ public class InvoiceMongoRepositoryTest {
 	
 	@Before
 	public void setup() { 
-		client = new MongoClient(new ServerAddress(mongo.getContainerIpAddress(), mongo.getMappedPort(27017)));	
-		invoiceRepository = new InvoiceMongoRepository(client, client.startSession(),
+		mongoClient = new MongoClient(new ServerAddress(mongo.getContainerIpAddress(), mongo.getMappedPort(27017)));	
+		invoiceRepository = new InvoiceMongoRepository(mongoClient, mongoClient.startSession(),
 				BUDGET_DB_NAME, INVOICE_COLLECTION_NAME, clientRepository);
 		MockitoAnnotations.initMocks(this);
-		MongoDatabase database = client.getDatabase(BUDGET_DB_NAME);
+		MongoDatabase database = mongoClient.getDatabase(BUDGET_DB_NAME);
 		database.drop();
 		invoiceCollection = database.getCollection(INVOICE_COLLECTION_NAME);
 	}
 	
 	@After
 	public void tearDown() { 
-		client.close();
+		mongoClient.close();
 	}
 	
 	@Test
@@ -93,13 +98,13 @@ public class InvoiceMongoRepositoryTest {
 	
 	@Test
 	public void testFindAllWhenDatabaseIsNotEmpty() {
-		String idInvoiceTest1=addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_YEAR_FIXTURE , 10);
-		String idInvoiceTest2=addTestInvoiceToDatabase(CLIENT_FIXTURE_2.getId(), DATE_OF_THE_YEAR_FIXTURE, 20);
+		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_YEAR_FIXTURE , 10);
+		addTestInvoiceToDatabase(CLIENT_FIXTURE_2.getId(), DATE_OF_THE_YEAR_FIXTURE, 20);
 		when(clientRepository.findById(CLIENT_FIXTURE_1.getId())).thenReturn(CLIENT_FIXTURE_1);
 		when(clientRepository.findById(CLIENT_FIXTURE_2.getId())).thenReturn(CLIENT_FIXTURE_2);
 		assertThat(invoiceRepository.findAll())
-			.containsExactly(new Invoice(idInvoiceTest1,CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 10 ),
-			new Invoice(idInvoiceTest2,CLIENT_FIXTURE_2, DATE_OF_THE_YEAR_FIXTURE, 20));
+			.containsExactly(new Invoice(CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 10 ),
+			new Invoice(CLIENT_FIXTURE_2, DATE_OF_THE_YEAR_FIXTURE, 20));
 	}
 	
 	@Test
@@ -113,7 +118,7 @@ public class InvoiceMongoRepositoryTest {
 		addTestInvoiceToDatabase(CLIENT_FIXTURE_2.getId(), DATE_OF_THE_YEAR_FIXTURE, 20);
 		when(clientRepository.findById(CLIENT_FIXTURE_1.getId())).thenReturn(CLIENT_FIXTURE_1);
 		assertThat(invoiceRepository.findById(idInvoiceTest1)).isEqualTo(
-				new Invoice(idInvoiceTest1,CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 10 ));
+				new Invoice(CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 10 ));
 	}
 	
 	@Test
@@ -121,11 +126,10 @@ public class InvoiceMongoRepositoryTest {
 		Invoice invoice = new Invoice(CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 10 );
 		when(clientRepository.findById(CLIENT_FIXTURE_1.getId())).thenReturn(CLIENT_FIXTURE_1);
 		when(clientRepository.getClientCollection())
-			.thenReturn(client.getDatabase(BUDGET_DB_NAME).getCollection(CLIENT_COLLECTION_NAME));
+			.thenReturn(mongoClient.getDatabase(BUDGET_DB_NAME).getCollection(CLIENT_COLLECTION_NAME));
 		invoiceRepository.save(invoice);
-		List<Invoice> invoicesInDatabase=readAllInvoicesFromDatabase();
-		assertThat(invoicesInDatabase).containsExactly(new Invoice(
-				invoicesInDatabase.get(0).getId(),CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 10 ));
+		assertThat(readAllInvoicesFromDatabase()).containsExactly(new Invoice(
+				CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 10 ));
 	}
 	
 	@Test
@@ -195,21 +199,21 @@ public class InvoiceMongoRepositoryTest {
 	private List<Invoice> readAllInvoicesFromDatabase() {
 		
 		return StreamSupport.stream(invoiceCollection.find().spliterator(), false).
-				map(d -> new Invoice((""+d.get("_id")),
-						clientRepository.findById(((DBRef) d.get("client")).getId().toString()),
-						 (Date) d.get("date"),
-						 Double.parseDouble(""+d.get("revenue")))).
+				map(d -> new Invoice((""+d.get(FIELD_PK)),
+						clientRepository.findById(((DBRef) d.get(FIELD_CLIENT)).getId().toString()),
+						 (Date) d.get(FIELD_DATE),
+						 Double.parseDouble(""+d.get(FIELD_REVENUE)))).
 				collect(Collectors.toList());		
 	}
 	
 	private String addTestInvoiceToDatabase(String clientId, Date data, double revenue) {
-		Document invoiceToAdd=new Document().append("client",
+		Document invoiceToAdd=new Document().append(FIELD_CLIENT,
 				 new DBRef(CLIENT_COLLECTION_NAME,
 					 		new ObjectId(clientId)))
-			 .append("date", data)
-			 .append("revenue", revenue);
+			 .append(FIELD_DATE, data)
+			 .append(FIELD_REVENUE, revenue);
 		invoiceCollection.insertOne(invoiceToAdd);
-		return invoiceToAdd.get( "_id" ).toString();
+		return invoiceToAdd.get( FIELD_PK ).toString();
 	}
 	
 }

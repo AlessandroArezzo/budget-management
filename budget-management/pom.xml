@@ -25,7 +25,7 @@
     <jacoco.version>0.8.5</jacoco.version>
     <coveralls.version>4.3.0</coveralls.version>
     <pittest.version>1.4.10</pittest.version>
-    
+    <docker-maven-plugin.version>0.33.0</docker-maven-plugin.version>
     <sonar.coverage.exclusions>
    		**/model/*.*,
    		**/app/swing/*.*,
@@ -58,7 +58,8 @@
 		java:S2699
 	</sonar.issue.ignore.multicriteria.e3.ruleKey>
 	<sonar.issue.ignore.multicriteria.e3.resourceKey>
-		**/BalanceSwingViewTest.java
+		**/BalanceSwingViewTest.java,
+		**/BalanceSwingViewIT.java
 	</sonar.issue.ignore.multicriteria.e3.resourceKey>
 	<!--Disable rule for "Anonymous inner classes containing only one method should become lambdas"
 	 in TransactionMongoManager-->
@@ -192,6 +193,57 @@
 			    	</execution>
 			 	 </executions>
 			</plugin>
+			<plugin>
+				<groupId>io.fabric8</groupId> 
+				<artifactId>docker-maven-plugin</artifactId> 
+				<version>${docker-maven-plugin.version}</version>
+				<configuration>
+				<removeVolumes>true</removeVolumes>
+				 	<images>
+				 		<image>
+							<name>mongo</name>
+							<run>
+								<volumes>
+		                            <bind>
+		                                <volume>
+		                                	${project.basedir}/src/it/resources/docker:/script
+		                                </volume>
+		                            </bind>
+		                        </volumes>
+								<cmd>--replSet rs0</cmd>
+					         	 <ports>
+					         	 	<port> 27017:27017 </port>
+					         	 </ports>
+					         	 <wait>
+				                      <log>waiting for connections on port</log>
+				                      <time>45000</time>
+				                      <shutdown>5000</shutdown>
+				                      <kill>1000</kill>
+				                      <exec>
+			                      		 <postStart>sh /script/init_replicaSet.sh</postStart>
+				                      </exec>
+			                     </wait>
+			                  </run>
+				 		</image>
+				 	</images>
+				 </configuration>
+				  <executions>
+					<execution>
+						<id>docker:start</id> 
+						<phase>pre-integration-test</phase> 
+						<goals>
+							<goal>start</goal>
+						 </goals>
+				    </execution>
+				    <execution>
+						<id>docker:stop</id> 
+						<phase>post-integration-test</phase> 
+						<goals>
+							<goal>stop</goal> 
+						</goals>
+				    </execution>
+			  </executions>
+			</plugin>
 		</plugins>
 		
 		<pluginManagement>
@@ -242,6 +294,7 @@
 			        </targetTests>
 			        <excludedTestClasses>
 		              <param>com.balance.view.swing.*</param>
+		              <param>**.*IT</param>
 		            </excludedTestClasses>
 					<mutators>
 						<mutator>DEFAULTS</mutator> 

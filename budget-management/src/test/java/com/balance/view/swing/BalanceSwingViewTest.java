@@ -32,15 +32,15 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 	private BalanceController balanceController;
 	
 	private static final Client CLIENT_FIXTURE_1=
-			new Client(new ObjectId().toString(), "test identifier 1"); 
+			new Client("test identifier 1"); 
 	private static final Client CLIENT_FIXTURE_2=
-			new Client(new ObjectId().toString(), "test identifier 2"); 
+			new Client("test identifier 2"); 
 	
 	private static final Invoice INVOICE_FIXTURE_1=
-			new Invoice(new ObjectId().toString(), CLIENT_FIXTURE_1, new Date(), 10);
+			new Invoice(CLIENT_FIXTURE_1, new Date(), 10);
 	
 	private static final Invoice INVOICE_FIXTURE_2=
-			new Invoice(new ObjectId().toString(), CLIENT_FIXTURE_2, new Date(), 20);
+			new Invoice(CLIENT_FIXTURE_2, new Date(), 20);
 	
 	@Override
 	protected void onSetUp() {
@@ -75,7 +75,6 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 	
 	@Test @GUITest
 	public void testsShowAllInvoicesShouldAddInvoicesDescriptionsToTheInvoicesList(){ 
-		
 		GuiActionRunner.execute(() -> 
 			balanceSwingView.showInvoices(Arrays.asList(INVOICE_FIXTURE_1, INVOICE_FIXTURE_2)) 
 		);

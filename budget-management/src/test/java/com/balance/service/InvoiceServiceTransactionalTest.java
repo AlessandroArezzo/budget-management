@@ -53,14 +53,6 @@ public class InvoiceServiceTransactionalTest {
 
 	}
 	
-	@Test
-	public void testFindAllInvoices() {
-		List<Invoice> invoices = Arrays.asList(new Invoice());
-		when(invoiceRepository.findAll()).thenReturn(invoices);
-		assertThat(invoiceService.findAllInvoices())
-			.isEqualTo(invoices);
-	}
-	
 	
 	@Test
 	public void testFindAllInvoicesByYear() {

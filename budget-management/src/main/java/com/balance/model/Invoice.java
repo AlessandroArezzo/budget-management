@@ -63,20 +63,19 @@ public class Invoice extends BaseEntity{
 		Invoice other = (Invoice) obj;
 		return  Objects.equals(client, other.client)
 				&& Objects.equals(date, other.date)
-				&& Objects.equals(revenue, other.revenue)
-				&& Objects.equals(id, other.id);
+				&& Objects.equals(revenue, other.revenue);
 	}
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, date, client, revenue);
+		return Objects.hash(date, client, revenue);
 	}
 	
 	@Override
 	public String toString() {
-		return "id="+id+", cliente="+client.getIdentifier()+","
-				+ " data="+date.toString()+","
-				+ " ricavo="+revenue+"€";
+		return "Cliente="+client.getIdentifier()+","
+				+ " Data="+date.toString()+","
+				+ " Ricavo="+revenue+"€";
 	}
 
 }

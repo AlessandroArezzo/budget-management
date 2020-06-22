@@ -38,16 +38,16 @@ public class Client extends BaseEntity{
 			return false;
 		
 		Client other = (Client) obj;
-		return Objects.equals(identifier, other.identifier) && Objects.equals(id, other.id);
+		return Objects.equals(identifier, other.identifier);
 	}
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, identifier);
+		return Objects.hash(identifier);
 	}
 	
 	@Override
 	public String toString() {
-		return "id="+id+", cliente="+identifier;
+		return identifier;
 	}
 }

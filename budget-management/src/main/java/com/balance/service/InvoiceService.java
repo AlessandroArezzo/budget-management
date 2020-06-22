@@ -10,6 +10,4 @@ public interface InvoiceService {
 
 	public double getTotalRevenueOfAnYear(int year);
 	
-	public List<Invoice> findAllInvoices();
-
 }
