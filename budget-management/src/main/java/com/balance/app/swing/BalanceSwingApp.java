@@ -32,10 +32,10 @@ public class BalanceSwingApp implements Callable<Void>{
 	@Option(names= { "--db-name" }, description= "Database name")
 	private String databaseName = "balance";
 	
-	@Option(names= { "--collection-name" }, description= "Collection clients name")
+	@Option(names= { "--collection-clients-name" }, description= "Collection clients name")
 	private String collectionClientsName = "client";
 	
-	@Option(names= { "--collection-name" }, description= "Collection invoices name")
+	@Option(names= { "--collection-invoces-name" }, description= "Collection invoices name")
 	private String collectionInvoicesName = "invoices";
 	
 	
