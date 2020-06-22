@@ -32,7 +32,7 @@
    		**/repository/mongodb/RepositoryMongoFactory.java
    	</sonar.coverage.exclusions>
    	
-   	<sonar.issue.ignore.multicriteria>e1 , e2, e3 </sonar.issue.ignore.multicriteria>
+   	<sonar.issue.ignore.multicriteria>e1 , e2, e3, e4 </sonar.issue.ignore.multicriteria>
    	<!--Disable rule for "Boolean expressions should not be gratuitous" in 
    	classes ClientMongoRepository and InvoiceMongoRepository -->
    	<sonar.issue.ignore.multicriteria.e1.ruleKey>
@@ -60,6 +60,14 @@
 	<sonar.issue.ignore.multicriteria.e3.resourceKey>
 		**/BalanceSwingViewTest.java
 	</sonar.issue.ignore.multicriteria.e3.resourceKey>
+	<!--Disable rule for "Anonymous inner classes containing only one method should become lambdas"
+	 in TransactionMongoManager-->
+	<sonar.issue.ignore.multicriteria.e4.ruleKey>
+		squid:S1604
+	</sonar.issue.ignore.multicriteria.e4.ruleKey>
+	<sonar.issue.ignore.multicriteria.e4.resourceKey>
+		**/TransactionMongoManager.java
+	</sonar.issue.ignore.multicriteria.e4.resourceKey>
   </properties>
   
   
@@ -201,7 +209,7 @@
 						<excludes>
 							<exclude>**/model/*.*</exclude>
 							<exclude>**/app/swing/*.*</exclude>
-							<exclude>**/repository/mongodb/RepositoryMongoFactory.java</exclude>
+							<exclude>**/repository/mongodb/RepositoryMongoFactory.*</exclude>
 						</excludes>
 					</configuration>
 					<executions>

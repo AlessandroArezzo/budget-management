@@ -1,5 +1,6 @@
 package com.balance.repository;
 
 public interface RepositoryFactory {
-	public Repository<?> createRepository(TypeRepository type);
+	@SuppressWarnings("rawtypes")
+	public Repository createRepository(TypeRepository type);
 }
