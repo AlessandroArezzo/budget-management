@@ -31,16 +31,16 @@ public class ClientMongoRepository implements ClientRepository{
 	}
 	
 	private Client fromDocumentToClient(Document d) { 
-		return new Client(""+d.get(FIELD_PK), 
-				""+d.get(FIELD_IDENTIFIER));
+		return new Client(d.get(FIELD_PK).toString(), 
+				d.getString(FIELD_IDENTIFIER));
 	}
 
 	@Override
 	public List<Client> findAll() {
 		return StreamSupport.
 				stream(clientCollection.find(clientSession).spliterator(), false) 
-				.map(d -> new Client(""+d.get(FIELD_PK), 
-						""+d.get(FIELD_IDENTIFIER)))
+				.map(d -> new Client(d.get(FIELD_PK).toString(), 
+						d.getString(FIELD_IDENTIFIER)))
 				.collect(Collectors.toList());
 	}
 
@@ -54,7 +54,8 @@ public class ClientMongoRepository implements ClientRepository{
 
 	@Override
 	public void save(Client newClient) {
-	   clientCollection.insertOne(clientSession,new Document().append(FIELD_IDENTIFIER, newClient.getIdentifier()));
+	   clientCollection.insertOne(clientSession,new Document()
+			   .append(FIELD_IDENTIFIER, newClient.getIdentifier()));
 	}
 
 	@Override

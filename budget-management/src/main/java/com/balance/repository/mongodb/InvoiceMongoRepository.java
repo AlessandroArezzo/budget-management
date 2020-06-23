@@ -1,6 +1,6 @@
 package com.balance.repository.mongodb;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -16,7 +16,8 @@ import com.mongodb.DBRef;
 import com.mongodb.MongoClient;
 import com.mongodb.client.ClientSession;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
+import com.mongodb.client.model.Accumulators;
+import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 
 public class InvoiceMongoRepository implements InvoiceRepository{
@@ -37,20 +38,20 @@ public class InvoiceMongoRepository implements InvoiceRepository{
 	}
 	
 	private Invoice fromDocumentToInvoice(Document d) { 
-		return new Invoice((""+d.get(FIELD_PK)),
-				clientRepository.findById(((DBRef) d.get(FIELD_CLIENT)).getId().toString()),
-				 (Date) d.get(FIELD_DATE),
-				 Double.parseDouble(""+d.get(FIELD_REVENUE)));
+		return new Invoice((d.get(FIELD_PK).toString()),
+				 clientRepository.findById(((DBRef) d.get(FIELD_CLIENT)).getId().toString()),
+				 d.getDate(FIELD_DATE),
+				 d.getDouble(FIELD_REVENUE));
 	}
 	
 	@Override
 	public List<Invoice> findAll() {
 		return StreamSupport.
 				stream(invoiceCollection.find(clientSession).spliterator(), false) 
-				.map(d -> new Invoice((""+d.get(FIELD_PK)),
+				.map(d -> new Invoice(d.get(FIELD_PK).toString(),
 						clientRepository.findById(((DBRef) d.get(FIELD_CLIENT)).getId().toString()),
-						 (Date) d.get(FIELD_DATE),
-						 Double.parseDouble(""+d.get(FIELD_REVENUE))))
+						d.getDate(FIELD_DATE),
+						d.getDouble(FIELD_REVENUE)))
 				.collect(Collectors.toList());
 	}
 
@@ -75,41 +76,52 @@ public class InvoiceMongoRepository implements InvoiceRepository{
 	public void delete(String id) {
 		invoiceCollection.deleteOne(Filters.eq(FIELD_PK, new ObjectId(id)));
 	}
-
+	
 	@Override
 	public List<Invoice> findInvoicesByYear(int year) {
-		List<Invoice> invoicesOfYear=new ArrayList<>();
-		MongoCursor<Document> cursor = invoiceCollection.find(clientSession).iterator();
-		while (cursor.hasNext()) {
-			   Document tempInvoice = cursor.next();
-			   if(invoiceIsOfTheYear(tempInvoice,year)) {
-				   invoicesOfYear.add(fromDocumentToInvoice(tempInvoice));
-			   }
-	   }
-	   return invoicesOfYear;
+		return StreamSupport.
+				stream(invoiceCollection.find(clientSession,
+						Filters.and(Filters.gte(FIELD_DATE, getFirstDayOfYear(year)),
+								Filters.lte(FIELD_DATE, getLastDayOfYear(year)))
+						).spliterator(), false) 
+				.map(d -> new Invoice(d.get(FIELD_PK).toString(),
+						clientRepository.findById(((DBRef) d.get(FIELD_CLIENT)).getId().toString()),
+						d.getDate(FIELD_DATE),
+						d.getDouble(FIELD_REVENUE)))
+				.collect(Collectors.toList());
 	}
 
 	@Override
 	public double getTotalRevenueOfAnYear(int year) {
-		double totalRevenue=0;
-		MongoCursor<Document> cursor = invoiceCollection.find(clientSession).iterator();
-		while (cursor.hasNext()) {
-			Document tempInvoice = cursor.next();
-			if(invoiceIsOfTheYear(tempInvoice,year)) {
-				   totalRevenue+=tempInvoice.getDouble(FIELD_REVENUE);
-			   }
-	   }
-		return totalRevenue;
+		Document sumDocument=invoiceCollection.aggregate(
+				  Arrays.asList(
+				          Aggregates.match(Filters.and(Filters.gte(FIELD_DATE, getFirstDayOfYear(year)),
+									Filters.lte(FIELD_DATE, getLastDayOfYear(year)))),
+				          Aggregates.group("",Accumulators.sum("totalRevenue", "$"+FIELD_REVENUE))
+				  )).first();
+		if (sumDocument==null) 
+			return 0;
+		return sumDocument.getDouble("totalRevenue");
 	}
 	
-	private boolean invoiceIsOfTheYear(Document documentInvoice, int year) {
-		boolean invoiceIsOfTheYear=false;
+	private Date getFirstDayOfYear(int year) {
 		Calendar cal = Calendar.getInstance();
-		cal.setTime((Date) documentInvoice.get(FIELD_DATE));
-	    if(cal.get(Calendar.YEAR) == year) {
-	    	invoiceIsOfTheYear=true;
-	    }
-	    return invoiceIsOfTheYear;
+		cal.set(Calendar.YEAR, year);
+		cal.set(Calendar.DAY_OF_YEAR, 1); 
+		cal.set(Calendar.HOUR_OF_DAY, 0); 
+		cal.set(Calendar.MINUTE, 0); 
+		cal.set(Calendar.SECOND, 0); 
+		cal.set(Calendar.MILLISECOND, 0); 
+		return cal.getTime();
 	}
-
+	
+	private Date getLastDayOfYear(int year) {
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.YEAR, year);
+		cal.set(Calendar.MONTH, 11); 
+		cal.set(Calendar.DAY_OF_MONTH, 31);
+		return cal.getTime();
+	}
+	
+	
 }

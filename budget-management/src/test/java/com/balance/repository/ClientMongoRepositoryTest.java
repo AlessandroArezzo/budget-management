@@ -27,6 +27,8 @@ public class ClientMongoRepositoryTest {
 	
 	private static final String BUDGET_DB_NAME = "budget";
 	private static final String CLIENT_COLLECTION_NAME = "client";
+	private static final String FIELD_PK="_id";
+	private static final String FIELD_IDENTIFIER="identifier";
 	
 	@SuppressWarnings("rawtypes")
 	@ClassRule
@@ -35,9 +37,6 @@ public class ClientMongoRepositoryTest {
 	private MongoClient mongoClient;
 	private MongoCollection<Document> clientCollection;
 	private ClientMongoRepository clientRepository; 
-	
-	private static final String FIELD_PK="_id";
-	private static final String FIELD_IDENTIFIER="identifier";
 	
 	@BeforeClass
 	public static void init() throws UnsupportedOperationException, IOException, InterruptedException {
@@ -49,7 +48,8 @@ public class ClientMongoRepositoryTest {
 	
 	@Before
 	public void setup() { 
-		mongoClient = new MongoClient(new ServerAddress(mongo.getContainerIpAddress(), mongo.getMappedPort(27017)));		
+		mongoClient = new MongoClient(new ServerAddress(
+				mongo.getContainerIpAddress(), mongo.getMappedPort(27017)));		
 		clientRepository = new ClientMongoRepository(mongoClient, mongoClient.startSession(), 
 				BUDGET_DB_NAME, CLIENT_COLLECTION_NAME);
 		MongoDatabase database = mongoClient.getDatabase(BUDGET_DB_NAME);
@@ -110,7 +110,7 @@ public class ClientMongoRepositoryTest {
 	
 	private List<Client> readAllClientsFromDatabase() {
 		return StreamSupport.stream(clientCollection.find().spliterator(), false).
-				map(d -> new Client(""+d.get(FIELD_PK), ""+d.get(FIELD_IDENTIFIER))).
+				map(d -> new Client(d.get(FIELD_PK).toString(), d.getString(FIELD_IDENTIFIER))).
 				collect(Collectors.toList());		
 	}
 

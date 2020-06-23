@@ -2,9 +2,6 @@ package com.balance.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Calendar;
-import java.util.Date;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -16,6 +13,7 @@ import com.balance.repository.mongodb.ClientMongoRepository;
 import com.balance.repository.mongodb.InvoiceMongoRepository;
 import com.balance.transaction.TransactionManager;
 import com.balance.transaction.mongodb.TransactionMongoManager;
+import com.balance.utils.DateTestsUtil;
 import com.mongodb.MongoClient;
 import com.mongodb.client.ClientSession;
 
@@ -40,6 +38,7 @@ public class InvoiceMongoRepositoryServiceIT {
 	private static Invoice INVOICE_OF_YEAR_FIXTURE_1;
 	private static Invoice INVOICE_OF_YEAR_FIXTURE_2;
 	private static Invoice INVOICE_OF_NOT_YEAR_FIXTURE;
+
 	
 	@BeforeClass
 	public static void init() {
@@ -54,11 +53,11 @@ public class InvoiceMongoRepositoryServiceIT {
 		CLIENT_FIXTURE_1=clientRepository.findAll().get(0);
 		CLIENT_FIXTURE_2=clientRepository.findAll().get(1);
 		INVOICE_OF_YEAR_FIXTURE_1= new Invoice(CLIENT_FIXTURE_1,
-				getDateFromYear(YEAR_FIXTURE), 10);
+				DateTestsUtil.getDateFromYear(YEAR_FIXTURE), 10);
 		INVOICE_OF_YEAR_FIXTURE_2= new Invoice(CLIENT_FIXTURE_2,
-				getDateFromYear(YEAR_FIXTURE), 20);
+				DateTestsUtil.getDateFromYear(YEAR_FIXTURE), 20);
 		INVOICE_OF_NOT_YEAR_FIXTURE= new Invoice(CLIENT_FIXTURE_2,
-				getDateFromYear(YEAR_FIXTURE-1),30);
+				DateTestsUtil.getDateFromYear(YEAR_FIXTURE-1),30);
 		mongoClient.close();
 	}
 	
@@ -82,7 +81,6 @@ public class InvoiceMongoRepositoryServiceIT {
 		mongoClient.close();
 	}
 	
-
 	@Test
 	public void testFindAllInvoicesByYear() {
 		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_1);
@@ -103,11 +101,5 @@ public class InvoiceMongoRepositoryServiceIT {
 		
 	}
 	
-	
-	private static Date getDateFromYear(int year) {
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.YEAR, year);
-		return cal.getTime();
-	}
 	
 }

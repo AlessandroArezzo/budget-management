@@ -1,5 +1,8 @@
 package com.balance.bdd.steps;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -7,6 +10,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import com.balance.model.Client;
+import com.balance.utils.DateTestsUtil;
 import com.mongodb.DBRef;
 import com.mongodb.MongoClient;
 
@@ -30,23 +34,23 @@ public class DatabaseSteps {
 	static final int YEAR_FIXTURE=2019;
 	
 	static final double INVOICE_OF_THE_YEAR_FIXTURE_1_REVENUE=10.0;
-	static final Date INVOICE_OF_THE_YEAR_FIXTURE_1_DATE=getDateFromYear(YEAR_FIXTURE);
+	static final Date INVOICE_OF_THE_YEAR_FIXTURE_1_DATE=DateTestsUtil.getDateFromYear(YEAR_FIXTURE);
 	static Client INVOICE_OF_THE_YEAR_FIXTURE_1_CLIENT;
 	
 	static final double INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE=20.0;
-	static final Date INVOICE_OF_THE_YEAR_FIXTURE_2_DATE=getDateFromYear(YEAR_FIXTURE);
+	static final Date INVOICE_OF_THE_YEAR_FIXTURE_2_DATE=DateTestsUtil.getDateFromYear(YEAR_FIXTURE);
 	static Client INVOICE_OF_THE_YEAR_FIXTURE_2_CLIENT;
 	
 	static final double INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE=30.0;
-	static final Date INVOICE_OF_THE_YEAR_FIXTURE_3_DATE=getDateFromYear(YEAR_FIXTURE);
+	static final Date INVOICE_OF_THE_YEAR_FIXTURE_3_DATE=DateTestsUtil.getDateFromYear(YEAR_FIXTURE);
 	static Client INVOICE_OF_THE_YEAR_FIXTURE_3_CLIENT;
 	
 	static final double INVOICE_OF_THE_CURRENT_YEAR_1_REVENUE=10.0;
-	static final Date INVOICE_OF_THE_CURRENT_YEAR_1_DATE=getDateFromYear(CURRENT_YEAR);
+	static final Date INVOICE_OF_THE_CURRENT_YEAR_1_DATE=DateTestsUtil.getDateFromYear(CURRENT_YEAR);
 	static Client INVOICE_OF_THE_CURRENT_YEAR_1_CLIENT;
 	
 	static final double INVOICE_OF_THE_CURRENT_YEAR_2_REVENUE=20.0;
-	static final Date INVOICE_OF_THE_CURRENT_YEAR_2_DATE=getDateFromYear(CURRENT_YEAR);
+	static final Date INVOICE_OF_THE_CURRENT_YEAR_2_DATE=DateTestsUtil.getDateFromYear(CURRENT_YEAR);
 	static Client INVOICE_OF_THE_CURRENT_YEAR_2_CLIENT;
 	
 	private MongoClient mongoClient;
@@ -130,10 +134,6 @@ public class DatabaseSteps {
 		mongoClient.getDatabase(DB_NAME).getCollection(COLLECTION_CLIENTS_NAME).insertOne(clientToAdd);
 		return clientToAdd.get( "_id" ).toString();
 	}
+
 	
-	private static Date getDateFromYear(int year) {
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.YEAR, year);
-		return cal.getTime();
-	}
 }
