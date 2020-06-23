@@ -32,44 +32,62 @@
    		**/app/swing/*.*,
    		**/repository/mongodb/RepositoryMongoFactory.java
    	</sonar.coverage.exclusions>
-
-   	<sonar.issue.ignore.multicriteria>e1 , e2, e3, e4 </sonar.issue.ignore.multicriteria>
-   	<!--Disable rule for "Boolean expressions should not be gratuitous" in 
-   	classes ClientMongoRepository and InvoiceMongoRepository -->
-   	<sonar.issue.ignore.multicriteria.e1.ruleKey>
-		squid:S2589
+   	
+	<sonar.issue.ignore.multicriteria>e1,e2,e3,e4,e5,e6</sonar.issue.ignore.multicriteria>
+	
+	<!--Disable rule for "Tests should include assertions" in swing view tests-->
+	<sonar.issue.ignore.multicriteria.e1.ruleKey>
+		squid:S2699
 	</sonar.issue.ignore.multicriteria.e1.ruleKey>
 	<sonar.issue.ignore.multicriteria.e1.resourceKey>
-		**/ClientMongoRepository.java,
-		**/InvoiceMongoRepository.java
+		**/swing/**/*.java
 	</sonar.issue.ignore.multicriteria.e1.resourceKey>
-	 <!--Disable rule for "Inheritance tree of classes should no be to deep" 
-	 and "Local variable and method parameter names should comply with a naming convention" 
-	in BalanceSwingView-->
-    <sonar.issue.ignore.multicriteria.e2.ruleKey>
-		squid:S110,
-		squid:S116,
-		squid:S117
+	
+	<!--Disable rule for "Boolean expressions should not be gratuitous"
+	 in mongo repositories-->
+	<sonar.issue.ignore.multicriteria.e2.ruleKey>
+		squid:S2589
 	</sonar.issue.ignore.multicriteria.e2.ruleKey>
 	<sonar.issue.ignore.multicriteria.e2.resourceKey>
-		**/BalanceSwingView.java
+		**/repository/mongodb/*MongoRepository.java
 	</sonar.issue.ignore.multicriteria.e2.resourceKey>
-	<!--Disable rule for "Tests should include assertions" in BalanceSwingViewTest-->
+	
+	<!--Disable rule for "Fields in a "Serializable class should either be transient or serializable"
+	 in BalanceSwingView-->
 	<sonar.issue.ignore.multicriteria.e3.ruleKey>
-		squid:S2699
+		squid:MaximumInheritanceDepth
 	</sonar.issue.ignore.multicriteria.e3.ruleKey>
 	<sonar.issue.ignore.multicriteria.e3.resourceKey>
-		**/BalanceSwingViewTest.java,
-		**/BalanceSwingViewIT.java
+		**/BalanceSwingView.java
 	</sonar.issue.ignore.multicriteria.e3.resourceKey>
-	<!--Disable rule for "Anonymous inner classes containing only one method should become lambdas"
-	 in TransactionMongoManager-->
+	
+	<!--Disable rule for "Local variable and method parameter names should comply with a naming convention""
+	 in BalanceSwingView-->
 	<sonar.issue.ignore.multicriteria.e4.ruleKey>
-		squid:S1604
+		squid:S00117
 	</sonar.issue.ignore.multicriteria.e4.ruleKey>
 	<sonar.issue.ignore.multicriteria.e4.resourceKey>
-		**/TransactionMongoManager.java
+		**/BalanceSwingView.java
 	</sonar.issue.ignore.multicriteria.e4.resourceKey>
+	
+	<!--Disable rule for "Anonymous inner classes containing only one method should become lambdas"
+	 in TransactionMongoManager-->
+ 	<sonar.issue.ignore.multicriteria.e5.ruleKey>
+		squid:S1604
+	</sonar.issue.ignore.multicriteria.e5.ruleKey>
+	<sonar.issue.ignore.multicriteria.e5.resourceKey>
+		**/TransactionMongoManager.java
+	</sonar.issue.ignore.multicriteria.e5.resourceKey>  
+	
+		<!--Disable rule for "Conditionally executed blocks should be reachables"
+	 in InvoiceMongoRepository. Is a false positive-->
+ 	<sonar.issue.ignore.multicriteria.e6.ruleKey>
+		squid:S2583
+	</sonar.issue.ignore.multicriteria.e6.ruleKey>
+	<sonar.issue.ignore.multicriteria.e6.resourceKey>
+		**/InvoiceMongoRepository.java
+	</sonar.issue.ignore.multicriteria.e6.resourceKey> 
+	
   </properties>
   
   

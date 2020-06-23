@@ -26,7 +26,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 
 	private static final long serialVersionUID = 1L;
 
-	private BalanceController balanceController;
+	private transient BalanceController balanceController;
 	
 	private JPanel contentPane;
 	private JList<?> listClients;
