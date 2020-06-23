@@ -3,6 +3,8 @@ Project developed for the advanced programming techniques exam of the university
 
 [![Build Status](https://travis-ci.com/AlessandroArezzo/budget-management.svg?branch=master)](https://travis-ci.com/AlessandroArezzo/budget-management)
 
+[![Coverage Status](https://coveralls.io/repos/github/AlessandroArezzo/budget-management/badge.svg?branch=master)](https://coveralls.io/github/AlessandroArezzo/budget-management?branch=master)
+
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com%3Abudget-management&metric=alert_status)](https://sonarcloud.io/dashboard?id=com%3Abudget-management)
 
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=com%3Abudget-management&metric=bugs)](https://sonarcloud.io/dashboard?id=com%3Abudget-management)
