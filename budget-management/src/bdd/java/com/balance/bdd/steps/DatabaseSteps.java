@@ -20,11 +20,11 @@ public class DatabaseSteps {
 	static final String COLLECTION_INVOICES_NAME = "test-invoices-collection";
 	
 	static final String CLIENT_FIXTURE_1_IDENTIFIER="first client";
-	String CLIENT_FIXTURE_1_ID;
+	static String CLIENT_FIXTURE_1_ID;
 	static final String CLIENT_FIXTURE_2_IDENTIFIER="second client";
-	String CLIENT_FIXTURE_2_ID;
+	static String CLIENT_FIXTURE_2_ID;
 	static final String CLIENT_FIXTURE_3_IDENTIFIER="third client";
-	String CLIENT_FIXTURE_3_ID;
+	static String CLIENT_FIXTURE_3_ID;
 	
 	static final int CURRENT_YEAR=2020;
 	static final int YEAR_FIXTURE=2019;

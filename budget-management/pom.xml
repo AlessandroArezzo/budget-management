@@ -301,6 +301,7 @@
 			        <excludedTestClasses>
 		              <param>com.balance.view.swing.*</param>
 		              <param>**.*IT</param>
+		              <param>**/*BDD</param>
 		            </excludedTestClasses>
 					<mutators>
 						<mutator>DEFAULTS</mutator> 
