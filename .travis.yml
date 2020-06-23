@@ -1,10 +1,15 @@
 language: java
 
+dist: xenial
+
 jdk: openjdk8
 
+services:
+   - xvbf
+   
 env:
    global:
-      - ACTIVE_PROFILES="-Pjacoco" ADDITIONAL_MAVEN_ARGS="sonar:sonar"
+      - ACTIVE_PROFILES="-Pjacoco,mutation-testing" ADDITIONAL_MAVEN_ARGS="coveralls:report sonar:sonar"
    
 addons:
    sonarcloud:

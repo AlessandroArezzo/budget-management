@@ -1,5 +1,7 @@
 package com.balance.model;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 
@@ -35,11 +37,15 @@ public class Invoice extends BaseEntity{
 	public Date getDate() {
 		return date;
 	}
+	
+	public String getDateInString() {
+		final DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+		return formatter.format(this.date);
+	}
 
 	public double getRevenue() {
 		return revenue;
 	}
-	
 	
 	public void setClient(Client client) {
 		this.client = client;
@@ -63,19 +69,19 @@ public class Invoice extends BaseEntity{
 		Invoice other = (Invoice) obj;
 		return  Objects.equals(client, other.client)
 				&& Objects.equals(date, other.date)
-				&& Objects.equals(revenue, other.revenue)
-				&& Objects.equals(id, other.id);
+				&& Objects.equals(revenue, other.revenue);
 	}
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, date, client, revenue);
+		return Objects.hash(date, client, revenue);
 	}
 	
 	@Override
 	public String toString() {
-		return "id="+id+", cliente="+client.getIdentifier()+","
-				+ " data="+date.toString()+","
-				+ " ricavo="+revenue+"€";
+		return "Cliente="+client.getIdentifier()+","
+				+ " Data="+getDateInString()+","
+				+ " Ricavo="+revenue+"€";
 	}
+
 }

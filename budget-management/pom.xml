@@ -15,16 +15,61 @@
     <junit.version>4.13</junit.version>
     <mockito.version>3.3.3</mockito.version>
     <assertj-swing.version>3.9.2</assertj-swing.version>
+    <testcontainers.version>1.14.3</testcontainers.version>
+    <logback-classic.version>1.2.3</logback-classic.version>
+    <mongo-java-driver.version>3.12.5</mongo-java-driver.version>
+    <mongo-java-server.version>1.29.1</mongo-java-server.version>
+    <picocli.version>4.3.0</picocli.version>
     
     <!-- Plugin version -->
     <sonarqube.version>3.7.0.1746</sonarqube.version>
     <jacoco.version>0.8.5</jacoco.version>
     <coveralls.version>4.3.0</coveralls.version>
-    
+    <pittest.version>1.4.10</pittest.version>
+    <docker-maven-plugin.version>0.33.0</docker-maven-plugin.version>
     <sonar.coverage.exclusions>
    		**/model/*.*,
+   		**/app/swing/*.*,
+   		**/repository/mongodb/RepositoryMongoFactory.java
    	</sonar.coverage.exclusions>
-   	
+
+   	<sonar.issue.ignore.multicriteria>e1 , e2, e3, e4 </sonar.issue.ignore.multicriteria>
+   	<!--Disable rule for "Boolean expressions should not be gratuitous" in 
+   	classes ClientMongoRepository and InvoiceMongoRepository -->
+   	<sonar.issue.ignore.multicriteria.e1.ruleKey>
+		squid:S2589
+	</sonar.issue.ignore.multicriteria.e1.ruleKey>
+	<sonar.issue.ignore.multicriteria.e1.resourceKey>
+		**/ClientMongoRepository.java,
+		**/InvoiceMongoRepository.java
+	</sonar.issue.ignore.multicriteria.e1.resourceKey>
+	 <!--Disable rule for "Inheritance tree of classes should no be to deep" 
+	 and "Local variable and method parameter names should comply with a naming convention" 
+	in BalanceSwingView-->
+    <sonar.issue.ignore.multicriteria.e2.ruleKey>
+		squid:S110,
+		squid:S116,
+		squid:S117
+	</sonar.issue.ignore.multicriteria.e2.ruleKey>
+	<sonar.issue.ignore.multicriteria.e2.resourceKey>
+		**/BalanceSwingView.java
+	</sonar.issue.ignore.multicriteria.e2.resourceKey>
+	<!--Disable rule for "Tests should include assertions" in BalanceSwingViewTest-->
+	<sonar.issue.ignore.multicriteria.e3.ruleKey>
+		squid:S2699
+	</sonar.issue.ignore.multicriteria.e3.ruleKey>
+	<sonar.issue.ignore.multicriteria.e3.resourceKey>
+		**/BalanceSwingViewTest.java,
+		**/BalanceSwingViewIT.java
+	</sonar.issue.ignore.multicriteria.e3.resourceKey>
+	<!--Disable rule for "Anonymous inner classes containing only one method should become lambdas"
+	 in TransactionMongoManager-->
+	<sonar.issue.ignore.multicriteria.e4.ruleKey>
+		squid:S1604
+	</sonar.issue.ignore.multicriteria.e4.ruleKey>
+	<sonar.issue.ignore.multicriteria.e4.resourceKey>
+		**/TransactionMongoManager.java
+	</sonar.issue.ignore.multicriteria.e4.resourceKey>
   </properties>
   
   
@@ -59,6 +104,33 @@
 			<version>${cucumber.version}</version> 
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId> 
+			<artifactId>testcontainers</artifactId> 
+			<version>${testcontainers.version}</version> 
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId> 
+			<artifactId>logback-classic</artifactId> 
+			<version>${logback-classic.version}</version>
+		</dependency>
+		<dependency>
+	    	  <groupId>de.bwaldvogel</groupId>
+		      <artifactId>mongo-java-server</artifactId>
+		      <version>${mongo-java-server.version}</version>
+		      <scope>test</scope>
+	    </dependency>
+	    <dependency>
+			<groupId>org.mongodb</groupId> 
+			<artifactId>mongo-java-driver</artifactId> 
+			<version>${mongo-java-driver.version}</version>
+		</dependency>
+		<dependency>
+		  	<groupId>info.picocli</groupId>
+		  	<artifactId>picocli</artifactId>
+		  	<version>${picocli.version}</version>
+		  </dependency>
 	</dependencies>
 	
 	<build>
@@ -127,6 +199,57 @@
 			    	</execution>
 			 	 </executions>
 			</plugin>
+			<plugin>
+				<groupId>io.fabric8</groupId> 
+				<artifactId>docker-maven-plugin</artifactId> 
+				<version>${docker-maven-plugin.version}</version>
+				<configuration>
+				<removeVolumes>true</removeVolumes>
+				 	<images>
+				 		<image>
+							<name>mongo</name>
+							<run>
+								<volumes>
+		                            <bind>
+		                                <volume>
+		                                	${project.basedir}/src/it/resources/docker:/script
+		                                </volume>
+		                            </bind>
+		                        </volumes>
+								<cmd>--replSet rs0</cmd>
+					         	 <ports>
+					         	 	<port> 27017:27017 </port>
+					         	 </ports>
+					         	 <wait>
+				                      <log>waiting for connections on port</log>
+				                      <time>45000</time>
+				                      <shutdown>5000</shutdown>
+				                      <kill>1000</kill>
+				                      <exec>
+			                      		 <postStart>sh /script/init_replicaSet.sh</postStart>
+				                      </exec>
+			                     </wait>
+			                  </run>
+				 		</image>
+				 	</images>
+				 </configuration>
+				  <executions>
+					<execution>
+						<id>docker:start</id> 
+						<phase>pre-integration-test</phase> 
+						<goals>
+							<goal>start</goal>
+						 </goals>
+				    </execution>
+				    <execution>
+						<id>docker:stop</id> 
+						<phase>post-integration-test</phase> 
+						<goals>
+							<goal>stop</goal> 
+						</goals>
+				    </execution>
+			  </executions>
+			</plugin>
 		</plugins>
 		
 		<pluginManagement>
@@ -143,6 +266,8 @@
 					<configuration>
 						<excludes>
 							<exclude>**/model/*.*</exclude>
+							<exclude>**/app/swing/*.*</exclude>
+							<exclude>**/repository/mongodb/RepositoryMongoFactory.*</exclude>
 						</excludes>
 					</configuration>
 					<executions>
@@ -159,6 +284,31 @@
 					 <artifactId>coveralls-maven-plugin</artifactId> 
 					 <version>${coveralls.version}</version>
 	      		</plugin>
+	      		<plugin>
+				<groupId>org.pitest</groupId>
+				<artifactId>pitest-maven</artifactId>
+				<version>${pittest.version}</version>
+				<configuration>
+					 <excludedClasses>
+			            <param>com.balance.model.*</param>
+			            <param>com.balance.app.swing.*</param>
+			            <param>com.balance.view.swing.*</param>
+			            <param>com.balance.repository.mongodb.RepositoryMongoFactory</param>
+			        </excludedClasses>
+			         <targetTests>
+			            <param>com.balance.*</param>
+			        </targetTests>
+			        <excludedTestClasses>
+		              <param>com.balance.view.swing.*</param>
+		              <param>**.*IT</param>
+		              <param>**.*BDD</param>
+		            </excludedTestClasses>
+					<mutators>
+						<mutator>DEFAULTS</mutator> 
+					</mutators>
+					<mutationThreshold>100</mutationThreshold>
+				</configuration>
+			</plugin>
       		</plugins>
      	</pluginManagement>
 	</build>
@@ -175,5 +325,24 @@
 		      	</plugins>
 		   	</build>
 		  </profile>
+		  <profile>
+	  	<id>mutation-testing</id> 
+		<build>
+	        <plugins>
+	        	<plugin>
+					<groupId>org.pitest</groupId>
+					<artifactId>pitest-maven</artifactId> 
+					<executions>
+						<execution>
+							<goals>
+								<goal>mutationCoverage</goal>
+							</goals>
+							<phase>verify</phase>
+						</execution>
+					</executions>
+				</plugin>
+	      	</plugins>
+	   	</build>
+	  </profile>
 	 </profiles>
 </project>
