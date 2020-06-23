@@ -32,12 +32,12 @@
    		**/app/swing/*.*,
    		**/repository/mongodb/RepositoryMongoFactory.java
    	</sonar.coverage.exclusions>
-   	
+
    	<sonar.issue.ignore.multicriteria>e1 , e2, e3, e4 </sonar.issue.ignore.multicriteria>
    	<!--Disable rule for "Boolean expressions should not be gratuitous" in 
    	classes ClientMongoRepository and InvoiceMongoRepository -->
    	<sonar.issue.ignore.multicriteria.e1.ruleKey>
-		java:S2589
+		squid:S2589
 	</sonar.issue.ignore.multicriteria.e1.ruleKey>
 	<sonar.issue.ignore.multicriteria.e1.resourceKey>
 		**/ClientMongoRepository.java,
@@ -47,16 +47,16 @@
 	 and "Local variable and method parameter names should comply with a naming convention" 
 	in BalanceSwingView-->
     <sonar.issue.ignore.multicriteria.e2.ruleKey>
-		java:S110,
-		java:S116,
-		java:S117
+		squid:S110,
+		squid:S116,
+		squid:S117
 	</sonar.issue.ignore.multicriteria.e2.ruleKey>
 	<sonar.issue.ignore.multicriteria.e2.resourceKey>
 		**/BalanceSwingView.java
 	</sonar.issue.ignore.multicriteria.e2.resourceKey>
 	<!--Disable rule for "Tests should include assertions" in BalanceSwingViewTest-->
 	<sonar.issue.ignore.multicriteria.e3.ruleKey>
-		java:S2699
+		squid:S2699
 	</sonar.issue.ignore.multicriteria.e3.ruleKey>
 	<sonar.issue.ignore.multicriteria.e3.resourceKey>
 		**/BalanceSwingViewTest.java,
@@ -301,7 +301,7 @@
 			        <excludedTestClasses>
 		              <param>com.balance.view.swing.*</param>
 		              <param>**.*IT</param>
-		              <param>**/*BDD</param>
+		              <param>**.*BDD</param>
 		            </excludedTestClasses>
 					<mutators>
 						<mutator>DEFAULTS</mutator> 
