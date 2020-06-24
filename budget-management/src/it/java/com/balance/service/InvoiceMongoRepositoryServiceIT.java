@@ -118,5 +118,22 @@ public class InvoiceMongoRepositoryServiceIT {
 			.containsExactly(YEAR_FIXTURE-1,YEAR_FIXTURE);
 	}
 	
+	@Test
+	public void testFindInvoicesOfAClientAndYear() {
+		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_1);
+		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_2);
+		invoiceRepository.save(INVOICE_OF_PREVIOUS_YEAR_FIXTURE);
+		assertThat(invoiceService.findInvoicesByClientAndYear(CLIENT_FIXTURE_1, YEAR_FIXTURE))
+			.containsExactly(INVOICE_OF_YEAR_FIXTURE_1);
+	}
+	
+	@Test
+	public void testGetAnnualClientRevenue() {
+		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_1);
+		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_2);
+		invoiceRepository.save(INVOICE_OF_PREVIOUS_YEAR_FIXTURE);
+		assertThat(invoiceService.getAnnualClientRevenue(CLIENT_FIXTURE_1, YEAR_FIXTURE))
+			.isEqualTo(INVOICE_OF_YEAR_FIXTURE_1.getRevenue());
+	}
 	
 }
