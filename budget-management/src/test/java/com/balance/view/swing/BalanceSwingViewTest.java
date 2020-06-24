@@ -106,6 +106,17 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 	}
 	
 	@Test @GUITest
+	public void testShowAllInvoicesShouldAddInvoicesDescriptionsToTheInvoicesListAndResetPrevious(){ 
+		GuiActionRunner.execute(() -> {
+				balanceSwingView.getInvoiceListModel().add(0,INVOICE_FIXTURE_1);
+				balanceSwingView.showInvoices(Arrays.asList(INVOICE_FIXTURE_2));
+			}
+		);
+		String[] listContents = window.list("invoicesList").contents(); 
+		assertThat(listContents).containsExactly(INVOICE_FIXTURE_2.toString());
+	}
+	
+	@Test @GUITest
 	public void testSetAnnualTotalRevenueWithoutNoZeroNotSignificant() {
 		GuiActionRunner.execute(() -> 
 				balanceSwingView.setAnnualTotalRevenue(2019,300.55)

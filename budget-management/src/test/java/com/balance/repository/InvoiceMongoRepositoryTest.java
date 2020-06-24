@@ -142,12 +142,12 @@ public class InvoiceMongoRepositoryTest {
 	}
 	
 	@Test
-	public void testFindAllInvoicesByYearWhenDatabaseIsEmpty() {
+	public void testFindInvoicesByYearWhenDatabaseIsEmpty() {
 		assertThat(invoiceRepository.findInvoicesByYear(YEAR_FIXTURE)).isEmpty();
 	}
 	
 	@Test
-	public void testFindAllInvoicesByYearWhenThereAreInvoicesAllSameYearInDatabase() {
+	public void testFindInvoicesByYearWhenThereAreInvoicesAllSameYearInDatabase() {
 		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_YEAR_FIXTURE, 10);
 		addTestInvoiceToDatabase(CLIENT_FIXTURE_2.getId(), DATE_OF_THE_YEAR_FIXTURE, 20);
 		when(clientRepository.findById(CLIENT_FIXTURE_1.getId())).thenReturn(CLIENT_FIXTURE_1);
@@ -168,7 +168,7 @@ public class InvoiceMongoRepositoryTest {
 	}
 	
 	@Test
-	public void testFindAllInvoicesByYearWhenThereAreInvoicesOfLimitDayYearsInDatabase() {
+	public void testFindInvoicesByYearWhenThereAreInvoicesOfLimitDayYearsInDatabase() {
 		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), FIRST_DAY_OF_THE_YEAR_FIXTURE, 10);
 		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), LAST_DAY_OF_THE_YEAR_FIXTURE, 20);
 		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), LAST_DAY_OF_THE_PREVIOUS_YEAR_FIXTURE, 30);

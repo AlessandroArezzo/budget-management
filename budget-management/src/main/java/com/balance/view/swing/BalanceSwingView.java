@@ -1,3 +1,4 @@
+
 package com.balance.view.swing;
 
 import java.awt.Dimension;
@@ -151,6 +152,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 
 	@Override
 	public void showInvoices(List<Invoice> invoices) {
+		invoiceListModel.removeAllElements();
 		invoices.stream().forEach(invoiceListModel::addElement); 
 	}
 
@@ -178,6 +180,10 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 	
 	public DefaultComboBoxModel<Integer> getComboboxYearsModel() {
 		return comboboxYearsModel;
+	}
+	
+	public DefaultListModel<Invoice> getInvoiceListModel() {
+		return invoiceListModel;
 	}
 
 }

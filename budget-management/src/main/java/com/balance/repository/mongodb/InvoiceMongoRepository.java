@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -84,7 +82,7 @@ public class InvoiceMongoRepository implements InvoiceRepository{
 	
 	@Override
 	public List<Invoice> findInvoicesByYear(int year) {
-		return StreamSupport.
+		List<Invoice> invoices= StreamSupport.
 				stream(invoiceCollection.find(clientSession,
 						Filters.and(Filters.gte(FIELD_DATE, getFirstDayOfYear(year)),
 								Filters.lte(FIELD_DATE, getLastDayOfYear(year)))
@@ -94,6 +92,7 @@ public class InvoiceMongoRepository implements InvoiceRepository{
 						d.getDate(FIELD_DATE),
 						d.getDouble(FIELD_REVENUE)))
 				.collect(Collectors.toList());
+		return invoices;
 	}
 
 	@Override

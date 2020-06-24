@@ -37,7 +37,7 @@ public class InvoiceMongoRepositoryServiceIT {
 	
 	private static Invoice INVOICE_OF_YEAR_FIXTURE_1;
 	private static Invoice INVOICE_OF_YEAR_FIXTURE_2;
-	private static Invoice INVOICE_OF_NOT_YEAR_FIXTURE;
+	private static Invoice INVOICE_OF_PREVIOUS_YEAR_FIXTURE;
 
 	
 	@BeforeClass
@@ -56,7 +56,7 @@ public class InvoiceMongoRepositoryServiceIT {
 				DateTestsUtil.getDateFromYear(YEAR_FIXTURE), 10);
 		INVOICE_OF_YEAR_FIXTURE_2= new Invoice(CLIENT_FIXTURE_2,
 				DateTestsUtil.getDateFromYear(YEAR_FIXTURE), 20);
-		INVOICE_OF_NOT_YEAR_FIXTURE= new Invoice(CLIENT_FIXTURE_2,
+		INVOICE_OF_PREVIOUS_YEAR_FIXTURE= new Invoice(CLIENT_FIXTURE_2,
 				DateTestsUtil.getDateFromYear(YEAR_FIXTURE-1),30);
 		mongoClient.close();
 	}
@@ -85,20 +85,37 @@ public class InvoiceMongoRepositoryServiceIT {
 	public void testFindAllInvoicesByYear() {
 		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_1);
 		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_2);
-		invoiceRepository.save(INVOICE_OF_NOT_YEAR_FIXTURE);
+		invoiceRepository.save(INVOICE_OF_PREVIOUS_YEAR_FIXTURE);
 		assertThat(invoiceService.findAllInvoicesByYear(YEAR_FIXTURE)).containsExactly(
 				INVOICE_OF_YEAR_FIXTURE_1,
 				INVOICE_OF_YEAR_FIXTURE_2);
 	}
 	
 	@Test
-	public void testgetTotalRevenueOfAnYear() {
+	public void testGetTotalRevenueOfAnYear() {
 		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_1);
 		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_2);
-		invoiceRepository.save(INVOICE_OF_NOT_YEAR_FIXTURE);
+		invoiceRepository.save(INVOICE_OF_PREVIOUS_YEAR_FIXTURE);
 		assertThat(invoiceService.getTotalRevenueOfAnYear(YEAR_FIXTURE)).isEqualTo(
 				INVOICE_OF_YEAR_FIXTURE_1.getRevenue()+INVOICE_OF_YEAR_FIXTURE_2.getRevenue());
-		
+	}
+	
+	@Test
+	public void testGetYearsOfInvoicesInDatabase() {
+		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_1);
+		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_2);
+		invoiceRepository.save(INVOICE_OF_PREVIOUS_YEAR_FIXTURE);
+		assertThat(invoiceService.getTotalRevenueOfAnYear(YEAR_FIXTURE)).isEqualTo(
+				INVOICE_OF_YEAR_FIXTURE_1.getRevenue()+INVOICE_OF_YEAR_FIXTURE_2.getRevenue());
+	}
+	
+	@Test
+	public void testFindYearsOfTheInvoices() {
+		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_1);
+		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_2);
+		invoiceRepository.save(INVOICE_OF_PREVIOUS_YEAR_FIXTURE);
+		assertThat(invoiceService.findYearsOfTheInvoices())
+			.containsExactly(YEAR_FIXTURE-1,YEAR_FIXTURE);
 	}
 	
 	

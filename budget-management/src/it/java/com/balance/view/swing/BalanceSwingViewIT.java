@@ -8,9 +8,11 @@ import java.util.Date;
 import org.assertj.swing.annotation.GUITest;
 import org.assertj.swing.edt.GuiActionRunner;
 import org.assertj.swing.fixture.FrameFixture;
+import org.assertj.swing.junit.runner.GUITestRunner;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import com.balance.controller.BalanceController;
 import com.balance.model.Client;
@@ -23,12 +25,14 @@ import com.balance.service.InvoiceService;
 import com.balance.service.InvoiceServiceTransactional;
 import com.balance.transaction.TransactionManager;
 import com.balance.transaction.mongodb.TransactionMongoManager;
+import com.balance.utils.DateTestsUtil;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.ClientSession;
 
 import de.bwaldvogel.mongo.MongoServer;
 
+@RunWith(GUITestRunner.class)
 public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 	
 	private static final String DB_NAME="balance";
@@ -41,11 +45,12 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 	private static final int YEAR_FIXTURE=2019;
 	
 	private static final Date DATE_OF_THE_YEAR_FIXTURE=getDateFromYear(YEAR_FIXTURE);
-	private static final Date DATE_NOT_OF_THE_YEAR_FIXTURE=getDateFromYear(YEAR_FIXTURE-1);
+	private static final Date DATE_OF_THE_PREVIOUS_YEAR_FIXTURE=getDateFromYear(YEAR_FIXTURE-1);
+	private static final Date DATE_OF_THE_NEXT_YEAR_FIXTURE=getDateFromYear(YEAR_FIXTURE+1);
 	
 	private static final double INVOICE_REVENUE_1=10.0;
 	private static final double INVOICE_REVENUE_2=20.0;
-	private static final double INVOICE_REVENUE_3=30.0;
+	private static final double INVOICE_REVENUE_3=40.0;
 	
 	private MongoClient mongoClient;
 	
@@ -109,7 +114,7 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		client2.setId(clientRepository.findAll().get(1).getId());
 		Invoice invoice1=new Invoice(client1, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_1);
 		Invoice invoice2=new Invoice(client2, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_2);
-		Invoice invoice3=new Invoice(client2, DATE_NOT_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_3);
+		Invoice invoice3=new Invoice(client2, DATE_OF_THE_PREVIOUS_YEAR_FIXTURE, INVOICE_REVENUE_3);
 		invoiceRepository.save(invoice1);
 		invoiceRepository.save(invoice2);
 		invoiceRepository.save(invoice3);
@@ -130,7 +135,7 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		client2.setId(clientRepository.findAll().get(1).getId());
 		Invoice invoice1=new Invoice(client1, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_1);
 		Invoice invoice2=new Invoice(client2, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_2);
-		Invoice invoice3=new Invoice(client2, DATE_NOT_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_3);
+		Invoice invoice3=new Invoice(client2, DATE_OF_THE_PREVIOUS_YEAR_FIXTURE, INVOICE_REVENUE_3);
 		invoiceRepository.save(invoice1);
 		invoiceRepository.save(invoice2);
 		invoiceRepository.save(invoice3);
@@ -139,6 +144,36 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		);
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale del "+YEAR_FIXTURE+" è di "+String.format("%.2f", 
+						INVOICE_REVENUE_1+INVOICE_REVENUE_2)+"€");
+	}
+	
+	@Test @GUITest
+	public void testViewInvoicesAndAnnualRevenueByYear() {
+		Client client1 = new Client(CLIENT_IDENTIFIER_1);
+		Client client2 = new Client(CLIENT_IDENTIFIER_2);
+		clientRepository.save(client1);
+		clientRepository.save(client2);
+		client1.setId(clientRepository.findAll().get(0).getId());
+		client2.setId(clientRepository.findAll().get(1).getId());
+		Invoice invoice1=new Invoice(client1, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_1);
+		Invoice invoice2=new Invoice(client2, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_2);
+		Invoice invoice3=new Invoice(client2, DATE_OF_THE_PREVIOUS_YEAR_FIXTURE, INVOICE_REVENUE_3);
+		Invoice invoice4=new Invoice(client2, DATE_OF_THE_NEXT_YEAR_FIXTURE, 
+				INVOICE_REVENUE_3);
+		invoiceRepository.save(invoice1);
+		invoiceRepository.save(invoice2);
+		invoiceRepository.save(invoice3);
+		invoiceRepository.save(invoice4);
+		GuiActionRunner.execute( 
+				() -> {
+					balanceController.yearsOfTheInvoices();
+					balanceSwingView.getComboboxYearsModel().setSelectedItem(YEAR_FIXTURE);
+				}
+		);		
+		assertThat(window.list("invoicesList").contents())
+			.containsExactly(invoice1.toString(),invoice2.toString());
+		window.label("revenueLabel").requireText(
+				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
 						INVOICE_REVENUE_1+INVOICE_REVENUE_2)+"€");
 	}
 	
