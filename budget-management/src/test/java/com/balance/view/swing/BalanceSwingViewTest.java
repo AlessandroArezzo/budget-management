@@ -175,6 +175,23 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		verify(balanceController).annualRevenue(CURRENT_YEAR-1);
 	}
 	
+	@Test @GUITest
+	public void testSelectYearWhenAClientIsSelectedShouldDelegateToControllerFindClientInvoices() {
+		GuiActionRunner.execute(() -> {
+			DefaultComboBoxModel<Integer> listYearsModel=balanceSwingView.getComboboxYearsModel();
+			listYearsModel.addElement(CURRENT_YEAR-1);
+			listYearsModel.addElement(CURRENT_YEAR);
+			DefaultListModel<Client> listClientsModel =balanceSwingView.getClientListModel();
+			listClientsModel.addElement(CLIENT_FIXTURE_1);
+			listClientsModel.addElement(CLIENT_FIXTURE_2);
+			}
+		);
+		window.list("clientsList").selectItem(1);
+		window.comboBox("yearsCombobox").selectItem(0);
+		verify(balanceController).allInvoicesByClientAndYear(CLIENT_FIXTURE_2, CURRENT_YEAR-1);
+		verify(balanceController).annualClientRevenue(CLIENT_FIXTURE_2, CURRENT_YEAR-1);
+	}
+	
 	@Test
 	public void testChangeClientSelectedShoulDelegateToControllerFindInvoicesAndRevenue(){ 
 		GuiActionRunner.execute(() -> {

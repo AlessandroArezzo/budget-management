@@ -76,7 +76,6 @@ public class BalanceSwingSteps {
 
 	@When("The user selects a year from the year selection combobox")
 	public void the_user_selects_a_year_from_the_year_selection_combobox() {
-		
 		window.comboBox("yearsCombobox")
 			.selectItem(Pattern.compile(""+YEAR_FIXTURE));
 	}
@@ -101,23 +100,31 @@ public class BalanceSwingSteps {
 						INVOICE_OF_THE_YEAR_FIXTURE_1_REVENUE+INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE+
 						INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE)+"€");
 	}
+	
+	@Given("The user selects a client from the client list")
+	public void the_user_selects_a_client_from_the_client_list() {
+	    window.list("clientsList")
+	    	.selectItem(Pattern.compile(CLIENT_FIXTURE_2_IDENTIFIER));
+	}
 
 	@Then("The invoice list contains the invoices of the selected year for the client selected")
 	public void the_invoice_list_contains_the_invoices_of_the_selected_year_for_the_client_selected() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
+		assertThat(window.list("invoicesList").contents())
+		.containsExactly(
+			new Invoice(INVOICE_OF_THE_YEAR_FIXTURE_2_CLIENT,INVOICE_OF_THE_YEAR_FIXTURE_2_DATE,
+					INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE).toString(),
+			new Invoice(INVOICE_OF_THE_YEAR_FIXTURE_3_CLIENT,INVOICE_OF_THE_YEAR_FIXTURE_3_DATE,
+					INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE).toString()
+	);
 	}
 
 	@Then("The initial total annual revenue of the client selected of the selected year is shown")
 	public void the_initial_total_annual_revenue_of_the_client_selected_of_the_selected_year_is_shown() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
-	}
-
-	@Given("The user selects a client from the client list")
-	public void the_user_selects_a_client_from_the_client_list() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
+		window.label("revenueLabel").requireText(
+				"Il ricavo totale delle fatture del cliente "+CLIENT_FIXTURE_2_IDENTIFIER
+				+" nel "+YEAR_FIXTURE+" è di "+String.format("%.2f", 
+						INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE+
+						INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE)+"€");
 	}
 
 	@When("The user selects the client removed from the client list")
