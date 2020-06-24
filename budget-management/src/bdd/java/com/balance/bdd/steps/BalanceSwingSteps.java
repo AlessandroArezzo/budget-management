@@ -18,6 +18,8 @@ import cucumber.api.java.en.When;
 import static com.balance.bdd.steps.DatabaseSteps.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.regex.Pattern;
+
 public class BalanceSwingSteps {
 	
 	private FrameFixture window;
@@ -56,8 +58,9 @@ public class BalanceSwingSteps {
 	@Then("The invoice list contains all invoices of the current year contained in the database")
 	public void the_invoice_list_contains_all_invoices_of_the_current_year_contained_in_the_database() {
 		assertThat(window.list("invoicesList").contents())
-		.containsExactly(new Invoice(INVOICE_OF_THE_CURRENT_YEAR_1_CLIENT,INVOICE_OF_THE_CURRENT_YEAR_1_DATE,
-				INVOICE_OF_THE_CURRENT_YEAR_1_REVENUE).toString(),
+			.containsExactly(new Invoice(INVOICE_OF_THE_CURRENT_YEAR_1_CLIENT,
+					INVOICE_OF_THE_CURRENT_YEAR_1_DATE, 
+					INVOICE_OF_THE_CURRENT_YEAR_1_REVENUE).toString(),
 				new Invoice(INVOICE_OF_THE_CURRENT_YEAR_2_CLIENT,INVOICE_OF_THE_CURRENT_YEAR_2_DATE,
 						INVOICE_OF_THE_CURRENT_YEAR_2_REVENUE).toString()
 		);
@@ -67,26 +70,36 @@ public class BalanceSwingSteps {
 	public void the_initial_total_annual_revenue_of_the_current_year_is_shown() {
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale del "+CURRENT_YEAR+" è di "+String.format("%.2f", 
-						INVOICE_OF_THE_CURRENT_YEAR_1_REVENUE+INVOICE_OF_THE_CURRENT_YEAR_2_REVENUE)+"€");
+					INVOICE_OF_THE_CURRENT_YEAR_1_REVENUE+INVOICE_OF_THE_CURRENT_YEAR_2_REVENUE)+"€");
 	}
 	
 
 	@When("The user selects a year from the year selection combobox")
 	public void the_user_selects_a_year_from_the_year_selection_combobox() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
+		
+		window.comboBox("yearsCombobox")
+			.selectItem(Pattern.compile(""+YEAR_FIXTURE));
 	}
 
 	@Then("The invoice list contains all invoices of the selected year")
 	public void the_invoice_list_contains_all_invoices_of_the_selected_year() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
+		assertThat(window.list("invoicesList").contents())
+			.containsExactly(
+				new Invoice(INVOICE_OF_THE_YEAR_FIXTURE_1_CLIENT, INVOICE_OF_THE_YEAR_FIXTURE_1_DATE,
+					INVOICE_OF_THE_YEAR_FIXTURE_1_REVENUE).toString(),
+				new Invoice(INVOICE_OF_THE_YEAR_FIXTURE_2_CLIENT,INVOICE_OF_THE_YEAR_FIXTURE_2_DATE,
+						INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE).toString(),
+				new Invoice(INVOICE_OF_THE_YEAR_FIXTURE_3_CLIENT,INVOICE_OF_THE_YEAR_FIXTURE_3_DATE,
+						INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE).toString()
+		);
 	}
 
 	@Then("The initial total annual revenue of the selected year is shown")
 	public void the_initial_total_annual_revenue_of_the_selected_year_is_shown() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
+		window.label("revenueLabel").requireText(
+				"Il ricavo totale del "+YEAR_FIXTURE+" è di "+String.format("%.2f", 
+						INVOICE_OF_THE_YEAR_FIXTURE_1_REVENUE+INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE+
+						INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE)+"€");
 	}
 
 	@Then("The invoice list contains the invoices of the selected year for the client selected")

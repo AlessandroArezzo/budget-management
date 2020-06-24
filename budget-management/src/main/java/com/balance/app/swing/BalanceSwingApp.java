@@ -1,7 +1,6 @@
 package com.balance.app.swing;
 
 import java.awt.EventQueue;
-import java.util.Calendar;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -57,9 +56,7 @@ public class BalanceSwingApp implements Callable<Void>{
 						balanceView,clientService,invoiceService );
 				balanceView.setBalanceController(balanceController);
 				balanceView.setVisible(true);
-				balanceController.allClients();
-				balanceController.allInvoicesByYear(Calendar.getInstance().get(Calendar.YEAR));
-				balanceController.annualRevenue(Calendar.getInstance().get(Calendar.YEAR));
+				balanceController.initializeView();
 			}
 			catch(Exception e) {
 				Logger.getLogger(getClass().getName())

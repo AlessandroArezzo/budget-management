@@ -1,5 +1,7 @@
 package com.balance.controller;
 
+import java.util.Calendar;
+
 import com.balance.service.ClientService;
 import com.balance.service.InvoiceService;
 import com.balance.view.BalanceView;
@@ -31,5 +33,11 @@ public class BalanceController {
 	public void yearsOfTheInvoices() {		
 		balanceView.setChoiceYearInvoices( 
 				invoiceService.findYearsOfTheInvoices());
+	}
+	
+	public void initializeView() {
+		allClients();
+		yearsOfTheInvoices();
+		balanceView.setYearSelected(Calendar.getInstance().get(Calendar.YEAR));
 	}
 }

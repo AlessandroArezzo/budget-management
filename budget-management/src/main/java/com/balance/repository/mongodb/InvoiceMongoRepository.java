@@ -82,17 +82,16 @@ public class InvoiceMongoRepository implements InvoiceRepository{
 	
 	@Override
 	public List<Invoice> findInvoicesByYear(int year) {
-		List<Invoice> invoices= StreamSupport.
-				stream(invoiceCollection.find(clientSession,
-						Filters.and(Filters.gte(FIELD_DATE, getFirstDayOfYear(year)),
-								Filters.lte(FIELD_DATE, getLastDayOfYear(year)))
-						).spliterator(), false) 
-				.map(d -> new Invoice(d.get(FIELD_PK).toString(),
-						clientRepository.findById(((DBRef) d.get(FIELD_CLIENT)).getId().toString()),
-						d.getDate(FIELD_DATE),
-						d.getDouble(FIELD_REVENUE)))
-				.collect(Collectors.toList());
-		return invoices;
+		return StreamSupport.
+					stream(invoiceCollection.find(clientSession,
+							Filters.and(Filters.gte(FIELD_DATE, getFirstDayOfYear(year)),
+									Filters.lte(FIELD_DATE, getLastDayOfYear(year)))
+							).spliterator(), false) 
+					.map(d -> new Invoice(d.get(FIELD_PK).toString(),
+							clientRepository.findById(((DBRef) d.get(FIELD_CLIENT)).getId().toString()),
+							d.getDate(FIELD_DATE),
+							d.getDouble(FIELD_REVENUE)))
+					.collect(Collectors.toList());
 	}
 
 	@Override

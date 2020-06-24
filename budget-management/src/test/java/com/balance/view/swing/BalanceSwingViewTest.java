@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
@@ -72,22 +73,6 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 	}
 	
 	@Test @GUITest
-	public void testInitializeView() {
-		GuiActionRunner.execute(() -> {
-			DefaultComboBoxModel<Integer> listYearsModel =balanceSwingView.getComboboxYearsModel();
-			listYearsModel.addElement(2019);
-			listYearsModel.addElement(CURRENT_YEAR);
-			balanceSwingView.initializeView();
-			}
-		);
-		verify(balanceController).allClients();
-		verify(balanceController).allInvoicesByYear(CURRENT_YEAR);
-		verify(balanceController).annualRevenue(CURRENT_YEAR);
-		verify(balanceController).yearsOfTheInvoices();
-		window.comboBox("yearsCombobox").requireSelection(""+CURRENT_YEAR);
-	}
-	
-	@Test @GUITest
 	public void testShowAllClientsShouldAddClientsDescriptionsToTheClientsList(){ 
 		GuiActionRunner.execute(() -> 
 			balanceSwingView.showClients(Arrays.asList(CLIENT_FIXTURE_1, CLIENT_FIXTURE_2)) 
@@ -134,6 +119,31 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 					"Il ricavo totale del 2019 è di 300.50€");
 	}
 	
+	@Test 
+	public void testSetYearSelectedInComboboxWhenYearIsInCombobox() {
+		GuiActionRunner.execute(() -> {
+				DefaultComboBoxModel<Integer> listYearsModel =balanceSwingView.getComboboxYearsModel();
+				listYearsModel.addElement(CURRENT_YEAR-1);
+				listYearsModel.addElement(CURRENT_YEAR);
+				listYearsModel.setSelectedItem(CURRENT_YEAR);
+				balanceSwingView.setYearSelected(CURRENT_YEAR-1);
+			}
+		);
+		window.comboBox("yearsCombobox").requireSelection(Pattern.compile(""+(CURRENT_YEAR-1)));
+	}
+	@Test 
+	public void testSetYearSelectedInComboboxWhenYearIsNotInCombobox() {
+		GuiActionRunner.execute(() -> {
+				DefaultComboBoxModel<Integer> listYearsModel =balanceSwingView.getComboboxYearsModel();
+				listYearsModel.addElement(CURRENT_YEAR);
+				listYearsModel.setSelectedItem(CURRENT_YEAR);
+				balanceSwingView.setYearSelected(CURRENT_YEAR-1);
+			}
+		);
+		window.comboBox("yearsCombobox").requireSelection(Pattern.compile(""+(CURRENT_YEAR)));
+	}
+	
+	
 	@Test @GUITest
 	public void testSetChoiceYearInvoicesWhenThereIsCurrentYear() {
 		GuiActionRunner.execute(() -> 
@@ -156,13 +166,13 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 	public void testSelectYearShouldDelegateToControllerFindYearsInvoices() {
 		GuiActionRunner.execute(() -> {
 			DefaultComboBoxModel<Integer> listYearsModel =balanceSwingView.getComboboxYearsModel();
-			listYearsModel.addElement(2019);
+			listYearsModel.addElement(CURRENT_YEAR-1);
 			listYearsModel.addElement(CURRENT_YEAR);
 			}
 		);
 		window.comboBox("yearsCombobox").selectItem(0);
-		verify(balanceController).allInvoicesByYear(2019);
-		verify(balanceController).annualRevenue(2019);
+		verify(balanceController).allInvoicesByYear(CURRENT_YEAR-1);
+		verify(balanceController).annualRevenue(CURRENT_YEAR-1);
 	}
 	
 }

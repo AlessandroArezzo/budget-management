@@ -4,13 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 import org.assertj.swing.annotation.GUITest;
 import org.assertj.swing.edt.GuiActionRunner;
 import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.junit.runner.GUITestRunner;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -25,12 +25,8 @@ import com.balance.service.InvoiceService;
 import com.balance.service.InvoiceServiceTransactional;
 import com.balance.transaction.TransactionManager;
 import com.balance.transaction.mongodb.TransactionMongoManager;
-import com.balance.utils.DateTestsUtil;
 import com.mongodb.MongoClient;
-import com.mongodb.ServerAddress;
 import com.mongodb.client.ClientSession;
-
-import de.bwaldvogel.mongo.MongoServer;
 
 @RunWith(GUITestRunner.class)
 public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
@@ -165,11 +161,11 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		invoiceRepository.save(invoice3);
 		invoiceRepository.save(invoice4);
 		GuiActionRunner.execute( 
-				() -> {
-					balanceController.yearsOfTheInvoices();
-					balanceSwingView.getComboboxYearsModel().setSelectedItem(YEAR_FIXTURE);
-				}
-		);		
+				() -> balanceController.yearsOfTheInvoices()
+		);	
+		window.comboBox("yearsCombobox")
+			.selectItem(Pattern.compile(""+YEAR_FIXTURE)); 
+
 		assertThat(window.list("invoicesList").contents())
 			.containsExactly(invoice1.toString(),invoice2.toString());
 		window.label("revenueLabel").requireText(

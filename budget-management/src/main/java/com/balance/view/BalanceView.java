@@ -15,5 +15,6 @@ public interface BalanceView {
 
 	public void setChoiceYearInvoices(List<Integer> yearsOfTheInvoices);
 
-	public void initializeView();
+	void setYearSelected(int year);
+
 }

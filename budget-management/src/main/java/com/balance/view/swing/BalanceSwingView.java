@@ -20,8 +20,6 @@ import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -88,7 +86,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		contentPane.add(lblInvoice, gbc_lblInvoice);
 		
 		clientListModel=new DefaultListModel<>();
-		comboboxYearsModel=new DefaultComboBoxModel<Integer>();
+		comboboxYearsModel=new DefaultComboBoxModel<>();
 	    comboboxYears = new JComboBox<>(comboboxYearsModel);
 		comboboxYears.setName("yearsCombobox");
 		GridBagConstraints gbc_comboboxYears = new GridBagConstraints();
@@ -135,12 +133,11 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		gbc_lblRevenue.gridy = 5;
 		contentPane.add(lblRevenue, gbc_lblRevenue);
 		
-		comboboxYears.addActionListener(new ActionListener () {
-		    public void actionPerformed(ActionEvent e) {
+		comboboxYears.addActionListener(
+					e -> {
 		    	balanceController.allInvoicesByYear((int) comboboxYears.getSelectedItem());
 		    	balanceController.annualRevenue((int) comboboxYears.getSelectedItem());
-		    }
-		});
+			});
 	}
 
 
@@ -170,13 +167,6 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		}
 		yearsToAddInModel.stream().forEach(comboboxYearsModel::addElement); 
 	}
-
-	@Override
-	public void initializeView() {
-		balanceController.allClients();
-		balanceController.yearsOfTheInvoices();
-		comboboxYears.setSelectedItem(CURRENT_YEAR);
-	}
 	
 	public DefaultComboBoxModel<Integer> getComboboxYearsModel() {
 		return comboboxYearsModel;
@@ -184,6 +174,13 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 	
 	public DefaultListModel<Invoice> getInvoiceListModel() {
 		return invoiceListModel;
+	}
+
+	@Override
+	public void setYearSelected(int year) {
+		if(comboboxYearsModel.getIndexOf(year)!=-1) {
+			comboboxYearsModel.setSelectedItem(year);
+		}
 	}
 
 }
