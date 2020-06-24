@@ -41,6 +41,7 @@ public class InvoiceServiceTransactionalTest {
 	private InvoiceRepository invoiceRepository;
 	
 	private static final int YEAR_FIXTURE=2019;
+	private static final Client CLIENT_FIXTURE=new Client("test identifier");
 
 	
 	
@@ -76,8 +77,27 @@ public class InvoiceServiceTransactionalTest {
 		when(invoiceRepository.getYearsOfInvoicesInDatabase()).thenReturn(years);
 		assertThat(invoiceService.findYearsOfTheInvoices()).isEqualTo(
 				years);
-		
 	}
+	
+	@Test
+	public void testFindInvoicesByClientAndYear() {
+		List<Invoice> invoices=Arrays.asList(new Invoice());
+		when(invoiceRepository.findInvoicesByClientAndYear(CLIENT_FIXTURE, YEAR_FIXTURE))
+			.thenReturn(invoices);
+		assertThat(invoiceService.findInvoicesByClientAndYear(CLIENT_FIXTURE, YEAR_FIXTURE))
+			.isEqualTo(invoices);
+	}
+	
+	@Test
+	public void testGetAnnualClientRevenue() {
+		double revenueOfYear=100.0;
+		when(invoiceRepository.getClientRevenueOfAnYear(CLIENT_FIXTURE, YEAR_FIXTURE))
+			.thenReturn(revenueOfYear);
+		assertThat(invoiceService.getAnnualClientRevenue(CLIENT_FIXTURE, YEAR_FIXTURE))
+			.isEqualTo(revenueOfYear);
+	}
+	
+	
 	
 	
 }

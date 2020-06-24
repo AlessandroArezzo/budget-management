@@ -175,4 +175,60 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		verify(balanceController).annualRevenue(CURRENT_YEAR-1);
 	}
 	
+	@Test @GUITest
+	public void testSelectYearWhenAClientIsSelectedShouldDelegateToControllerFindClientInvoices() {
+		GuiActionRunner.execute(() -> {
+			DefaultComboBoxModel<Integer> listYearsModel=balanceSwingView.getComboboxYearsModel();
+			listYearsModel.addElement(CURRENT_YEAR-1);
+			listYearsModel.addElement(CURRENT_YEAR);
+			DefaultListModel<Client> listClientsModel =balanceSwingView.getClientListModel();
+			listClientsModel.addElement(CLIENT_FIXTURE_1);
+			listClientsModel.addElement(CLIENT_FIXTURE_2);
+			}
+		);
+		window.list("clientsList").selectItem(1);
+		window.comboBox("yearsCombobox").selectItem(0);
+		verify(balanceController).allInvoicesByClientAndYear(CLIENT_FIXTURE_2, CURRENT_YEAR-1);
+		verify(balanceController).annualClientRevenue(CLIENT_FIXTURE_2, CURRENT_YEAR-1);
+	}
+	
+	@Test
+	public void testChangeClientSelectedShoulDelegateToControllerFindInvoicesAndRevenue(){ 
+		GuiActionRunner.execute(() -> {
+			DefaultListModel<Client> listClientsModel =balanceSwingView.getClientListModel();
+			listClientsModel.addElement(CLIENT_FIXTURE_1);
+			listClientsModel.addElement(CLIENT_FIXTURE_2);
+			DefaultComboBoxModel<Integer> listYearsModel =balanceSwingView.getComboboxYearsModel();
+			listYearsModel.addElement(CURRENT_YEAR-1);
+			listYearsModel.addElement(CURRENT_YEAR);
+			listYearsModel.setSelectedItem(CURRENT_YEAR-1);
+			}
+		);
+		window.list("clientsList").selectItem(0);
+		verify(balanceController).allInvoicesByClientAndYear(CLIENT_FIXTURE_1, CURRENT_YEAR-1);
+		verify(balanceController).annualClientRevenue(CLIENT_FIXTURE_1, CURRENT_YEAR-1);
+	}
+	
+	@Test @GUITest
+	public void testSetClientAnnualRevenueWithoutNoZeroNotSignificant() {
+		GuiActionRunner.execute(() -> 
+				balanceSwingView.setAnnualClientRevenue(CLIENT_FIXTURE_1,2019,300.55)
+			);
+		window.label("revenueLabel").requireText(
+					"Il ricavo totale delle fatture del cliente "
+							+CLIENT_FIXTURE_1.getIdentifier()+""
+							+ " nel 2019 è di 300.55€");
+	}
+	
+	@Test @GUITest
+	public void testSetClientAnnualRevenueWithOneOrMoreZeroNotSignificant() {
+		GuiActionRunner.execute(() -> 
+		balanceSwingView.setAnnualClientRevenue(CLIENT_FIXTURE_1,2019,300.50)
+		);
+		window.label("revenueLabel").requireText(
+				"Il ricavo totale delle fatture del cliente "
+						+CLIENT_FIXTURE_1.getIdentifier()+""
+						+ " nel 2019 è di 300.50€");
+	}
+	
 }

@@ -82,7 +82,6 @@ public class DatabaseSteps {
 	
 	@Given("The database contains a few invoices of different years")
 	public void the_database_contains_a_few_invoices_of_different_years() {
-		
 		addInvoiceToDatabase(INVOICE_OF_THE_YEAR_FIXTURE_1_CLIENT.getId(),INVOICE_OF_THE_YEAR_FIXTURE_1_DATE,
 				INVOICE_OF_THE_YEAR_FIXTURE_1_REVENUE);
 		addInvoiceToDatabase(INVOICE_OF_THE_YEAR_FIXTURE_2_CLIENT.getId(),INVOICE_OF_THE_YEAR_FIXTURE_2_DATE,
