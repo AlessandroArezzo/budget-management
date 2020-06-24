@@ -11,6 +11,7 @@ import java.util.stream.StreamSupport;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
+import com.balance.model.Client;
 import com.balance.model.Invoice;
 import com.balance.repository.InvoiceRepository;
 import com.mongodb.DBRef;
@@ -61,8 +62,9 @@ public class InvoiceMongoRepository implements InvoiceRepository{
 	@Override
 	public Invoice findById(String id) {
 		Document d = invoiceCollection.find(clientSession,Filters.eq(FIELD_PK, new ObjectId(id))).first(); 
-		if (d != null)
+		if (d != null) {
 			return fromDocumentToInvoice(d); 
+		}
 		return null;
 	}
 
@@ -142,6 +144,42 @@ public class InvoiceMongoRepository implements InvoiceRepository{
 					.map(d -> d.getInteger("year"))
 					.collect(Collectors.toSet())
 			);
+	}
+
+	@Override
+	public List<Invoice> findInvoicesByClientAndYear(Client client, int year) {
+		return StreamSupport.
+				stream(invoiceCollection.find(clientSession,
+						Filters.and(
+								Filters.gte(FIELD_DATE, getFirstDayOfYear(year)),
+								Filters.lte(FIELD_DATE, getLastDayOfYear(year)),
+								Filters.eq(FIELD_CLIENT+".$id", new ObjectId(client.getId())))
+						).spliterator(), false) 
+				.map(d -> new Invoice(d.get(FIELD_PK).toString(),
+						clientRepository.findById(((DBRef) d.get(FIELD_CLIENT)).getId().toString()),
+						d.getDate(FIELD_DATE),
+						d.getDouble(FIELD_REVENUE)))
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	public double getClientRevenueOfAnYear(Client client, int year) {
+		Document sumClientDocument= invoiceCollection.aggregate(
+				  Arrays.asList(
+				          Aggregates.match(
+				        		  Filters.and(
+				        		    Filters.gte(FIELD_DATE, getFirstDayOfYear(year)),
+									Filters.lte(FIELD_DATE, getLastDayOfYear(year)),
+									Filters.eq(FIELD_CLIENT+".$id", 
+											new ObjectId(client.getId()))
+									)),
+				          Aggregates.group("",
+				        		  Accumulators.sum("totalRevenue", "$"+FIELD_REVENUE))
+						  )).first();
+		if(sumClientDocument==null) {
+			return 0;
+		}
+		return sumClientDocument.getDouble("totalRevenue");
 	}
 	
 	

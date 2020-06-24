@@ -2,6 +2,7 @@ package com.balance.service;
 
 import java.util.List;
 
+import com.balance.model.Client;
 import com.balance.model.Invoice;
 import com.balance.repository.InvoiceRepository;
 import com.balance.repository.TypeRepository;
@@ -40,6 +41,24 @@ public class InvoiceServiceTransactional implements InvoiceService{
 					InvoiceRepository invoiceRepository=(InvoiceRepository) factory.createRepository(TypeRepository.INVOICE);
 				    return invoiceRepository.getYearsOfInvoicesInDatabase();
 		});
+	}
+
+	@Override
+	public List<Invoice> findInvoicesByClientAndYear(Client client, int year) {
+		return transactionManager.doInTransaction(
+			factory -> { 
+				InvoiceRepository invoiceRepository=(InvoiceRepository) factory.createRepository(TypeRepository.INVOICE);
+			    return invoiceRepository.findInvoicesByClientAndYear(client, year);
+		});
+	}
+
+	@Override
+	public double getAnnualClientRevenue(Client client, int year) {
+		return transactionManager.doInTransaction(
+				factory -> { 
+					InvoiceRepository invoiceRepository=(InvoiceRepository) factory.createRepository(TypeRepository.INVOICE);
+				    return invoiceRepository.getClientRevenueOfAnYear(client, year);
+			});
 	}
 
 	

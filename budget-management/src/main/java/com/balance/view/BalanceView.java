@@ -17,4 +17,6 @@ public interface BalanceView {
 
 	void setYearSelected(int year);
 
+	public void setAnnualClientRevenue(Client client, int year, double clientRevenue);
+
 }

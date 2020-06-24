@@ -41,6 +41,7 @@ public class BalanceControllerTest {
 	private static final int CURRENT_YEAR=Calendar.getInstance().get(Calendar.YEAR);
 	private static final int YEAR_FIXTURE=2019;
 	private static final double TOTAL_REVENUE_FIXTURE=50.6;
+	private static final Client CLIENT_FIXTURE=new Client("test identifier");
 	
 	@Before
 	public void init() {
@@ -77,7 +78,8 @@ public class BalanceControllerTest {
 	
 	@Test
 	public void testAnnualRevenue() {
-		when(invoiceService.getTotalRevenueOfAnYear(YEAR_FIXTURE)).thenReturn(TOTAL_REVENUE_FIXTURE);
+		when(invoiceService.getTotalRevenueOfAnYear(YEAR_FIXTURE))
+			.thenReturn(TOTAL_REVENUE_FIXTURE);
 		balanceController.annualRevenue(YEAR_FIXTURE);
 		verify(balanceView).setAnnualTotalRevenue(YEAR_FIXTURE,TOTAL_REVENUE_FIXTURE);
 	}
@@ -88,6 +90,24 @@ public class BalanceControllerTest {
 		when(invoiceService.findYearsOfTheInvoices()).thenReturn(yearsOfTheinvoices);
 		balanceController.yearsOfTheInvoices();
 		verify(balanceView).setChoiceYearInvoices(yearsOfTheinvoices);
+	}
+	
+	@Test
+	public void testInvoicesByClientAndYear() {
+		List<Invoice> invoiceofClientAndYear = Arrays.asList(new Invoice());
+		when(invoiceService.findInvoicesByClientAndYear(CLIENT_FIXTURE,YEAR_FIXTURE))
+			.thenReturn(invoiceofClientAndYear);
+		balanceController.allInvoicesByClientAndYear(CLIENT_FIXTURE, YEAR_FIXTURE);
+		verify(balanceView).showInvoices(invoiceofClientAndYear);
+	}
+	
+	@Test
+	public void testAnnualClientRevenue() {
+		when(invoiceService.getAnnualClientRevenue(CLIENT_FIXTURE, YEAR_FIXTURE))
+			.thenReturn(TOTAL_REVENUE_FIXTURE);
+		balanceController.annualClientRevenue(CLIENT_FIXTURE, YEAR_FIXTURE);
+		verify(balanceView).setAnnualClientRevenue(
+				CLIENT_FIXTURE, YEAR_FIXTURE, TOTAL_REVENUE_FIXTURE);
 	}
 	
 	
