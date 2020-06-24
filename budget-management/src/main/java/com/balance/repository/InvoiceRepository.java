@@ -8,4 +8,6 @@ public interface InvoiceRepository extends Repository<Invoice> {
 	public List<Invoice> findInvoicesByYear(int year);
 	
 	public double getTotalRevenueOfAnYear(int year) ;
+
+	public List<Integer> getYearsOfInvoicesInDatabase();
 }

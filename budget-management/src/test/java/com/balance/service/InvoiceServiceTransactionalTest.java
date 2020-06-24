@@ -53,7 +53,6 @@ public class InvoiceServiceTransactionalTest {
 
 	}
 	
-	
 	@Test
 	public void testFindAllInvoicesByYear() {
 		List<Invoice> invoices=Arrays.asList(new Invoice());
@@ -62,7 +61,6 @@ public class InvoiceServiceTransactionalTest {
 				invoices);
 	}
 	
-	
 	@Test
 	public void testGetTotalRevenueOfAnYear() {
 		double revenueOfYear=100.0;
@@ -70,6 +68,15 @@ public class InvoiceServiceTransactionalTest {
 				revenueOfYear);
 		assertThat(invoiceService.getTotalRevenueOfAnYear(YEAR_FIXTURE)).isEqualTo(
 				revenueOfYear);
+	}
+	
+	@Test
+	public void testGetYearsOfTheInvoicesInDatabase() {
+		List<Integer> years=Arrays.asList(YEAR_FIXTURE);
+		when(invoiceRepository.getYearsOfInvoicesInDatabase()).thenReturn(years);
+		assertThat(invoiceService.findYearsOfTheInvoices()).isEqualTo(
+				years);
+		
 	}
 	
 	

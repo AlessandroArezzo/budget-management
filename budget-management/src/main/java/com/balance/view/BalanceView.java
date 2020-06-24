@@ -13,4 +13,7 @@ public interface BalanceView {
 
 	public void setAnnualTotalRevenue(int year, double  totalRevenue);
 
+	public void setChoiceYearInvoices(List<Integer> yearsOfTheInvoices);
+
+	public void initializeView();
 }

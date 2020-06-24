@@ -46,7 +46,7 @@ public class BalanceControllerTest {
 		List<Client> clients = Arrays.asList(new Client());
 		when(clientService.findAllClients()).thenReturn(clients);
 		balanceController.allClients();
-		verify(balanceView).showClients(clients); // Controllo che metodo allClients() del controller invochi il metodo showClients con la lista attesa come parametro(quella ritornata dal metodo findAllClients() del repository)
+		verify(balanceView).showClients(clients);
 	}
 	
 	@Test
@@ -62,5 +62,13 @@ public class BalanceControllerTest {
 		when(invoiceService.getTotalRevenueOfAnYear(YEAR_FIXTURE)).thenReturn(TOTAL_REVENUE_FIXTURE);
 		balanceController.annualRevenue(YEAR_FIXTURE);
 		verify(balanceView).setAnnualTotalRevenue(YEAR_FIXTURE,TOTAL_REVENUE_FIXTURE);
+	}
+	
+	@Test
+	public void testYearsOfTheInvoices() {
+		List<Integer> yearsOfTheinvoices=Arrays.asList(YEAR_FIXTURE);
+		when(invoiceService.findYearsOfTheInvoices()).thenReturn(yearsOfTheinvoices);
+		balanceController.yearsOfTheInvoices();
+		verify(balanceView).setChoiceYearInvoices(yearsOfTheinvoices);
 	}
 }

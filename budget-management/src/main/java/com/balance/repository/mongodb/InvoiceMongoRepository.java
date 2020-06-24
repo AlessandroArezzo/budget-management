@@ -1,9 +1,12 @@
 package com.balance.repository.mongodb;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -19,6 +22,8 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Projections;
+import com.mongodb.client.model.Sorts;
 
 public class InvoiceMongoRepository implements InvoiceRepository{
 
@@ -121,6 +126,24 @@ public class InvoiceMongoRepository implements InvoiceRepository{
 		cal.set(Calendar.MONTH, 11); 
 		cal.set(Calendar.DAY_OF_MONTH, 31);
 		return cal.getTime();
+	}
+
+	@Override
+	public List<Integer> getYearsOfInvoicesInDatabase() {
+		return new ArrayList<> (
+				StreamSupport.
+					stream(invoiceCollection.aggregate(
+							  Arrays.asList(
+							          Aggregates.project(
+							        		  Projections.fields(
+							        		  Projections.computed("year", 
+						        				  	Document.parse("{ $year: '$date' }"))
+				        				  )),
+							  			Aggregates.sort(Sorts.ascending("year")))
+								  ).spliterator(), false)
+					.map(d -> d.getInteger("year"))
+					.collect(Collectors.toSet())
+			);
 	}
 	
 	

@@ -27,4 +27,9 @@ public class BalanceController {
 		balanceView.setAnnualTotalRevenue(year, 
 				invoiceService.getTotalRevenueOfAnYear(year));
 	}
+
+	public void yearsOfTheInvoices() {		
+		balanceView.setChoiceYearInvoices( 
+				invoiceService.findYearsOfTheInvoices());
+	}
 }
