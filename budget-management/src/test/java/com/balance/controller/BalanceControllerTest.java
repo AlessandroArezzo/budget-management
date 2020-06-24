@@ -4,8 +4,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
+import javax.swing.DefaultComboBoxModel;
+
+import org.assertj.swing.annotation.GUITest;
+import org.assertj.swing.edt.GuiActionRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -33,6 +38,7 @@ public class BalanceControllerTest {
 	@InjectMocks
 	private BalanceController balanceController;
 	
+	private static final int CURRENT_YEAR=Calendar.getInstance().get(Calendar.YEAR);
 	private static final int YEAR_FIXTURE=2019;
 	private static final double TOTAL_REVENUE_FIXTURE=50.6;
 	
@@ -41,12 +47,24 @@ public class BalanceControllerTest {
 		MockitoAnnotations.initMocks(this);
 	}
 	
+	@Test @GUITest
+	public void testInitializeView() {
+		List<Client> clients = Arrays.asList(new Client());
+		when(clientService.findAllClients()).thenReturn(clients);
+		List<Integer> yearsOfTheinvoices=Arrays.asList(CURRENT_YEAR);
+		when(invoiceService.findYearsOfTheInvoices()).thenReturn(yearsOfTheinvoices);
+		balanceController.initializeView();
+		verify(balanceView).showClients(clients);
+		verify(balanceView).setChoiceYearInvoices(yearsOfTheinvoices);
+		verify(balanceView).setYearSelected(CURRENT_YEAR);
+	}
+	
 	@Test
 	public void testAllClients() {
 		List<Client> clients = Arrays.asList(new Client());
 		when(clientService.findAllClients()).thenReturn(clients);
 		balanceController.allClients();
-		verify(balanceView).showClients(clients); // Controllo che metodo allClients() del controller invochi il metodo showClients con la lista attesa come parametro(quella ritornata dal metodo findAllClients() del repository)
+		verify(balanceView).showClients(clients);
 	}
 	
 	@Test
@@ -63,4 +81,14 @@ public class BalanceControllerTest {
 		balanceController.annualRevenue(YEAR_FIXTURE);
 		verify(balanceView).setAnnualTotalRevenue(YEAR_FIXTURE,TOTAL_REVENUE_FIXTURE);
 	}
+	
+	@Test
+	public void testYearsOfTheInvoices() {
+		List<Integer> yearsOfTheinvoices=Arrays.asList(YEAR_FIXTURE);
+		when(invoiceService.findYearsOfTheInvoices()).thenReturn(yearsOfTheinvoices);
+		balanceController.yearsOfTheInvoices();
+		verify(balanceView).setChoiceYearInvoices(yearsOfTheinvoices);
+	}
+	
+	
 }

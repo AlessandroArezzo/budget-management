@@ -32,6 +32,17 @@ public class InvoiceServiceTransactional implements InvoiceService{
 				    return invoiceRepository.getTotalRevenueOfAnYear(year);
 		});
 	}
+
+	@Override
+	public List<Integer> findYearsOfTheInvoices() {
+		return transactionManager.doInTransaction(
+				factory -> { 
+					InvoiceRepository invoiceRepository=(InvoiceRepository) factory.createRepository(TypeRepository.INVOICE);
+				    return invoiceRepository.getYearsOfInvoicesInDatabase();
+		});
+	}
+
+	
 	
 	
 }
