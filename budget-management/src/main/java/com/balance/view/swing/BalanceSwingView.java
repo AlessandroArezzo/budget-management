@@ -98,15 +98,12 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		gbc_comboboxYears.gridy = 3;
 		contentPane.add(comboboxYears, gbc_comboboxYears);
 		listClients = new JList<>(clientListModel);
-		listClients.addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				if (!e.getValueIsAdjusting()) {
-					balanceController.allInvoicesByClientAndYear(
-							listClients.getSelectedValue(), (int) comboboxYears.getSelectedItem());
-					balanceController.annualClientRevenue(
-							listClients.getSelectedValue(), (int) comboboxYears.getSelectedItem());
-				}
+		listClients.addListSelectionListener(e -> {
+			if (!e.getValueIsAdjusting()) {
+				balanceController.allInvoicesByClientAndYear(
+						listClients.getSelectedValue(), (int) comboboxYears.getSelectedItem());
+				balanceController.annualClientRevenue(
+						listClients.getSelectedValue(), (int) comboboxYears.getSelectedItem());
 			}
 		});
 		listClients.setName("clientsList");

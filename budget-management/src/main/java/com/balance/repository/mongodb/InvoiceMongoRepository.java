@@ -98,15 +98,16 @@ public class InvoiceMongoRepository implements InvoiceRepository{
 
 	@Override
 	public double getTotalRevenueOfAnYear(int year) {
+		String totalRevenueField="totalRevenue";
 		Document sumDocument=invoiceCollection.aggregate(
 				  Arrays.asList(
 				          Aggregates.match(Filters.and(Filters.gte(FIELD_DATE, getFirstDayOfYear(year)),
 									Filters.lte(FIELD_DATE, getLastDayOfYear(year)))),
-				          Aggregates.group("",Accumulators.sum("totalRevenue", "$"+FIELD_REVENUE))
+				          Aggregates.group("",Accumulators.sum(totalRevenueField, "$"+FIELD_REVENUE))
 				  )).first();
 		if (sumDocument==null) 
 			return 0;
-		return sumDocument.getDouble("totalRevenue");
+		return sumDocument.getDouble(totalRevenueField);
 	}
 	
 	private Date getFirstDayOfYear(int year) {
@@ -164,6 +165,7 @@ public class InvoiceMongoRepository implements InvoiceRepository{
 
 	@Override
 	public double getClientRevenueOfAnYear(Client client, int year) {
+		String totalRevenueField="totalClientRevenue";
 		Document sumClientDocument= invoiceCollection.aggregate(
 				  Arrays.asList(
 				          Aggregates.match(
@@ -174,12 +176,12 @@ public class InvoiceMongoRepository implements InvoiceRepository{
 											new ObjectId(client.getId()))
 									)),
 				          Aggregates.group("",
-				        		  Accumulators.sum("totalRevenue", "$"+FIELD_REVENUE))
+				        		  Accumulators.sum(totalRevenueField, "$"+FIELD_REVENUE))
 						  )).first();
 		if(sumClientDocument==null) {
 			return 0;
 		}
-		return sumClientDocument.getDouble("totalRevenue");
+		return sumClientDocument.getDouble(totalRevenueField);
 	}
 	
 	

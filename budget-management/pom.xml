@@ -37,7 +37,7 @@
 	
 	<!--Disable rule for "Tests should include assertions" in swing view tests-->
 	<sonar.issue.ignore.multicriteria.e1.ruleKey>
-		squid:S2699
+		java:S2699
 	</sonar.issue.ignore.multicriteria.e1.ruleKey>
 	<sonar.issue.ignore.multicriteria.e1.resourceKey>
 		**/swing/**/*.java
@@ -52,10 +52,10 @@
 		**/repository/mongodb/*MongoRepository.java
 	</sonar.issue.ignore.multicriteria.e2.resourceKey>
 	
-	<!--Disable rule for "Fields in a "Serializable class should either be transient or serializable"
+	<!--Disable rule for "Inheritance tree of classes should not be too deep"
 	 in BalanceSwingView-->
 	<sonar.issue.ignore.multicriteria.e3.ruleKey>
-		java:MaximumInheritanceDepth
+		java:S110
 	</sonar.issue.ignore.multicriteria.e3.ruleKey>
 	<sonar.issue.ignore.multicriteria.e3.resourceKey>
 		**/BalanceSwingView.java
@@ -64,7 +64,7 @@
 	<!--Disable rule for "Local variable and method parameter names should comply with a naming convention""
 	 in BalanceSwingView-->
 	<sonar.issue.ignore.multicriteria.e4.ruleKey>
-		java:S00117
+		java:S117
 	</sonar.issue.ignore.multicriteria.e4.ruleKey>
 	<sonar.issue.ignore.multicriteria.e4.resourceKey>
 		**/BalanceSwingView.java
