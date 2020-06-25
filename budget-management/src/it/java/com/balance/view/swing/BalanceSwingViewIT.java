@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.regex.Pattern;
 
 import org.assertj.swing.annotation.GUITest;
+import org.assertj.swing.core.matcher.JButtonMatcher;
 import org.assertj.swing.edt.GuiActionRunner;
 import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.junit.runner.GUITestRunner;
@@ -240,6 +241,37 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
 						INVOICE_REVENUE_2)+"€");
+	}
+	
+	@Test @GUITest
+	public void testViewAllInvoicesAndAnnualRevenueAfterSelectingAClient() {
+		Client client1 = new Client(CLIENT_IDENTIFIER_1);
+		Client client2 = new Client(CLIENT_IDENTIFIER_2);
+		clientRepository.save(client1);
+		clientRepository.save(client2);
+		client1.setId(clientRepository.findAll().get(0).getId());
+		client2.setId(clientRepository.findAll().get(1).getId());
+		Invoice invoice1=new Invoice(client1, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_1);
+		Invoice invoice2=new Invoice(client2, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_2);
+		Invoice invoice3=new Invoice(client1, DATE_OF_THE_PREVIOUS_YEAR_FIXTURE,
+										INVOICE_REVENUE_3);
+		invoiceRepository.save(invoice1);
+		invoiceRepository.save(invoice2);
+		invoiceRepository.save(invoice3);
+		GuiActionRunner.execute( () -> {
+				balanceController.yearsOfTheInvoices();
+				balanceController.allClients();
+			}
+		);
+		window.comboBox("yearsCombobox")
+			.selectItem(Pattern.compile(""+YEAR_FIXTURE));
+		window.list("clientsList").selectItem(Pattern.compile(CLIENT_IDENTIFIER_1));
+		window.button(JButtonMatcher.withText("Vedi tutte le fatture")).click();
+		assertThat(window.list("invoicesList").contents())
+			.containsExactly(invoice1.toString(),invoice2.toString());
+		window.label("revenueLabel").requireText(
+				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
+						INVOICE_REVENUE_1+INVOICE_REVENUE_2)+"€");
 	}
 	
 	private static Date getDateFromYear(int year) {

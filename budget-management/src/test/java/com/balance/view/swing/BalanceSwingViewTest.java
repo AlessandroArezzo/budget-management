@@ -16,6 +16,7 @@ import org.assertj.swing.core.matcher.JButtonMatcher;
 import org.assertj.swing.core.matcher.JLabelMatcher;
 import org.assertj.swing.edt.GuiActionRunner;
 import org.assertj.swing.fixture.FrameFixture;
+import org.assertj.swing.fixture.JButtonFixture;
 import org.assertj.swing.junit.runner.GUITestRunner;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.junit.Test;
@@ -49,6 +50,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 			new Invoice(CLIENT_FIXTURE_2, new Date(), 20);
 	
 	private static final int CURRENT_YEAR=Calendar.getInstance().get(Calendar.YEAR);
+	private static final int YEAR_FIXTURE=2019;
 	
 	@Override
 	protected void onSetUp() {
@@ -73,6 +75,8 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.comboBox("yearsCombobox");
 		window.label("labelClientErrorMessage").requireText("");
 		window.comboBox("clientsCombobox");
+		window.button(JButtonMatcher.withText("Vedi tutte le fatture"))
+			.requireNotVisible();
 	}
 	
 	@Test @GUITest
@@ -262,6 +266,33 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 				() -> balanceSwingView.showClientError("error message", CLIENT_FIXTURE_1) );
 		window.label("labelClientErrorMessage").requireText("error message: " + 
 				CLIENT_FIXTURE_1.getIdentifier());
+	}
+	
+	@Test @GUITest
+	public void testShowAllInvoicesButtonShouldBeVisibleOnlyWhenAClientIsSelected() {
+		GuiActionRunner.execute(() -> balanceSwingView.getClientListModel()
+				.addElement(CLIENT_FIXTURE_1)); 
+		window.list("clientsList").selectItem(0); 
+		JButtonFixture deleteButton = 
+				window.button(JButtonMatcher.withText("Vedi tutte le fatture"));
+		deleteButton.requireVisible();
+		window.list("clientsList").clearSelection(); 
+		deleteButton.requireNotVisible();
+	}
+	
+	@Test @GUITest
+	public void testShowAllInvoicesShouldDelegateToControllerFindAllInvoicesAndRevenue() {
+		GuiActionRunner.execute(() -> {
+			balanceSwingView.getClientListModel().addElement(CLIENT_FIXTURE_1);
+			balanceSwingView.getComboboxYearsModel().addElement(CURRENT_YEAR);
+			balanceSwingView.getComboboxYearsModel().addElement(YEAR_FIXTURE);
+		}); 
+		window.list("clientsList").selectItem(0);
+		window.comboBox("yearsCombobox").selectItem(1);
+		window.button(JButtonMatcher.withText("Vedi tutte le fatture")).click();
+		verify(balanceController).allInvoicesByYear(YEAR_FIXTURE);
+		verify(balanceController).annualRevenue(YEAR_FIXTURE);
+		window.button(JButtonMatcher.withText("Vedi tutte le fatture")).requireNotVisible();
 	}
 	
 }
