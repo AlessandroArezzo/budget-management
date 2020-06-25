@@ -284,10 +284,11 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 	public void testShowAllInvoicesShouldDelegateToControllerFindAllInvoicesAndRevenue() {
 		GuiActionRunner.execute(() -> {
 			balanceSwingView.getClientListModel().addElement(CLIENT_FIXTURE_1);
+			balanceSwingView.getComboboxYearsModel().addElement(CURRENT_YEAR);
 			balanceSwingView.getComboboxYearsModel().addElement(YEAR_FIXTURE);
 		}); 
-		window.comboBox("yearsCombobox").selectItem(0);
 		window.list("clientsList").selectItem(0);
+		window.comboBox("yearsCombobox").selectItem(1);
 		window.button(JButtonMatcher.withText("Vedi tutte le fatture")).click();
 		verify(balanceController).allInvoicesByYear(YEAR_FIXTURE);
 		verify(balanceController).annualRevenue(YEAR_FIXTURE);

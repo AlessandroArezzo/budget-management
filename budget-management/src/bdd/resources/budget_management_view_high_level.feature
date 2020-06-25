@@ -67,7 +67,7 @@ Feature: Budget Management View High Level
 	
 	Scenario: Show all invoices of a selected year after selected a client
 		Given The user selects a year from the year selection combobox
-		And The user selects a client from the list
+		And The user selects a client from the client list
 		When The user clicks the "Vedi tutte le fatture" button
 		Then The invoice list contains all invoices of the selected year
 		And The initial total annual revenue of the selected year is shown

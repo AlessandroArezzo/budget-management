@@ -4,6 +4,8 @@ import javax.swing.JFrame;
 
 import org.assertj.swing.core.BasicRobot;
 import org.assertj.swing.core.GenericTypeMatcher;
+import org.assertj.swing.core.matcher.JButtonMatcher;
+import org.assertj.swing.exception.ComponentLookupException;
 import org.assertj.swing.finder.WindowFinder;
 import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.launcher.ApplicationLauncher;
@@ -177,8 +179,12 @@ public class BalanceSwingSteps {
 
 	@When("The user clicks the {string} button")
 	public void the_user_clicks_the_button(String string) {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
+		try {
+			window.button(JButtonMatcher.withText(string)).click();
+		}
+		catch(ComponentLookupException e) {
+			throw new cucumber.api.PendingException();
+		}
 	}
 
 	@Then("The client list contains the new client")

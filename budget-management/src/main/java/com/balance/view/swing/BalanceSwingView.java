@@ -178,22 +178,26 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		
 		comboboxYears.addActionListener(
 					e -> {
-					int yearSelected=(int) comboboxYears.getSelectedItem();
-					Client clientSelected=listClients.getSelectedValue();
-					if(clientSelected==null) {
-				    	balanceController.allInvoicesByYear(yearSelected);
-				    	balanceController.annualRevenue(yearSelected);
-					}
-					else {
-						balanceController.allInvoicesByClientAndYear(clientSelected, yearSelected);
-						balanceController.annualClientRevenue(clientSelected, yearSelected);
+					if(comboboxYears.getSelectedIndex()!=-1) {
+						int yearSelected=(int) comboboxYears.getSelectedItem();
+						Client clientSelected=listClients.getSelectedValue();
+						if(clientSelected==null) {
+					    	balanceController.allInvoicesByYear(yearSelected);
+					    	balanceController.annualRevenue(yearSelected);
+						}
+						else {
+							balanceController.allInvoicesByClientAndYear(clientSelected, yearSelected);
+							balanceController.annualClientRevenue(clientSelected, yearSelected);
+						}
 					}
 			});
 		
 		btnShowAllInvoices.addActionListener(
 				e -> {
 					if(comboboxYears.getSelectedItem()!=null) {
-						listClients.clearSelection();
+						int yearSelected=(int) comboboxYears.getSelectedItem();
+						balanceController.allInvoicesByYear(yearSelected);
+				    	balanceController.annualRevenue(yearSelected);
 						btnShowAllInvoices.setVisible(false);
 					}
 				});
