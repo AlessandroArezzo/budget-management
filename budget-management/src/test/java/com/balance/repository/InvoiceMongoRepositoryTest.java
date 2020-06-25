@@ -324,6 +324,20 @@ public class InvoiceMongoRepositoryTest {
 			.isEqualTo(10.0);
 	}
 	
+	@Test
+	public void testDeleteAllInvoicesOfAClient() {
+		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), 
+				DATE_OF_THE_YEAR_FIXTURE, 10);
+		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), 
+				DATE_NOT_OF_THE_YEAR_FIXTURE, 20);
+		addTestInvoiceToDatabase(CLIENT_FIXTURE_2.getId(), 
+				DATE_OF_THE_YEAR_FIXTURE, 30);
+		when(clientRepository.findById(CLIENT_FIXTURE_2.getId())).thenReturn(CLIENT_FIXTURE_2);
+		invoiceRepository.deleteAllInvoicesByClient(CLIENT_FIXTURE_1.getId());
+		assertThat(readAllInvoicesFromDatabase()).containsOnly(
+				new Invoice(CLIENT_FIXTURE_2, DATE_OF_THE_YEAR_FIXTURE,30));
+	}
+	
 	private List<Invoice> readAllInvoicesFromDatabase() {
 		return StreamSupport.stream(invoiceCollection.find().spliterator(), false).
 				map(d -> new Invoice(d.get(FIELD_PK).toString(),

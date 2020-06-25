@@ -26,8 +26,6 @@ import java.util.List;
 
 import javax.swing.JList;
 import javax.swing.JComboBox;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.ListSelectionEvent;
 
 public class BalanceSwingView extends JFrame implements BalanceView {
 
@@ -44,7 +42,10 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 	private JComboBox<Integer> comboboxYears;
 	private DefaultComboBoxModel<Integer> comboboxYearsModel;
 	private JLabel lblRevenue;
-	
+	private JLabel lbClientError;
+	private JComboBox<Client> comboBoxClients;
+	private DefaultComboBoxModel<Client> comboboxClientsModel;
+
 	public void setBalanceController(BalanceController balanceController) {
 		this.balanceController = balanceController;
 	}
@@ -61,9 +62,9 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		setContentPane(contentPane);
 		GridBagLayout gbl_contentPane = new GridBagLayout();
 		gbl_contentPane.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-		gbl_contentPane.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0};
+		gbl_contentPane.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
 		gbl_contentPane.columnWeights = new double[]{1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_contentPane.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
+		gbl_contentPane.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		contentPane.setLayout(gbl_contentPane);
 		
 		JLabel lblManagement = new JLabel("GESTIONE RICAVI");
@@ -99,7 +100,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		contentPane.add(comboboxYears, gbc_comboboxYears);
 		listClients = new JList<>(clientListModel);
 		listClients.addListSelectionListener(e -> {
-			if (!e.getValueIsAdjusting()) {
+			if (!e.getValueIsAdjusting() && listClients.getSelectedValue()!=null) {
 				balanceController.allInvoicesByClientAndYear(
 						listClients.getSelectedValue(), (int) comboboxYears.getSelectedItem());
 				balanceController.annualClientRevenue(
@@ -135,13 +136,32 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		scrollPaneInvoicesList.setViewportView(listInvoices);
 		contentPane.add(scrollPaneInvoicesList, gbc_listInvoices);
 		
+		comboboxClientsModel=new DefaultComboBoxModel<>();
+		comboBoxClients = new JComboBox<>(comboboxClientsModel);
+		comboBoxClients.setName("clientsCombobox");
+		GridBagConstraints gbc_comboBoxClients = new GridBagConstraints();
+		gbc_comboBoxClients.insets = new Insets(0, 0, 5, 5);
+		gbc_comboBoxClients.fill = GridBagConstraints.HORIZONTAL;
+		gbc_comboBoxClients.gridx = 6;
+		gbc_comboBoxClients.gridy = 5;
+		contentPane.add(comboBoxClients, gbc_comboBoxClients);
+		
+		lbClientError = new JLabel("");
+		lbClientError.setName("labelClientErrorMessage");
+		GridBagConstraints gbc_lbClientError = new GridBagConstraints();
+		gbc_lbClientError.insets = new Insets(0, 0, 5, 5);
+		gbc_lbClientError.gridx = 0;
+		gbc_lbClientError.gridy = 6;
+		contentPane.add(lbClientError, gbc_lbClientError);
+		
 		lblRevenue = new JLabel("");
 		lblRevenue.setName("revenueLabel");
 		GridBagConstraints gbc_lblRevenue = new GridBagConstraints();
 		gbc_lblRevenue.insets = new Insets(0, 0, 0, 5);
 		gbc_lblRevenue.gridx = 6;
-		gbc_lblRevenue.gridy = 5;
+		gbc_lblRevenue.gridy = 7;
 		contentPane.add(lblRevenue, gbc_lblRevenue);
+		
 		
 		comboboxYears.addActionListener(
 					e -> {
@@ -161,7 +181,8 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 
 	@Override
 	public void showClients(List<Client> clients) {
-		clients.stream().forEach(clientListModel::addElement); 
+		clients.stream().forEach(clientListModel::addElement);
+		clients.stream().forEach(comboboxClientsModel::addElement);
 	}
 
 
@@ -197,6 +218,10 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 	public DefaultListModel<Client> getClientListModel() {
 		return clientListModel;
 	}
+	
+	public DefaultComboBoxModel<Client> getComboboxClientsModel() {
+		return comboboxClientsModel;
+	}
 
 	@Override
 	public void setYearSelected(int year) {
@@ -209,6 +234,16 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 	public void setAnnualClientRevenue(Client client, int year, double clientRevenue) {
 		lblRevenue.setText("Il ricavo totale delle fatture del cliente "+client.getIdentifier()+" "
 				+ "nel "+year+" è di "+String.format("%.2f", clientRevenue)+"€");
+	}
+
+	@Override
+	public void clientRemoved(Client clientToRemove) {
+		clientListModel.removeElement(clientToRemove);
+		comboboxClientsModel.removeElement(clientToRemove);
+	}
+
+	public void showClientError(String message, Client client) {
+		lbClientError.setText(message+": "+client.getIdentifier());
 	}
 
 }

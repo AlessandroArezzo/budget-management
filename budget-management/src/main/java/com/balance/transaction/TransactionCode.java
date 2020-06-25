@@ -6,5 +6,4 @@ import com.balance.repository.RepositoryFactory;
 
 
 @FunctionalInterface
-public interface TransactionCode<R> extends Function <RepositoryFactory,R>{
-}
+public interface TransactionCode<R> extends Function<RepositoryFactory,R>{ }

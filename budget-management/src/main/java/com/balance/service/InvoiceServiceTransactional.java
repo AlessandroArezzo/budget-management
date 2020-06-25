@@ -2,8 +2,10 @@ package com.balance.service;
 
 import java.util.List;
 
+import com.balance.exception.ClientNotFoundException;
 import com.balance.model.Client;
 import com.balance.model.Invoice;
+import com.balance.repository.ClientRepository;
 import com.balance.repository.InvoiceRepository;
 import com.balance.repository.TypeRepository;
 import com.balance.transaction.TransactionManager;
@@ -44,18 +46,27 @@ public class InvoiceServiceTransactional implements InvoiceService{
 	}
 
 	@Override
-	public List<Invoice> findInvoicesByClientAndYear(Client client, int year) {
+	public List<Invoice> findInvoicesByClientAndYear(Client client, int year){
 		return transactionManager.doInTransaction(
-			factory -> { 
+			factory -> {
+				ClientRepository clientRepository=(ClientRepository) factory.createRepository(TypeRepository.CLIENT);
+				if(clientRepository.findById(client.getId())==null) {
+					throw new ClientNotFoundException("Cliente "+client.getIdentifier()+" non presente nel database");
+				}
 				InvoiceRepository invoiceRepository=(InvoiceRepository) factory.createRepository(TypeRepository.INVOICE);
 			    return invoiceRepository.findInvoicesByClientAndYear(client, year);
-		});
+			});
+		
 	}
 
 	@Override
-	public double getAnnualClientRevenue(Client client, int year) {
+	public double getAnnualClientRevenue(Client client, int year){
 		return transactionManager.doInTransaction(
-				factory -> { 
+				factory -> {
+					ClientRepository clientRepository=(ClientRepository) factory.createRepository(TypeRepository.CLIENT);
+					if(clientRepository.findById(client.getId())==null) {
+						throw new ClientNotFoundException("Cliente "+client.getIdentifier()+" non presente nel database");
+					}
 					InvoiceRepository invoiceRepository=(InvoiceRepository) factory.createRepository(TypeRepository.INVOICE);
 				    return invoiceRepository.getClientRevenueOfAnYear(client, year);
 			});

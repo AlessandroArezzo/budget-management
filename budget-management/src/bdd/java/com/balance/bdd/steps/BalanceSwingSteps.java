@@ -115,7 +115,7 @@ public class BalanceSwingSteps {
 					INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE).toString(),
 			new Invoice(INVOICE_OF_THE_YEAR_FIXTURE_3_CLIENT,INVOICE_OF_THE_YEAR_FIXTURE_3_DATE,
 					INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE).toString()
-	);
+		);
 	}
 
 	@Then("The initial total annual revenue of the client selected of the selected year is shown")
@@ -129,38 +129,44 @@ public class BalanceSwingSteps {
 
 	@When("The user selects the client removed from the client list")
 	public void the_user_selects_the_client_removed_from_the_client_list() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
+		window.list("clientsList")
+    		.selectItem(Pattern.compile(CLIENT_FIXTURE_2_IDENTIFIER));
 	}
 
 	@Then("An error is shown containing the name of the selected client")
 	public void an_error_is_shown_containing_the_name_of_the_selected_client() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
+		assertThat(window.label("labelClientErrorMessage").text())
+			.contains(CLIENT_FIXTURE_2_IDENTIFIER); 
 	}
 
 	@Then("The client is removed from the client list")
 	public void the_client_is_removed_from_the_client_list() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
+		assertThat(window.list("clientsList").contents())
+			.noneMatch(
+				e -> e.contains(CLIENT_FIXTURE_2_IDENTIFIER));
 	}
 
 	@Then("The client is removed from client selection combobox in the invoice addition data")
 	public void the_client_is_removed_from_client_selection_combobox_in_the_invoice_addition_data() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
+		assertThat(window.comboBox("clientsCombobox").contents())
+			.noneMatch(
+				e -> e.contains(CLIENT_FIXTURE_2_IDENTIFIER));
 	}
 
 	@Then("The invoice list contains all invoices of the selected year without invoices of the client removed")
 	public void the_invoice_list_contains_all_invoices_of_the_selected_year_without_invoices_of_the_client_removed() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
+		assertThat(window.list("invoicesList").contents())
+		.containsOnly(
+			new Invoice(INVOICE_OF_THE_YEAR_FIXTURE_1_CLIENT,INVOICE_OF_THE_YEAR_FIXTURE_1_DATE,
+					INVOICE_OF_THE_YEAR_FIXTURE_1_REVENUE).toString()
+			);
 	}
 
 	@Then("The total annual revenue of the selected year is shown considering invoices of the client removed")
 	public void the_total_annual_revenue_of_the_selected_year_is_shown_considering_invoices_of_the_client_removed() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
+		window.label("revenueLabel").requireText(
+				"Il ricavo totale del "+YEAR_FIXTURE+" è di "+String.format("%.2f", 
+						INVOICE_OF_THE_YEAR_FIXTURE_1_REVENUE)+"€");
 	}
 
 	@Given("The user provides client data in the text fields")
