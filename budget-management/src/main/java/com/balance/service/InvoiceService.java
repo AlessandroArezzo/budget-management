@@ -14,7 +14,7 @@ public interface InvoiceService {
 	
 	public List<Integer> findYearsOfTheInvoices();
 
-	public List<Invoice> findInvoicesByClientAndYear(Client client, int year) throws ClientNotFoundException;
+	public List<Invoice> findInvoicesByClientAndYear(Client client, int year);
 
 	public double getAnnualClientRevenue(Client client, int year);
 	

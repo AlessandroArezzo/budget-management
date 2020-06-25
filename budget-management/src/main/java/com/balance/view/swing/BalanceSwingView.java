@@ -9,7 +9,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 import com.balance.controller.BalanceController;
@@ -27,7 +26,6 @@ import java.util.List;
 
 import javax.swing.JList;
 import javax.swing.JComboBox;
-import javax.swing.JTextField;
 
 public class BalanceSwingView extends JFrame implements BalanceView {
 

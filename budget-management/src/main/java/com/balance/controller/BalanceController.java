@@ -1,11 +1,9 @@
 package com.balance.controller;
 
 import java.util.Calendar;
-import java.util.List;
 
 import com.balance.exception.ClientNotFoundException;
 import com.balance.model.Client;
-import com.balance.model.Invoice;
 import com.balance.service.ClientService;
 import com.balance.service.InvoiceService;
 import com.balance.view.BalanceView;
