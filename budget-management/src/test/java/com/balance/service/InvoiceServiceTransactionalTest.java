@@ -1,6 +1,7 @@
 package com.balance.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.AdditionalAnswers.answer;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -18,8 +19,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import com.balance.exception.ClientNotFoundException;
 import com.balance.model.Client;
 import com.balance.model.Invoice;
+import com.balance.repository.ClientRepository;
 import com.balance.repository.InvoiceRepository;
 import com.balance.repository.RepositoryFactory;
 import com.balance.repository.TypeRepository;
@@ -40,6 +43,9 @@ public class InvoiceServiceTransactionalTest {
 	@Mock 
 	private InvoiceRepository invoiceRepository;
 	
+	@Mock 
+	private ClientRepository clientRepository;
+	
 	private static final int YEAR_FIXTURE=2019;
 	private static final Client CLIENT_FIXTURE=new Client("test identifier");
 
@@ -51,6 +57,7 @@ public class InvoiceServiceTransactionalTest {
 		when(transactionManager.doInTransaction(
 				any())).thenAnswer(answer((TransactionCode<?> code) -> code.apply(repositoryFactory)));
 		doReturn(invoiceRepository).when(repositoryFactory).createRepository(TypeRepository.INVOICE);
+		doReturn(clientRepository).when(repositoryFactory).createRepository(TypeRepository.CLIENT);
 
 	}
 	
@@ -81,6 +88,8 @@ public class InvoiceServiceTransactionalTest {
 	
 	@Test
 	public void testFindInvoicesByClientAndYear() {
+		when(clientRepository.findById(CLIENT_FIXTURE.getId()))
+			.thenReturn(CLIENT_FIXTURE);
 		List<Invoice> invoices=Arrays.asList(new Invoice());
 		when(invoiceRepository.findInvoicesByClientAndYear(CLIENT_FIXTURE, YEAR_FIXTURE))
 			.thenReturn(invoices);
@@ -90,6 +99,8 @@ public class InvoiceServiceTransactionalTest {
 	
 	@Test
 	public void testGetAnnualClientRevenue() {
+		when(clientRepository.findById(CLIENT_FIXTURE.getId()))
+			.thenReturn(CLIENT_FIXTURE);
 		double revenueOfYear=100.0;
 		when(invoiceRepository.getClientRevenueOfAnYear(CLIENT_FIXTURE, YEAR_FIXTURE))
 			.thenReturn(revenueOfYear);
@@ -97,7 +108,32 @@ public class InvoiceServiceTransactionalTest {
 			.isEqualTo(revenueOfYear);
 	}
 	
+	@Test
+	public void testFindInvoicesByClientAndYearWhenClientIsNotPresentInDatabase() {
+		when(clientRepository.findById(CLIENT_FIXTURE.getId()))
+			.thenReturn(null);
+		try {
+			invoiceService.findInvoicesByClientAndYear(CLIENT_FIXTURE, YEAR_FIXTURE);
+			fail("Excpected a ClientNotFoundException to be thrown");
+		}
+		catch(ClientNotFoundException e) {
+			assertThat("Cliente "+CLIENT_FIXTURE.getIdentifier()+" non presente nel database")
+					.isEqualTo(e.getMessage());
+		}
+	}
 	
-	
+	@Test
+	public void testGetAnnualClientRevenueWhenClientIsNotPresentInDatabase() {
+		when(clientRepository.findById(CLIENT_FIXTURE.getId()))
+			.thenReturn(null);
+		try {
+			invoiceService.getAnnualClientRevenue(CLIENT_FIXTURE, YEAR_FIXTURE);
+			fail("Excpected a ClientNotFoundException to be thrown");
+		}
+		catch(ClientNotFoundException e) {
+			assertThat("Cliente "+CLIENT_FIXTURE.getIdentifier()+" non presente nel database")
+					.isEqualTo(e.getMessage());
+		}
+	}	
 	
 }

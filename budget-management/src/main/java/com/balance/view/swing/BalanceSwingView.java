@@ -26,8 +26,6 @@ import java.util.List;
 
 import javax.swing.JList;
 import javax.swing.JComboBox;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.ListSelectionEvent;
 
 public class BalanceSwingView extends JFrame implements BalanceView {
 
@@ -44,6 +42,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 	private JComboBox<Integer> comboboxYears;
 	private DefaultComboBoxModel<Integer> comboboxYearsModel;
 	private JLabel lblRevenue;
+	private JLabel lblClientErrorMessage;
 	
 	public void setBalanceController(BalanceController balanceController) {
 		this.balanceController = balanceController;
@@ -61,9 +60,9 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		setContentPane(contentPane);
 		GridBagLayout gbl_contentPane = new GridBagLayout();
 		gbl_contentPane.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-		gbl_contentPane.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0};
+		gbl_contentPane.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
 		gbl_contentPane.columnWeights = new double[]{1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_contentPane.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
+		gbl_contentPane.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
 		contentPane.setLayout(gbl_contentPane);
 		
 		JLabel lblManagement = new JLabel("GESTIONE RICAVI");
@@ -135,12 +134,20 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		scrollPaneInvoicesList.setViewportView(listInvoices);
 		contentPane.add(scrollPaneInvoicesList, gbc_listInvoices);
 		
+		lblClientErrorMessage = new JLabel("");
+		lblClientErrorMessage.setName("labelClientErrorMessage");
+		GridBagConstraints gbc_lblClientErrorMessage = new GridBagConstraints();
+		gbc_lblClientErrorMessage.insets = new Insets(0, 0, 5, 5);
+		gbc_lblClientErrorMessage.gridx = 0;
+		gbc_lblClientErrorMessage.gridy = 5;
+		contentPane.add(lblClientErrorMessage, gbc_lblClientErrorMessage);
+		
 		lblRevenue = new JLabel("");
 		lblRevenue.setName("revenueLabel");
 		GridBagConstraints gbc_lblRevenue = new GridBagConstraints();
 		gbc_lblRevenue.insets = new Insets(0, 0, 0, 5);
 		gbc_lblRevenue.gridx = 6;
-		gbc_lblRevenue.gridy = 5;
+		gbc_lblRevenue.gridy = 6;
 		contentPane.add(lblRevenue, gbc_lblRevenue);
 		
 		comboboxYears.addActionListener(
@@ -209,6 +216,15 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 	public void setAnnualClientRevenue(Client client, int year, double clientRevenue) {
 		lblRevenue.setText("Il ricavo totale delle fatture del cliente "+client.getIdentifier()+" "
 				+ "nel "+year+" è di "+String.format("%.2f", clientRevenue)+"€");
+	}
+
+	@Override
+	public void clientRemoved(Client clientToRemove) {
+		clientListModel.removeElement(clientToRemove);
+	}
+
+	public void showClientError(String message, Client client) {
+		lblClientErrorMessage.setText(message+": "+client.getIdentifier());
 	}
 
 }

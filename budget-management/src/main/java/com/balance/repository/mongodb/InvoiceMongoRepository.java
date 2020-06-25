@@ -79,7 +79,7 @@ public class InvoiceMongoRepository implements InvoiceRepository{
 
 	@Override
 	public void delete(String id) {
-		invoiceCollection.deleteOne(Filters.eq(FIELD_PK, new ObjectId(id)));
+		invoiceCollection.deleteOne(clientSession, Filters.eq(FIELD_PK, new ObjectId(id)));
 	}
 	
 	@Override
@@ -99,7 +99,7 @@ public class InvoiceMongoRepository implements InvoiceRepository{
 	@Override
 	public double getTotalRevenueOfAnYear(int year) {
 		String totalRevenueField="totalRevenue";
-		Document sumDocument=invoiceCollection.aggregate(
+		Document sumDocument=invoiceCollection.aggregate(clientSession,
 				  Arrays.asList(
 				          Aggregates.match(Filters.and(Filters.gte(FIELD_DATE, getFirstDayOfYear(year)),
 									Filters.lte(FIELD_DATE, getLastDayOfYear(year)))),
@@ -133,7 +133,7 @@ public class InvoiceMongoRepository implements InvoiceRepository{
 	public List<Integer> getYearsOfInvoicesInDatabase() {
 		return new ArrayList<> (
 				StreamSupport.
-					stream(invoiceCollection.aggregate(
+					stream(invoiceCollection.aggregate(clientSession,
 							  Arrays.asList(
 							          Aggregates.project(
 							        		  Projections.fields(
@@ -166,7 +166,7 @@ public class InvoiceMongoRepository implements InvoiceRepository{
 	@Override
 	public double getClientRevenueOfAnYear(Client client, int year) {
 		String totalRevenueField="totalClientRevenue";
-		Document sumClientDocument= invoiceCollection.aggregate(
+		Document sumClientDocument= invoiceCollection.aggregate(clientSession,
 				  Arrays.asList(
 				          Aggregates.match(
 				        		  Filters.and(

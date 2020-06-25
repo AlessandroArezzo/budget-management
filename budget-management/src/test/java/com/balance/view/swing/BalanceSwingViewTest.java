@@ -70,6 +70,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.list("invoicesList");
 		window.label("revenueLabel");
 		window.comboBox("yearsCombobox");
+		window.label("labelClientErrorMessage").requireText("");
 	}
 	
 	@Test @GUITest
@@ -223,12 +224,35 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 	@Test @GUITest
 	public void testSetClientAnnualRevenueWithOneOrMoreZeroNotSignificant() {
 		GuiActionRunner.execute(() -> 
-		balanceSwingView.setAnnualClientRevenue(CLIENT_FIXTURE_1,2019,300.50)
+			balanceSwingView.setAnnualClientRevenue(CLIENT_FIXTURE_1,2019,300.50)
 		);
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale delle fatture del cliente "
 						+CLIENT_FIXTURE_1.getIdentifier()+""
 						+ " nel 2019 è di 300.50€");
+	}
+	
+	@Test @GUITest
+	public void testClientRemovedShouldRemoveTheClientFromTheList(){
+		GuiActionRunner.execute(() -> {
+			DefaultListModel<Client> listClientsModel =balanceSwingView.getClientListModel();
+			listClientsModel.addElement(CLIENT_FIXTURE_1);
+			listClientsModel.addElement(CLIENT_FIXTURE_2);
+			}
+		);
+		GuiActionRunner.execute( () -> balanceSwingView.clientRemoved(
+				CLIENT_FIXTURE_1)
+			);
+		assertThat(window.list("clientsList").contents())
+			.containsExactly(CLIENT_FIXTURE_2.toString());
+	}
+	
+	@Test @GUITest
+	public void testShowErrorClientShouldShowTheMessageInTheClientErrorLabel() {
+		GuiActionRunner.execute(
+				() -> balanceSwingView.showClientError("error message", CLIENT_FIXTURE_1) );
+		window.label("labelClientErrorMessage").requireText("error message: " + 
+				CLIENT_FIXTURE_1.getIdentifier());
 	}
 	
 }

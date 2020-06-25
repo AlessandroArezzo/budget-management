@@ -18,5 +18,9 @@ public interface BalanceView {
 	void setYearSelected(int year);
 
 	public void setAnnualClientRevenue(Client client, int year, double clientRevenue);
+	
+	public void clientRemoved(Client clientToRemove);
+	
+	public void showClientError(String message, Client client);
 
 }

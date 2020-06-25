@@ -34,7 +34,6 @@
    	</sonar.coverage.exclusions>
    	
 	<sonar.issue.ignore.multicriteria>e1,e2,e3,e4,e5,e6</sonar.issue.ignore.multicriteria>
-	
 	<!--Disable rule for "Tests should include assertions" in swing view tests-->
 	<sonar.issue.ignore.multicriteria.e1.ruleKey>
 		java:S2699

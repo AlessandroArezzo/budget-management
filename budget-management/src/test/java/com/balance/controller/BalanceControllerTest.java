@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.balance.controller.BalanceController;
+import com.balance.exception.ClientNotFoundException;
 import com.balance.model.Client;
 import com.balance.model.Invoice;
 import com.balance.service.ClientService;
@@ -93,7 +94,7 @@ public class BalanceControllerTest {
 	}
 	
 	@Test
-	public void testInvoicesByClientAndYear() {
+	public void testInvoicesByClientAndYear(){
 		List<Invoice> invoiceofClientAndYear = Arrays.asList(new Invoice());
 		when(invoiceService.findInvoicesByClientAndYear(CLIENT_FIXTURE,YEAR_FIXTURE))
 			.thenReturn(invoiceofClientAndYear);
@@ -110,5 +111,36 @@ public class BalanceControllerTest {
 				CLIENT_FIXTURE, YEAR_FIXTURE, TOTAL_REVENUE_FIXTURE);
 	}
 	
+	@Test
+	public void testInvoicesByClientAndYearWhenClientIsNotPresentInDatabase() {
+		List<Invoice> invoices = Arrays.asList(new Invoice());
+		when(invoiceService.findAllInvoicesByYear(YEAR_FIXTURE)).thenReturn(invoices);
+		when(invoiceService.getTotalRevenueOfAnYear(YEAR_FIXTURE))
+			.thenReturn(TOTAL_REVENUE_FIXTURE);
+		when(invoiceService.findInvoicesByClientAndYear(CLIENT_FIXTURE,YEAR_FIXTURE))
+			.thenThrow(new ClientNotFoundException("Client not found"));
+		balanceController.allInvoicesByClientAndYear(CLIENT_FIXTURE, YEAR_FIXTURE);
+		verify(balanceView).showClientError("Cliente non più presente nel database", 
+				CLIENT_FIXTURE);
+		verify(balanceView).clientRemoved(CLIENT_FIXTURE);
+		verify(balanceView).showInvoices(invoices);
+		verify(balanceView).setAnnualTotalRevenue(YEAR_FIXTURE,TOTAL_REVENUE_FIXTURE);
+	}
+	
+	@Test
+	public void testAnnualClientRevenueWhenClientIsNotPresentInDatabase() {
+		List<Invoice> invoices = Arrays.asList(new Invoice());
+		when(invoiceService.findAllInvoicesByYear(YEAR_FIXTURE)).thenReturn(invoices);
+		when(invoiceService.getTotalRevenueOfAnYear(YEAR_FIXTURE))
+			.thenReturn(TOTAL_REVENUE_FIXTURE);
+		when(invoiceService.getAnnualClientRevenue(CLIENT_FIXTURE,YEAR_FIXTURE))
+			.thenThrow(new ClientNotFoundException("Client not found"));
+		balanceController.annualClientRevenue(CLIENT_FIXTURE, YEAR_FIXTURE);
+		verify(balanceView).showClientError("Cliente non più presente nel database", 
+				CLIENT_FIXTURE);
+		verify(balanceView).clientRemoved(CLIENT_FIXTURE);
+		verify(balanceView).showInvoices(invoices);
+		verify(balanceView).setAnnualTotalRevenue(YEAR_FIXTURE,TOTAL_REVENUE_FIXTURE);
+	}
 	
 }

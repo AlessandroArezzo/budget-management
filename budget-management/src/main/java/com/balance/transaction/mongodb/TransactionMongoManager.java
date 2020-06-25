@@ -4,6 +4,7 @@ import com.balance.repository.mongodb.RepositoryMongoFactory;
 import com.balance.transaction.TransactionCode;
 import com.balance.transaction.TransactionManager;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoException;
 import com.mongodb.ReadConcern;
 import com.mongodb.ReadPreference;
 import com.mongodb.TransactionOptions;
@@ -44,7 +45,7 @@ public class TransactionMongoManager implements TransactionManager {
 			};
 			return clientSession.withTransaction(transactionBody , transactionOptions);
 		} 
-		catch(Exception ex){
+		catch(MongoException ex){
 			return null;
 		}
 	}
