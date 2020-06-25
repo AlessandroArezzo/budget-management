@@ -26,6 +26,7 @@ import java.util.List;
 
 import javax.swing.JList;
 import javax.swing.JComboBox;
+import javax.swing.JButton;
 
 public class BalanceSwingView extends JFrame implements BalanceView {
 
@@ -45,6 +46,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 	private JLabel lbClientError;
 	private JComboBox<Client> comboBoxClients;
 	private DefaultComboBoxModel<Client> comboboxClientsModel;
+	private JButton btnShowAllInvoices;
 
 	public void setBalanceController(BalanceController balanceController) {
 		this.balanceController = balanceController;
@@ -61,16 +63,16 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		GridBagLayout gbl_contentPane = new GridBagLayout();
-		gbl_contentPane.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-		gbl_contentPane.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
-		gbl_contentPane.columnWeights = new double[]{1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_contentPane.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_contentPane.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		gbl_contentPane.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		gbl_contentPane.columnWeights = new double[]{1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_contentPane.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		contentPane.setLayout(gbl_contentPane);
 		
 		JLabel lblManagement = new JLabel("GESTIONE RICAVI");
 		GridBagConstraints gbc_lblManagement = new GridBagConstraints();
 		gbc_lblManagement.insets = new Insets(0, 0, 5, 5);
-		gbc_lblManagement.gridx = 6;
+		gbc_lblManagement.gridx = 7;
 		gbc_lblManagement.gridy = 0;
 		contentPane.add(lblManagement, gbc_lblManagement);
 		
@@ -84,7 +86,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		JLabel lblInvoice = new JLabel("FATTURE");
 		GridBagConstraints gbc_lblInvoice = new GridBagConstraints();
 		gbc_lblInvoice.insets = new Insets(0, 0, 5, 5);
-		gbc_lblInvoice.gridx = 6;
+		gbc_lblInvoice.gridx = 7;
 		gbc_lblInvoice.gridy = 2;
 		contentPane.add(lblInvoice, gbc_lblInvoice);
 		
@@ -95,12 +97,15 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		GridBagConstraints gbc_comboboxYears = new GridBagConstraints();
 		gbc_comboboxYears.insets = new Insets(0, 0, 5, 5);
 		gbc_comboboxYears.fill = GridBagConstraints.HORIZONTAL;
-		gbc_comboboxYears.gridx = 6;
+		gbc_comboboxYears.gridx = 7;
 		gbc_comboboxYears.gridy = 3;
 		contentPane.add(comboboxYears, gbc_comboboxYears);
 		listClients = new JList<>(clientListModel);
 		listClients.addListSelectionListener(e -> {
-			if (!e.getValueIsAdjusting() && listClients.getSelectedValue()!=null) {
+			btnShowAllInvoices.setVisible(
+					listClients.getSelectedIndex() != -1); 
+			if (!e.getValueIsAdjusting() && listClients.getSelectedValue()!=null 
+					&& comboboxYears.getSelectedItem()!=null) {
 				balanceController.allInvoicesByClientAndYear(
 						listClients.getSelectedValue(), (int) comboboxYears.getSelectedItem());
 				balanceController.annualClientRevenue(
@@ -129,7 +134,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		GridBagConstraints gbc_listInvoices = new GridBagConstraints();
 		gbc_listInvoices.insets = new Insets(0, 0, 5, 5);
 		gbc_listInvoices.fill = GridBagConstraints.BOTH;
-		gbc_listInvoices.gridx = 6;
+		gbc_listInvoices.gridx = 7;
 		gbc_listInvoices.gridy = 4;
 		JScrollPane scrollPaneInvoicesList = new JScrollPane();
 		scrollPaneInvoicesList.setPreferredSize(new Dimension(200, 100));
@@ -137,13 +142,21 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		contentPane.add(scrollPaneInvoicesList, gbc_listInvoices);
 		
 		comboboxClientsModel=new DefaultComboBoxModel<>();
+		
+		btnShowAllInvoices = new JButton("Vedi tutte le fatture");
+		btnShowAllInvoices.setVisible(false);
+		GridBagConstraints gbc_btnShowAllInvoices = new GridBagConstraints();
+		gbc_btnShowAllInvoices.insets = new Insets(0, 0, 5, 5);
+		gbc_btnShowAllInvoices.gridx = 7;
+		gbc_btnShowAllInvoices.gridy = 5;
+		contentPane.add(btnShowAllInvoices, gbc_btnShowAllInvoices);
 		comboBoxClients = new JComboBox<>(comboboxClientsModel);
 		comboBoxClients.setName("clientsCombobox");
 		GridBagConstraints gbc_comboBoxClients = new GridBagConstraints();
 		gbc_comboBoxClients.insets = new Insets(0, 0, 5, 5);
 		gbc_comboBoxClients.fill = GridBagConstraints.HORIZONTAL;
-		gbc_comboBoxClients.gridx = 6;
-		gbc_comboBoxClients.gridy = 5;
+		gbc_comboBoxClients.gridx = 7;
+		gbc_comboBoxClients.gridy = 6;
 		contentPane.add(comboBoxClients, gbc_comboBoxClients);
 		
 		lbClientError = new JLabel("");
@@ -151,15 +164,15 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		GridBagConstraints gbc_lbClientError = new GridBagConstraints();
 		gbc_lbClientError.insets = new Insets(0, 0, 5, 5);
 		gbc_lbClientError.gridx = 0;
-		gbc_lbClientError.gridy = 6;
+		gbc_lbClientError.gridy = 7;
 		contentPane.add(lbClientError, gbc_lbClientError);
 		
 		lblRevenue = new JLabel("");
 		lblRevenue.setName("revenueLabel");
 		GridBagConstraints gbc_lblRevenue = new GridBagConstraints();
 		gbc_lblRevenue.insets = new Insets(0, 0, 0, 5);
-		gbc_lblRevenue.gridx = 6;
-		gbc_lblRevenue.gridy = 7;
+		gbc_lblRevenue.gridx = 7;
+		gbc_lblRevenue.gridy = 8;
 		contentPane.add(lblRevenue, gbc_lblRevenue);
 		
 		
@@ -176,6 +189,14 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 						balanceController.annualClientRevenue(clientSelected, yearSelected);
 					}
 			});
+		
+		btnShowAllInvoices.addActionListener(
+				e -> {
+					if(comboboxYears.getSelectedItem()!=null) {
+						listClients.clearSelection();
+						btnShowAllInvoices.setVisible(false);
+					}
+				});
 	}
 
 
