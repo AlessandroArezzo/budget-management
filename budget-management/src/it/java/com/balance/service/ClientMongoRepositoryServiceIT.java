@@ -52,4 +52,6 @@ public class ClientMongoRepositoryServiceIT {
 		clientRepository.save(CLIENT_FIXTURE_2);
 		assertThat(clientService.findAllClients()).containsExactly(CLIENT_FIXTURE_1,CLIENT_FIXTURE_2);
 	}
+	
+	
 }

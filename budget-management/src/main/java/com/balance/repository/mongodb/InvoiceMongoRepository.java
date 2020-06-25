@@ -69,12 +69,16 @@ public class InvoiceMongoRepository implements InvoiceRepository{
 	}
 
 	@Override
-	public void save(Invoice newInvoice) {
-		invoiceCollection.insertOne(clientSession,new Document().append(FIELD_DATE, newInvoice.getDate())
-				.append(FIELD_REVENUE, newInvoice.getRevenue())
-				.append(FIELD_CLIENT,
-						new DBRef(clientRepository.getClientCollection().getNamespace().getCollectionName(),
-						new ObjectId(newInvoice.getClient().getId()))));
+	public Invoice save(Invoice newInvoice) {
+		Document invoiceToAdd=new Document().append(FIELD_CLIENT,
+				 new DBRef(clientRepository.getClientCollection().getNamespace().getCollectionName(),
+					 new ObjectId(newInvoice.getClient().getId())))
+			 .append(FIELD_DATE, newInvoice.getDate())
+			 .append(FIELD_REVENUE, newInvoice.getRevenue());
+		invoiceCollection.insertOne(clientSession, invoiceToAdd);
+		newInvoice.setId(invoiceToAdd.get( FIELD_PK ).toString());
+		return newInvoice;
+		
 	}
 
 	@Override

@@ -68,4 +68,8 @@ public class BalanceController {
 			annualRevenue(year);
 		}
 	}
+
+	public void newClient(Client client) {
+		balanceView.clientAdded(clientService.addClient(client));
+	}
 }

@@ -54,9 +54,11 @@ public class ClientMongoRepository implements ClientRepository{
 	}
 
 	@Override
-	public void save(Client newClient) {
-	   clientCollection.insertOne(clientSession,new Document()
-			   .append(FIELD_IDENTIFIER, newClient.getIdentifier()));
+	public Client save(Client newClient) {
+	    Document clientToAdd=new Document().append(FIELD_IDENTIFIER, newClient.getIdentifier());
+		clientCollection.insertOne(clientSession,clientToAdd);
+		newClient.setId(clientToAdd.get( FIELD_PK ).toString());
+		return newClient;
 	}
 
 	@Override

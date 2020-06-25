@@ -129,7 +129,10 @@ public class InvoiceMongoRepositoryTest {
 		when(clientRepository.findById(CLIENT_FIXTURE_1.getId())).thenReturn(CLIENT_FIXTURE_1);
 		when(clientRepository.getClientCollection())
 			.thenReturn(mongoClient.getDatabase(BUDGET_DB_NAME).getCollection(CLIENT_COLLECTION_NAME));
-		invoiceRepository.save(invoice);
+		Invoice invoiceResult=invoiceRepository.save(invoice);
+		assertThat(invoiceResult).isEqualTo(
+				new Invoice(CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 10 ));
+		assertThat(invoiceResult.getId()).isNotNull();
 		assertThat(readAllInvoicesFromDatabase()).containsExactly(new Invoice(
 				CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 10 ));
 	}

@@ -24,4 +24,13 @@ public class ClientServiceTransactional implements ClientService {
 			});
 	}
 
+	public Client addClient(Client client) {
+		return transactionManager.doInTransaction(
+			factory -> { 
+				 ((ClientRepository) factory.createRepository(TypeRepository.CLIENT))
+					.save(client);
+				 return client;
+			});
+	}
+
 }
