@@ -12,6 +12,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 
 import org.assertj.swing.annotation.GUITest;
+import org.assertj.swing.core.matcher.JButtonMatcher;
 import org.assertj.swing.core.matcher.JLabelMatcher;
 import org.assertj.swing.edt.GuiActionRunner;
 import org.assertj.swing.fixture.FrameFixture;
@@ -71,15 +72,18 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.label("revenueLabel");
 		window.comboBox("yearsCombobox");
 		window.label("labelClientErrorMessage").requireText("");
+		window.comboBox("clientsCombobox");
 	}
 	
 	@Test @GUITest
-	public void testShowAllClientsShouldAddClientsDescriptionsToTheClientsList(){ 
+	public void testShowAllClientsShouldAddClientsDescriptionsToTheClientsListAndCombobox(){ 
 		GuiActionRunner.execute(() -> 
 			balanceSwingView.showClients(Arrays.asList(CLIENT_FIXTURE_1, CLIENT_FIXTURE_2)) 
 		);
-		String[] listContents = window.list("clientsList").contents(); 
-		assertThat(listContents).containsExactly(CLIENT_FIXTURE_1.toString(), CLIENT_FIXTURE_2.toString());
+		assertThat(window.list("clientsList").contents())
+			.containsExactly(CLIENT_FIXTURE_1.toString(), CLIENT_FIXTURE_2.toString());
+		assertThat(window.comboBox("clientsCombobox").contents())
+			.containsExactly(CLIENT_FIXTURE_1.toString(), CLIENT_FIXTURE_2.toString());
 	}
 	
 	@Test @GUITest
@@ -233,17 +237,22 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 	}
 	
 	@Test @GUITest
-	public void testClientRemovedShouldRemoveTheClientFromTheList(){
+	public void testClientRemovedShouldRemoveTheClientFromTheListAndCombobox(){
 		GuiActionRunner.execute(() -> {
 			DefaultListModel<Client> listClientsModel =balanceSwingView.getClientListModel();
 			listClientsModel.addElement(CLIENT_FIXTURE_1);
 			listClientsModel.addElement(CLIENT_FIXTURE_2);
+			DefaultComboBoxModel<Client> comboboxClientsModel =balanceSwingView.getComboboxClientsModel();
+			comboboxClientsModel.addElement(CLIENT_FIXTURE_1);
+			comboboxClientsModel.addElement(CLIENT_FIXTURE_2);
 			}
 		);
 		GuiActionRunner.execute( () -> balanceSwingView.clientRemoved(
 				CLIENT_FIXTURE_1)
 			);
 		assertThat(window.list("clientsList").contents())
+			.containsExactly(CLIENT_FIXTURE_2.toString());
+		assertThat(window.comboBox("clientsCombobox").contents())
 			.containsExactly(CLIENT_FIXTURE_2.toString());
 	}
 	

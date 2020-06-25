@@ -15,4 +15,6 @@ public interface InvoiceRepository extends Repository<Invoice> {
 	public List<Invoice> findInvoicesByClientAndYear(Client client, int year);
 
 	public double getClientRevenueOfAnYear(Client client, int year);
+	
+	public void deleteAllInvoicesByClient(String clientId);
 }

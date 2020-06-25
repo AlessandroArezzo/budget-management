@@ -1,9 +1,5 @@
 package com.balance.bdd.steps;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 import org.bson.Document;
@@ -13,6 +9,7 @@ import com.balance.model.Client;
 import com.balance.utils.DateTestsUtil;
 import com.mongodb.DBRef;
 import com.mongodb.MongoClient;
+import com.mongodb.client.model.Filters;
 
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
@@ -96,8 +93,7 @@ public class DatabaseSteps {
 	
 	@Given("A client is removed from the database")
 	public void a_client_is_removed_from_the_database() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
+		removeClientFromDatabase(CLIENT_FIXTURE_2_ID);
 	}
 	
 	@Given("The client is in meantime removed from the database")
@@ -116,6 +112,14 @@ public class DatabaseSteps {
 	public void the_client_of_invoice_selected_is_in_meantime_removed_from_the_database() {
 	    // Write code here that turns the phrase above into concrete actions
 	    throw new cucumber.api.PendingException();
+	}
+	
+	private void removeClientFromDatabase(String clientId) {
+		mongoClient.getDatabase(DB_NAME).getCollection(COLLECTION_INVOICES_NAME)
+			.deleteMany(Filters.eq("client"+".$id", 
+					new ObjectId(clientId)));
+		mongoClient.getDatabase(DB_NAME).getCollection(COLLECTION_CLIENTS_NAME)
+			.deleteOne( Filters.eq("_id", new ObjectId(clientId)));
 	}
 	
 	private String addInvoiceToDatabase(String clientId, Date data, double revenue) {

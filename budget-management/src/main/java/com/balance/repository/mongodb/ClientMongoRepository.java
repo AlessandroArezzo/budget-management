@@ -46,9 +46,10 @@ public class ClientMongoRepository implements ClientRepository{
 
 	@Override
 	public Client findById(String id) {
-		Document d = clientCollection.find(clientSession,Filters.eq(FIELD_PK, new ObjectId(id))).first(); 
-		if (d != null)
+		Document d = clientCollection.find(clientSession,Filters.eq(FIELD_PK, new ObjectId(id))).first();
+		if (d != null) {
 			return fromDocumentToClient(d); 
+		}
 		return null;
 	}
 
@@ -60,7 +61,7 @@ public class ClientMongoRepository implements ClientRepository{
 
 	@Override
 	public void delete(String id) {
-		clientCollection.deleteOne(Filters.eq(FIELD_PK, new ObjectId(id)));
+		clientCollection.deleteOne(clientSession, Filters.eq(FIELD_PK, new ObjectId(id)));
 	}
 	
 	

@@ -183,6 +183,12 @@ public class InvoiceMongoRepository implements InvoiceRepository{
 		}
 		return sumClientDocument.getDouble(totalRevenueField);
 	}
+
+	@Override
+	public void deleteAllInvoicesByClient(String clientId) {
+		invoiceCollection.deleteMany(clientSession, Filters.eq(FIELD_CLIENT+".$id", 
+				new ObjectId(clientId)));
+	}
 	
 	
 }

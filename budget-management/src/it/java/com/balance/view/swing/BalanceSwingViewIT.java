@@ -88,6 +88,7 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		mongoClient.close();
 	}
 	
+	
 	@Test @GUITest
 	public void testAllClients() {
 		Client client1 = new Client(CLIENT_IDENTIFIER_1);
@@ -204,6 +205,41 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 				"Il ricavo totale delle fatture del cliente " + CLIENT_IDENTIFIER_1 +
 				" nel "+ YEAR_FIXTURE+ " è di "+String.format("%.2f", 
 						INVOICE_REVENUE_1)+"€");
+	}
+	
+	@Test @GUITest
+	public void testViewInvoicesAndAnnualRevenueByClientAndYearWhenClientIsNotPresentInDatabase() {
+		Client client1 = new Client(CLIENT_IDENTIFIER_1);
+		Client client2 = new Client(CLIENT_IDENTIFIER_2);
+		clientRepository.save(client1);
+		clientRepository.save(client2);
+		client1.setId(clientRepository.findAll().get(0).getId());
+		client2.setId(clientRepository.findAll().get(1).getId());
+		Invoice invoice1=new Invoice(client1, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_1);
+		Invoice invoice2=new Invoice(client2, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_2);
+		Invoice invoice3=new Invoice(client1, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_3);
+		invoiceRepository.save(invoice1);
+		invoiceRepository.save(invoice2);
+		invoiceRepository.save(invoice3);
+		GuiActionRunner.execute( () -> {
+				balanceController.yearsOfTheInvoices();
+				balanceController.allClients();
+			}
+		);
+		invoiceRepository.deleteAllInvoicesByClient(client1.getId());
+		clientRepository.delete(client1.getId());
+		window.comboBox("yearsCombobox")
+			.selectItem(Pattern.compile(""+YEAR_FIXTURE)); 
+		window.list("clientsList").selectItem(Pattern.compile(CLIENT_IDENTIFIER_1));
+		window.label("labelClientErrorMessage").requireText(""
+				+ "Cliente non più presente nel database: " + 
+				client1.getIdentifier());
+		assertThat(window.list("clientsList").contents()).doesNotContain(client1.toString());
+		assertThat(window.list("invoicesList").contents())
+			.containsOnly(invoice2.toString());
+		window.label("revenueLabel").requireText(
+				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
+						INVOICE_REVENUE_2)+"€");
 	}
 	
 	private static Date getDateFromYear(int year) {
