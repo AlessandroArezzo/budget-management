@@ -26,6 +26,8 @@ public class BalanceSwingSteps {
 	
 	private FrameFixture window;
 	
+	private static final String NEW_CLIENT_IDENTIFIER="fourth identifier";
+	
 	@After 
 	public void tearDown() {
 		if (window != null) 
@@ -173,8 +175,7 @@ public class BalanceSwingSteps {
 
 	@Given("The user provides client data in the text fields")
 	public void the_user_provides_client_data_in_the_text_fields() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
+		window.textBox("textField_clientName").enterText(NEW_CLIENT_IDENTIFIER);
 	}
 
 	@When("The user clicks the {string} button")
@@ -189,14 +190,14 @@ public class BalanceSwingSteps {
 
 	@Then("The client list contains the new client")
 	public void the_client_list_contains_the_new_client() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
+		assertThat(window.list("clientsList").contents())
+			.contains(NEW_CLIENT_IDENTIFIER);
 	}
 
 	@Then("The client selection combobox in the invoice addition data contains the new client")
 	public void the_client_selection_combobox_in_the_invoice_addition_data_contains_the_new_client() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
+		assertThat(window.comboBox("clientsCombobox").contents())
+			.contains(NEW_CLIENT_IDENTIFIER);
 	}
 
 	@Given("The user selects a client from the list")

@@ -2,6 +2,10 @@ package com.balance.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,5 +57,10 @@ public class ClientMongoRepositoryServiceIT {
 		assertThat(clientService.findAllClients()).containsExactly(CLIENT_FIXTURE_1,CLIENT_FIXTURE_2);
 	}
 	
+	@Test
+	public void testAddClient() {
+		Client clientAdded=clientService.addClient(CLIENT_FIXTURE_1);
+		assertThat(clientRepository.findById(clientAdded.getId())).isEqualTo(CLIENT_FIXTURE_1);
+	}
 	
 }
