@@ -51,8 +51,6 @@ public class BalanceController {
 		catch(ClientNotFoundException e) {
 			balanceView.showClientError("Cliente non più presente nel database", client);
 			balanceView.clientRemoved(client);
-			allInvoicesByYear(year);
-			annualRevenue(year);
 		}		
 	}
 	
@@ -64,8 +62,6 @@ public class BalanceController {
 		catch(ClientNotFoundException e) {
 			balanceView.showClientError("Cliente non più presente nel database", client);
 			balanceView.clientRemoved(client);
-			allInvoicesByYear(year);
-			annualRevenue(year);
 		}
 	}
 
@@ -74,7 +70,13 @@ public class BalanceController {
 	}
 
 	public void deleteClient(Client clientToRemove) {
-		clientService.removeClient(clientToRemove.getId());
+		try {
+			clientService.removeClient(clientToRemove.getId());
+		}
+		catch(ClientNotFoundException e){
+			balanceView.showClientError("Cliente non più presente nel database", clientToRemove);
+		}
 		balanceView.clientRemoved(clientToRemove);
 	}
+	
 }

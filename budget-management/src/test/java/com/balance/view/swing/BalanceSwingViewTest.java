@@ -248,7 +248,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 	}
 	
 	@Test @GUITest
-	public void testClientRemovedShouldRemoveTheClientFromTheListAndCombobox(){
+	public void testClientRemovedShouldRemoveTheClientFromTheListAndComboboxAndClearSelectionList(){
 		GuiActionRunner.execute(() -> {
 			DefaultListModel<Client> listClientsModel =balanceSwingView.getClientListModel();
 			listClientsModel.addElement(CLIENT_FIXTURE_1);
@@ -258,6 +258,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 			comboboxClientsModel.addElement(CLIENT_FIXTURE_2);
 			}
 		);
+		window.list("clientsList").selectItem(0);
 		GuiActionRunner.execute( () -> balanceSwingView.clientRemoved(
 				CLIENT_FIXTURE_1)
 			);
@@ -265,6 +266,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 			.containsExactly(CLIENT_FIXTURE_2.toString());
 		assertThat(window.comboBox("clientsCombobox").contents())
 			.containsExactly(CLIENT_FIXTURE_2.toString());
+		window.list("clientsList").requireNoSelection();
 	}
 	
 	@Test @GUITest

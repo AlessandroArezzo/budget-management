@@ -47,7 +47,7 @@ public class InvoiceServiceTransactionalTest {
 	private ClientRepository clientRepository;
 	
 	private static final int YEAR_FIXTURE=2019;
-	private static final Client CLIENT_FIXTURE=new Client("test identifier");
+	private static final Client CLIENT_FIXTURE=new Client("1","test identifier");
 	
 	@Before
 	public void init(){
@@ -126,10 +126,10 @@ public class InvoiceServiceTransactionalTest {
 			.thenReturn(null);
 		try {
 			invoiceService.getAnnualClientRevenue(CLIENT_FIXTURE, YEAR_FIXTURE);
-			fail("Excpected a ClientNotFoundException to be thrown");
+			fail("Excepted a ClientNotFoundException to be thrown");
 		}
 		catch(ClientNotFoundException e) {
-			assertThat("Cliente "+CLIENT_FIXTURE.getIdentifier()+" non presente nel database")
+			assertThat("Il cliente con id "+CLIENT_FIXTURE.getId()+" è non presente nel database")
 					.isEqualTo(e.getMessage());
 		}
 	}	

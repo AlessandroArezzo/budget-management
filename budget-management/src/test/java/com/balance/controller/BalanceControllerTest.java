@@ -1,6 +1,6 @@
 package com.balance.controller;
 
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -8,10 +8,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
-import javax.swing.DefaultComboBoxModel;
-
 import org.assertj.swing.annotation.GUITest;
-import org.assertj.swing.edt.GuiActionRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -45,7 +42,7 @@ public class BalanceControllerTest {
 	private static final int CURRENT_YEAR=Calendar.getInstance().get(Calendar.YEAR);
 	private static final int YEAR_FIXTURE=2019;
 	private static final double TOTAL_REVENUE_FIXTURE=50.6;
-	private static final Client CLIENT_FIXTURE=new Client("test identifier");
+	private static final Client CLIENT_FIXTURE=new Client("1", "test identifier");
 	
 	@Before
 	public void init() {
@@ -126,8 +123,6 @@ public class BalanceControllerTest {
 		verify(balanceView).showClientError("Cliente non più presente nel database", 
 				CLIENT_FIXTURE);
 		verify(balanceView).clientRemoved(CLIENT_FIXTURE);
-		verify(balanceView).showInvoices(invoices);
-		verify(balanceView).setAnnualTotalRevenue(YEAR_FIXTURE,TOTAL_REVENUE_FIXTURE);
 	}
 	
 	@Test
@@ -142,8 +137,6 @@ public class BalanceControllerTest {
 		verify(balanceView).showClientError("Cliente non più presente nel database", 
 				CLIENT_FIXTURE);
 		verify(balanceView).clientRemoved(CLIENT_FIXTURE);
-		verify(balanceView).showInvoices(invoices);
-		verify(balanceView).setAnnualTotalRevenue(YEAR_FIXTURE,TOTAL_REVENUE_FIXTURE);
 	}
 	
 	@Test
@@ -156,10 +149,24 @@ public class BalanceControllerTest {
 	}
 	
 	@Test 
-	public void testDeleteClient() {
+	public void testDeleteClientWhenClientIsPresentInDatabase() {
 		balanceController.deleteClient(CLIENT_FIXTURE);
 		InOrder inOrder = Mockito.inOrder(clientService, balanceView);
 		inOrder.verify(clientService).removeClient(CLIENT_FIXTURE.getId());
 		inOrder.verify(balanceView).clientRemoved(CLIENT_FIXTURE);
 	}
+	
+	@Test 
+	public void testDeleteClientWhenClientIsNotPresentInDatabase() {
+		doThrow(new ClientNotFoundException("Client not found")).when(clientService)
+			.removeClient(CLIENT_FIXTURE.getId());
+		balanceController.deleteClient(CLIENT_FIXTURE);
+		verify(balanceView).showClientError("Cliente non più presente nel database", 
+				CLIENT_FIXTURE);
+		
+		InOrder inOrder = Mockito.inOrder(clientService, balanceView);
+		inOrder.verify(clientService).removeClient(CLIENT_FIXTURE.getId());
+		inOrder.verify(balanceView).clientRemoved(CLIENT_FIXTURE);
+	}
+	
 }

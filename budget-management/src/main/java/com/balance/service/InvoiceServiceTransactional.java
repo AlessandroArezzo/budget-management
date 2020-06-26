@@ -51,7 +51,7 @@ public class InvoiceServiceTransactional implements InvoiceService{
 			factory -> {
 				ClientRepository clientRepository=(ClientRepository) factory.createRepository(TypeRepository.CLIENT);
 				if(clientRepository.findById(client.getId())==null) {
-					throw new ClientNotFoundException("Cliente "+client.getIdentifier()+" non presente nel database");
+					throw new ClientNotFoundException("Cliente "+client.getIdentifier()+" non è presente nel database");
 				}
 				InvoiceRepository invoiceRepository=(InvoiceRepository) factory.createRepository(TypeRepository.INVOICE);
 			    return invoiceRepository.findInvoicesByClientAndYear(client, year);
@@ -65,7 +65,8 @@ public class InvoiceServiceTransactional implements InvoiceService{
 				factory -> {
 					ClientRepository clientRepository=(ClientRepository) factory.createRepository(TypeRepository.CLIENT);
 					if(clientRepository.findById(client.getId())==null) {
-						throw new ClientNotFoundException("Cliente "+client.getIdentifier()+" non presente nel database");
+						throw new ClientNotFoundException("Il cliente con id "
+								+client.getId()+" non presente nel database");
 					}
 					InvoiceRepository invoiceRepository=(InvoiceRepository) factory.createRepository(TypeRepository.INVOICE);
 				    return invoiceRepository.getClientRevenueOfAnYear(client, year);

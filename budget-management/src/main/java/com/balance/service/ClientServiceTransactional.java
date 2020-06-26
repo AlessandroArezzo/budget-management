@@ -2,6 +2,7 @@ package com.balance.service;
 
 import java.util.List;
 
+import com.balance.exception.ClientNotFoundException;
 import com.balance.model.Client;
 import com.balance.repository.ClientRepository;
 import com.balance.repository.InvoiceRepository;
@@ -39,9 +40,12 @@ public class ClientServiceTransactional implements ClientService {
 		transactionManager.doInTransaction(
 			factory -> { 
 				ClientRepository clientRepository=(ClientRepository) factory.createRepository(TypeRepository.CLIENT);
-				InvoiceRepository invoiceRepository=(InvoiceRepository) factory.createRepository(TypeRepository.INVOICE);
-				invoiceRepository.deleteAllInvoicesByClient(clientId);
-				return clientRepository.delete(clientId);
+				if(clientRepository.findById(clientId)!=null) {
+					InvoiceRepository invoiceRepository=(InvoiceRepository) factory.createRepository(TypeRepository.INVOICE);
+					invoiceRepository.deleteAllInvoicesByClient(clientId);
+					return clientRepository.delete(clientId);
+				}
+				throw new ClientNotFoundException("Il cliente con id "+clientId+" non è presente nel database");
 			});
 	}
 
