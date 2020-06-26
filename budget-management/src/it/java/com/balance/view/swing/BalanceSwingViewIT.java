@@ -276,7 +276,7 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 	
 	@Test @GUITest
 	public void testAddClientButton() {
-		window.textBox("textField_clientName").setText("test identifier");
+		window.textBox("textField_clientName").enterText("test identifier");
 		window.button(JButtonMatcher.withText("Aggiungi cliente")).click();
 		assertThat(window.list("clientsList").contents())
 			.containsOnly(new Client("test identifier").toString());
