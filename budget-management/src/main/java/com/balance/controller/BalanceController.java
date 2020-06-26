@@ -9,9 +9,12 @@ import com.balance.service.InvoiceService;
 import com.balance.view.BalanceView;
 
 public class BalanceController {
+	
+	private static final String CLIENT_NOT_FOUND_ERROR_LABEL="Cliente non più presente nel database";
 	private BalanceView balanceView;
 	private ClientService clientService;
 	private InvoiceService invoiceService;
+
 	
 	public BalanceController(BalanceView balanceView, ClientService clientService, InvoiceService invoiceService) {
 		this.balanceView=balanceView;
@@ -49,10 +52,8 @@ public class BalanceController {
 					invoiceService.findInvoicesByClientAndYear(client, year));
 		} 
 		catch(ClientNotFoundException e) {
-			balanceView.showClientError("Cliente non più presente nel database", client);
+			balanceView.showClientError(CLIENT_NOT_FOUND_ERROR_LABEL, client);
 			balanceView.clientRemoved(client);
-			allInvoicesByYear(year);
-			annualRevenue(year);
 		}		
 	}
 	
@@ -62,10 +63,8 @@ public class BalanceController {
 					invoiceService.getAnnualClientRevenue(client, year));
 		}
 		catch(ClientNotFoundException e) {
-			balanceView.showClientError("Cliente non più presente nel database", client);
+			balanceView.showClientError(CLIENT_NOT_FOUND_ERROR_LABEL, client);
 			balanceView.clientRemoved(client);
-			allInvoicesByYear(year);
-			annualRevenue(year);
 		}
 	}
 
@@ -74,7 +73,13 @@ public class BalanceController {
 	}
 
 	public void deleteClient(Client clientToRemove) {
-		clientService.removeClient(clientToRemove.getId());
+		try {
+			clientService.removeClient(clientToRemove.getId());
+		}
+		catch(ClientNotFoundException e){
+			balanceView.showClientError(CLIENT_NOT_FOUND_ERROR_LABEL, clientToRemove);
+		}
 		balanceView.clientRemoved(clientToRemove);
 	}
+	
 }

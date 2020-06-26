@@ -98,8 +98,7 @@ public class DatabaseSteps {
 	
 	@Given("The client is in meantime removed from the database")
 	public void the_client_is_in_meantime_removed_from_the_database() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
+		removeClientFromDatabase(CLIENT_FIXTURE_2_ID);
 	}
 	
 	@Given("The invoice is in meantime removed from the database")

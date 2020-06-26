@@ -36,14 +36,18 @@ public class Client extends BaseEntity{
 		
 		if (getClass() != obj.getClass())
 			return false;
-		
 		Client other = (Client) obj;
-		return Objects.equals(identifier, other.identifier);
+		
+		if(this.id==null || other.id==null)
+			return Objects.equals(identifier, other.identifier);
+		return Objects.equals(identifier, other.identifier) && Objects.equals(id, other.id);
 	}
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(identifier);
+		if(this.id==null)
+			return Objects.hash(identifier);
+		return Objects.hash(identifier,id);
 	}
 	
 	@Override

@@ -248,7 +248,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 	}
 	
 	@Test @GUITest
-	public void testClientRemovedShouldRemoveTheClientFromTheListAndCombobox(){
+	public void testClientRemovedShouldRemoveTheClientFromTheListAndComboboxAndClearSelectionList(){
 		GuiActionRunner.execute(() -> {
 			DefaultListModel<Client> listClientsModel =balanceSwingView.getClientListModel();
 			listClientsModel.addElement(CLIENT_FIXTURE_1);
@@ -258,6 +258,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 			comboboxClientsModel.addElement(CLIENT_FIXTURE_2);
 			}
 		);
+		window.list("clientsList").selectItem(0);
 		GuiActionRunner.execute( () -> balanceSwingView.clientRemoved(
 				CLIENT_FIXTURE_1)
 			);
@@ -265,6 +266,32 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 			.containsExactly(CLIENT_FIXTURE_2.toString());
 		assertThat(window.comboBox("clientsCombobox").contents())
 			.containsExactly(CLIENT_FIXTURE_2.toString());
+		window.list("clientsList").requireNoSelection();
+	}
+	
+	@Test @GUITest
+	public void testClientRemovedShouldRemoveTheClientWhenThereIsAnotherClientWithSameIdentifier(){
+		Client client1=new Client("1","test identifier");
+		Client client2=new Client("2","test identifier");
+		GuiActionRunner.execute(() -> {
+			DefaultListModel<Client> listClientsModel =balanceSwingView.getClientListModel();
+			listClientsModel.addElement(client1);
+			listClientsModel.addElement(client2);
+			DefaultComboBoxModel<Client> comboboxClientsModel =balanceSwingView.getComboboxClientsModel();
+			comboboxClientsModel.addElement(client1);
+			comboboxClientsModel.addElement(client2);
+			}
+		);
+		window.list("clientsList").selectItem(0);
+		GuiActionRunner.execute( () -> balanceSwingView.clientRemoved(
+				client1)
+			);
+		assertThat(window.list("clientsList").contents())
+			.containsExactly(client2.toString());
+		assertThat(window.comboBox("clientsCombobox").contents())
+			.containsExactly(client2.toString());
+		window.list("clientsList").requireNoSelection();
+		
 	}
 	
 	@Test @GUITest
