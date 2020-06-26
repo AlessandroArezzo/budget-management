@@ -63,4 +63,13 @@ public class ClientMongoRepositoryServiceIT {
 		assertThat(clientRepository.findById(clientAdded.getId())).isEqualTo(CLIENT_FIXTURE_1);
 	}
 	
+	@Test
+	public void testRemoveClient() {
+		clientRepository.save(CLIENT_FIXTURE_1);
+		clientRepository.save(CLIENT_FIXTURE_2);
+		String idClientToRemove=clientRepository.findAll().get(0).getId();
+		clientService.removeClient(idClientToRemove);
+		assertThat(clientRepository.findById(idClientToRemove)).isNull();
+	}
+	
 }

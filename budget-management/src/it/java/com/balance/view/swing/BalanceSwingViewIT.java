@@ -282,9 +282,42 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 			.containsOnly(new Client("test identifier").toString());
 		assertThat(window.comboBox("clientsCombobox").contents())
 			.containsExactly(new Client("test identifier").toString());
-		
 	}
 	
+	@Test @GUITest
+	public void testRemoveClientButton() {
+		Client client1 = new Client(CLIENT_IDENTIFIER_1);
+		Client client2 = new Client(CLIENT_IDENTIFIER_2);
+		clientRepository.save(client1);
+		clientRepository.save(client2);
+		client1.setId(clientRepository.findAll().get(0).getId());
+		client2.setId(clientRepository.findAll().get(1).getId());
+		Invoice invoice1=new Invoice(client1, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_1);
+		Invoice invoice2=new Invoice(client2, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_2);
+		Invoice invoice3=new Invoice(client1, DATE_OF_THE_PREVIOUS_YEAR_FIXTURE,
+										INVOICE_REVENUE_3);
+		invoiceRepository.save(invoice1);
+		invoiceRepository.save(invoice2);
+		invoiceRepository.save(invoice3);
+		GuiActionRunner.execute( () -> {
+				balanceController.yearsOfTheInvoices();
+				balanceController.allClients();
+			}
+		);
+		window.comboBox("yearsCombobox")
+			.selectItem(Pattern.compile(""+YEAR_FIXTURE));
+		window.list("clientsList").selectItem(Pattern.compile(CLIENT_IDENTIFIER_1));
+		window.button(JButtonMatcher.withText("Rimuovi cliente")).click();
+		assertThat(window.list("clientsList").contents())
+			.noneMatch(e -> e.contains(CLIENT_IDENTIFIER_1));
+		assertThat(window.comboBox("clientsCombobox").contents())
+			.noneMatch(e -> e.contains(CLIENT_IDENTIFIER_1));
+		assertThat(window.list("invoicesList").contents())
+			.containsOnly(invoice2.toString());
+		window.label("revenueLabel").requireText(
+				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
+					INVOICE_REVENUE_2)+"€");
+	}
 	private static Date getDateFromYear(int year) {
 		Calendar cal = Calendar.getInstance();
 		cal.set(Calendar.YEAR, year);
