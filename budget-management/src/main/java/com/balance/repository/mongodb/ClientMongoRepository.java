@@ -62,8 +62,10 @@ public class ClientMongoRepository implements ClientRepository{
 	}
 
 	@Override
-	public void delete(String id) {
+	public Client delete(String id) {
+		Client clientToRemove=findById(id);
 		clientCollection.deleteOne(clientSession, Filters.eq(FIELD_PK, new ObjectId(id)));
+		return clientToRemove;
 	}
 	
 	

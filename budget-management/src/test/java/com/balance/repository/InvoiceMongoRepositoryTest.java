@@ -138,10 +138,17 @@ public class InvoiceMongoRepositoryTest {
 	}
 	
 	@Test
-	public void testDelete() {
-		String idInvoiceTest1=addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_YEAR_FIXTURE , 10);
-		invoiceRepository.delete(idInvoiceTest1); 
+	public void testDeleteWhenInvoiceIsPresentInDatabase() {
+		String idInvoiceTest=addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_YEAR_FIXTURE , 10);
+		when(clientRepository.findById(CLIENT_FIXTURE_1.getId())).thenReturn(CLIENT_FIXTURE_1);
+		Invoice invoiceRemoved=invoiceRepository.delete(idInvoiceTest); 
+		assertThat(invoiceRemoved).isEqualTo(new Invoice(CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE , 10));
 		assertThat(readAllInvoicesFromDatabase()).isEmpty();
+	}
+	
+	@Test
+	public void testDeleteWhenInvoiceIsNotPresentInDatabase() {
+		assertThat(invoiceRepository.delete(new ObjectId().toString())).isNull();
 	}
 	
 	@Test

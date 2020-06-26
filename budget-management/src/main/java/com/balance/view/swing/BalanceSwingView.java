@@ -20,6 +20,7 @@ import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -54,6 +55,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 	private JLabel lblClientName;
 	private JTextField textFieldNewClient;
 	private JButton btnNewClient;
+	private JButton btnRemoveClient;
 
 	public void setBalanceController(BalanceController balanceController) {
 		this.balanceController = balanceController;
@@ -65,6 +67,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 	public BalanceSwingView() {
 		setTitle("Budget Management View");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -113,13 +116,21 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		listClients = new JList<>(clientListModel);
 		listClients.addListSelectionListener(e -> {
 			btnShowAllInvoices.setVisible(
+					listClients.getSelectedIndex() != -1);
+			btnRemoveClient.setEnabled(
 					listClients.getSelectedIndex() != -1); 
-			if (!e.getValueIsAdjusting() && listClients.getSelectedValue()!=null 
-					&& comboboxYears.getSelectedItem()!=null) {
-				balanceController.allInvoicesByClientAndYear(
-						listClients.getSelectedValue(), (int) comboboxYears.getSelectedItem());
-				balanceController.annualClientRevenue(
-						listClients.getSelectedValue(), (int) comboboxYears.getSelectedItem());
+			if (!e.getValueIsAdjusting() && comboboxYears.getSelectedItem()!=null) {
+				int yearSelected=(int) comboboxYears.getSelectedItem();
+				if(listClients.getSelectedValue()!=null ) {
+					balanceController.allInvoicesByClientAndYear(
+							listClients.getSelectedValue(), yearSelected);
+					balanceController.annualClientRevenue(
+							listClients.getSelectedValue(), yearSelected);
+				}
+				else {
+					balanceController.allInvoicesByYear(yearSelected);
+					balanceController.annualRevenue(yearSelected);
+				}
 			}
 		});
 		listClients.setName("clientsList");
@@ -167,12 +178,23 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		gbc_comboBoxClients.gridy = 6;
 		contentPane.add(comboBoxClients, gbc_comboBoxClients);
 		
+		btnRemoveClient=new JButton("Rimuovi cliente");
+		btnRemoveClient.setEnabled(false);
+		btnRemoveClient.setName("btnRemoveClient");
+		GridBagConstraints gbc_btnRemoveClient = new GridBagConstraints();
+		gbc_btnRemoveClient.gridwidth = 2;
+		gbc_btnRemoveClient.fill = GridBagConstraints.HORIZONTAL;
+		gbc_btnRemoveClient.insets = new Insets(0, 0, 0, 5);
+		gbc_btnRemoveClient.gridx = 1;
+		gbc_btnRemoveClient.gridy = 7;
+		contentPane.add(btnRemoveClient, gbc_btnRemoveClient);
+		
 		lbClientError = new JLabel("");
 		lbClientError.setName("labelClientErrorMessage");
 		GridBagConstraints gbc_lbClientError = new GridBagConstraints();
 		gbc_lbClientError.insets = new Insets(0, 0, 5, 5);
 		gbc_lbClientError.gridx = 0;
-		gbc_lbClientError.gridy = 7;
+		gbc_lbClientError.gridy = 8;
 		contentPane.add(lbClientError, gbc_lbClientError);
 		
 		lblRevenue = new JLabel("");
@@ -189,7 +211,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		gbc_lblNewClient.fill = GridBagConstraints.HORIZONTAL;
 		gbc_lblNewClient.insets = new Insets(0, 0, 5, 5);
 		gbc_lblNewClient.gridx = 0;
-		gbc_lblNewClient.gridy = 8;
+		gbc_lblNewClient.gridy = 9;
 		contentPane.add(lblNewClient, gbc_lblNewClient);
 		
 		lblClientName=new JLabel("Identificativo");
@@ -198,7 +220,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		gbc_lblClientName.fill = GridBagConstraints.HORIZONTAL;
 		gbc_lblClientName.insets = new Insets(0, 0, 0, 5);
 		gbc_lblClientName.gridx = 0;
-		gbc_lblClientName.gridy = 9;
+		gbc_lblClientName.gridy = 10;
 		contentPane.add(lblClientName, gbc_lblClientName);
 		
 		textFieldNewClient=new JTextField();
@@ -209,7 +231,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		gbc_txtFieldClientName.gridwidth = 3;
 		gbc_txtFieldClientName.insets = new Insets(0, 0, 0, 5);
 		gbc_txtFieldClientName.gridx = 4;
-		gbc_txtFieldClientName.gridy = 9;
+		gbc_txtFieldClientName.gridy = 10;
 		contentPane.add(textFieldNewClient, gbc_txtFieldClientName);
 		
 		btnNewClient=new JButton("Aggiungi cliente");
@@ -220,7 +242,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		gbc_btnNewClient.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnNewClient.insets = new Insets(0, 0, 0, 5);
 		gbc_btnNewClient.gridx = 1;
-		gbc_btnNewClient.gridy = 11;
+		gbc_btnNewClient.gridy = 12;
 		contentPane.add(btnNewClient, gbc_btnNewClient);
 		
 		comboboxYears.addActionListener(
@@ -240,11 +262,8 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		
 		btnShowAllInvoices.addActionListener(
 				e -> {
-					int yearSelected=(int) comboboxYears.getSelectedItem();
-					balanceController.allInvoicesByYear(yearSelected);
-			    	balanceController.annualRevenue(yearSelected);
 					btnShowAllInvoices.setVisible(false);
-					
+					listClients.clearSelection();
 				});
 		
 		KeyAdapter btnAddClientEnabler= new KeyAdapter() {
@@ -257,6 +276,10 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		};
 		btnNewClient.addActionListener(
 				e -> balanceController.newClient(new Client(textFieldNewClient.getText()))
+			);
+		
+		btnRemoveClient.addActionListener(
+				e -> balanceController.deleteClient(listClients.getSelectedValue())
 			);
 		textFieldNewClient.addKeyListener(btnAddClientEnabler);
 	}
@@ -333,11 +356,17 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 	public void clientAdded(Client clientToAdd) {
 		clientListModel.addElement(clientToAdd);
 		comboboxClientsModel.addElement(clientToAdd);
+		resetTextBoxNewClient();
 		resetClientErrorLabel();
 	}
 	
 	private void resetClientErrorLabel() {
 		lbClientError.setText("");
+	}
+	
+	private void resetTextBoxNewClient() {
+		textFieldNewClient.setText("");
+		btnNewClient.setEnabled(false);
 	}
 
 }

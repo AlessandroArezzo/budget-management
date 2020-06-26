@@ -72,4 +72,9 @@ public class BalanceController {
 	public void newClient(Client client) {
 		balanceView.clientAdded(clientService.addClient(client));
 	}
+
+	public void deleteClient(Client clientToRemove) {
+		clientService.removeClient(clientToRemove.getId());
+		balanceView.clientRemoved(clientToRemove);
+	}
 }

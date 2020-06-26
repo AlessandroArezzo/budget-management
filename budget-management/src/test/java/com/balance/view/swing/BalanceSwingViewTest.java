@@ -1,6 +1,7 @@
 package com.balance.view.swing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
@@ -82,6 +83,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.label(JLabelMatcher.withText("Identificativo"));
 		window.textBox("textField_clientName").requireEnabled();
 		window.button(JButtonMatcher.withText("Aggiungi cliente")).requireDisabled();
+		window.button(JButtonMatcher.withText("Rimuovi cliente")).requireDisabled();
 	}
 	
 	@Test @GUITest
@@ -297,6 +299,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.button(JButtonMatcher.withText("Vedi tutte le fatture")).click();
 		verify(balanceController).allInvoicesByYear(YEAR_FIXTURE);
 		verify(balanceController).annualRevenue(YEAR_FIXTURE);
+		window.list("clientsList").requireNoSelection();
 		window.button(JButtonMatcher.withText("Vedi tutte le fatture")).requireNotVisible();
 	}
 	
@@ -311,13 +314,15 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 	}
 	
 	@Test @GUITest
-	public void testClientAddedShouldAddTheClientToTheListAndComboboxAndResetTheErrorLabel(){
+	public void testClientAddedShouldAddTheClientToTheListAndComboboxAndResetTheErrorLabelAndTextFieldName(){
 		GuiActionRunner.execute(() -> balanceSwingView.clientAdded(CLIENT_FIXTURE_1) ); 
 		assertThat(window.list("clientsList").contents())
 			.contains(CLIENT_FIXTURE_1.toString());
 		assertThat(window.comboBox("clientsCombobox").contents())
 			.contains(CLIENT_FIXTURE_1.toString());
 		window.label("labelClientErrorMessage").requireText("");
+		window.textBox(("textField_clientName")).requireText("");
+		window.button("btnAddClient").requireDisabled();
 	}
 	
 	@Test @GUITest
@@ -326,5 +331,48 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.button(JButtonMatcher.withText("Aggiungi cliente")).click();
 		verify(balanceController).newClient(new Client("test identifier 1"));
 	}
+	
+	@Test @GUITest
+	public void testDeleteButtonShouldBeEnabledOnlyWhenAStudentIsSelected() {
+		GuiActionRunner.execute(() -> balanceSwingView.getClientListModel().addElement(CLIENT_FIXTURE_1)); 
+		window.list("clientsList").selectItem(0); 
+		JButtonFixture deleteButton = window.button(JButtonMatcher.withText("Rimuovi cliente"));
+		deleteButton.requireEnabled();
+		window.list("clientsList").clearSelection(); 
+		deleteButton.requireDisabled(); 
+	}
+	
+	@Test @GUITest
+	public void testDeleteButtonShouldDelegateToSchoolControllerDeleteStudent() {
+		GuiActionRunner.execute(() -> {
+			DefaultListModel<Client> listClientsModel =balanceSwingView.getClientListModel();
+			listClientsModel.addElement(CLIENT_FIXTURE_1);
+			listClientsModel.addElement(CLIENT_FIXTURE_2);
+			}
+		);
+		window.list("clientsList").selectItem(0);
+		window.button(JButtonMatcher.withText("Rimuovi cliente")).click();
+		verify(balanceController).deleteClient(new Client(CLIENT_FIXTURE_1.getIdentifier()));
+	}
+	
+	@Test @GUITest
+	public void testRefreshAllInvoicesByYearWhenAnyClientIsSelected(){
+		GuiActionRunner.execute(() -> {
+			DefaultComboBoxModel<Integer> comboboxYearsModel=balanceSwingView.getComboboxYearsModel();
+			comboboxYearsModel.addElement(CURRENT_YEAR-1);
+			comboboxYearsModel.addElement(CURRENT_YEAR);
+			DefaultListModel<Client> listClientsModel =balanceSwingView.getClientListModel();
+			listClientsModel.addElement(CLIENT_FIXTURE_1);
+			listClientsModel.addElement(CLIENT_FIXTURE_2);
+			}
+		);
+		window.comboBox("yearsCombobox").selectItem(0);
+		window.list("clientsList").selectItem(0);
+		window.list("clientsList").clearSelection();
+		verify(balanceController,times(2)).allInvoicesByYear(CURRENT_YEAR-1);
+		verify(balanceController,times(2)).annualRevenue(CURRENT_YEAR-1);
+	}
+	
+	
 	
 }

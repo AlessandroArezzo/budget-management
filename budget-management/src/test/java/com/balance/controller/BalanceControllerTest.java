@@ -1,5 +1,6 @@
 package com.balance.controller;
 
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -154,4 +155,11 @@ public class BalanceControllerTest {
 		inOrder.verify(balanceView).clientAdded(CLIENT_FIXTURE);
 	}
 	
+	@Test 
+	public void testDeleteClient() {
+		balanceController.deleteClient(CLIENT_FIXTURE);
+		InOrder inOrder = Mockito.inOrder(clientService, balanceView);
+		inOrder.verify(clientService).removeClient(CLIENT_FIXTURE.getId());
+		inOrder.verify(balanceView).clientRemoved(CLIENT_FIXTURE);
+	}
 }

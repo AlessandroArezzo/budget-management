@@ -105,10 +105,16 @@ public class ClientMongoRepositoryTest {
 	}
 	
 	@Test
-	public void testDelete() {
-		String idClientTest=addTestClientToDatabase("test identifier 1"); 
-		clientRepository.delete(idClientTest); 
+	public void testDeleteWhenClientIsPresentInDatabase() {
+		String idClientTest=addTestClientToDatabase("Client to remove"); 
+		Client clientRemoved=clientRepository.delete(idClientTest); 
+		assertThat(clientRemoved).isEqualTo(new Client("Client to remove"));
 		assertThat(readAllClientsFromDatabase()).isEmpty();
+	}
+	
+	@Test
+	public void testDeleteWhenClientIsNotPresentInDatabase() {
+		assertThat(clientRepository.delete(new ObjectId().toString())).isNull();
 	}
 	
 	private List<Client> readAllClientsFromDatabase() {

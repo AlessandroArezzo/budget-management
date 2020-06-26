@@ -47,6 +47,6 @@ public class RepositoryMongoFactory implements RepositoryFactory {
 	private  InvoiceMongoRepository createInvoiceRepository() {
 		return new InvoiceMongoRepository(client,
 			clientSession,databaseName,collectionInvoicesName, createClientRepository());
-}
+	}
 
 }
