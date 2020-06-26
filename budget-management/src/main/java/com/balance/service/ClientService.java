@@ -7,5 +7,7 @@ import com.balance.model.Client;
 public interface ClientService {
 
 	public List<Client> findAllClients();
+	
+	public Client addClient(Client client);
 
 }

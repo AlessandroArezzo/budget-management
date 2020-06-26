@@ -17,6 +17,7 @@ import org.assertj.swing.core.matcher.JLabelMatcher;
 import org.assertj.swing.edt.GuiActionRunner;
 import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.fixture.JButtonFixture;
+import org.assertj.swing.fixture.JTextComponentFixture;
 import org.assertj.swing.junit.runner.GUITestRunner;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.junit.Test;
@@ -77,6 +78,10 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.comboBox("clientsCombobox");
 		window.button(JButtonMatcher.withText("Vedi tutte le fatture"))
 			.requireNotVisible();
+		window.label(JLabelMatcher.withText("INSERISCI UN NUOVO CLIENTE"));
+		window.label(JLabelMatcher.withText("Identificativo"));
+		window.textBox("textField_clientName").requireEnabled();
+		window.button(JButtonMatcher.withText("Aggiungi cliente")).requireDisabled();
 	}
 	
 	@Test @GUITest
@@ -293,6 +298,33 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		verify(balanceController).allInvoicesByYear(YEAR_FIXTURE);
 		verify(balanceController).annualRevenue(YEAR_FIXTURE);
 		window.button(JButtonMatcher.withText("Vedi tutte le fatture")).requireNotVisible();
+	}
+	
+	@Test @GUITest
+	public void testWhenIdentifierAreNonEmptyThenAddButtonShouldBeEnabled() {
+		JTextComponentFixture nameTextBox = window.textBox("textField_clientName");
+		nameTextBox.enterText("test");
+		window.button("btnAddClient").requireEnabled();
+		nameTextBox.setText("");
+		nameTextBox.enterText(" ");
+		window.button("btnAddClient").requireDisabled();
+	}
+	
+	@Test @GUITest
+	public void testClientAddedShouldAddTheClientToTheListAndComboboxAndResetTheErrorLabel(){
+		GuiActionRunner.execute(() -> balanceSwingView.clientAdded(CLIENT_FIXTURE_1) ); 
+		assertThat(window.list("clientsList").contents())
+			.contains(CLIENT_FIXTURE_1.toString());
+		assertThat(window.comboBox("clientsCombobox").contents())
+			.contains(CLIENT_FIXTURE_1.toString());
+		window.label("labelClientErrorMessage").requireText("");
+	}
+	
+	@Test @GUITest
+	public void testAddClientButtonShouldDelegateToBalanceControllerNewClient() {
+		window.textBox("textField_clientName").enterText("test identifier 1");
+		window.button(JButtonMatcher.withText("Aggiungi cliente")).click();
+		verify(balanceController).newClient(new Client("test identifier 1"));
 	}
 	
 }

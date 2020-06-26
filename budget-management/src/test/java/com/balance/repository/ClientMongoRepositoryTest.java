@@ -97,7 +97,10 @@ public class ClientMongoRepositoryTest {
 	@Test
 	public void testSave() {
 		Client client = new Client("Client to add");
-		clientRepository.save(client);
+		Client clientResult=clientRepository.save(client);
+		assertThat(clientResult).isEqualTo(
+				new Client("Client to add"));
+		assertThat(clientResult.getId()).isNotNull();
 		assertThat(readAllClientsFromDatabase()).containsExactly(new Client("Client to add"));
 	}
 	

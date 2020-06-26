@@ -48,8 +48,6 @@ public class InvoiceServiceTransactionalTest {
 	
 	private static final int YEAR_FIXTURE=2019;
 	private static final Client CLIENT_FIXTURE=new Client("test identifier");
-
-	
 	
 	@Before
 	public void init(){

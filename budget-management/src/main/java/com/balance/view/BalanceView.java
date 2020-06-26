@@ -23,4 +23,6 @@ public interface BalanceView {
 	
 	public void showClientError(String message, Client client);
 
+	public void clientAdded(Client clientToAdd);
+
 }

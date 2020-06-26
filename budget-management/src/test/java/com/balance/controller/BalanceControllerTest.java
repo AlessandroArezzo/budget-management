@@ -13,8 +13,10 @@ import org.assertj.swing.annotation.GUITest;
 import org.assertj.swing.edt.GuiActionRunner;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import com.balance.controller.BalanceController;
@@ -141,6 +143,15 @@ public class BalanceControllerTest {
 		verify(balanceView).clientRemoved(CLIENT_FIXTURE);
 		verify(balanceView).showInvoices(invoices);
 		verify(balanceView).setAnnualTotalRevenue(YEAR_FIXTURE,TOTAL_REVENUE_FIXTURE);
+	}
+	
+	@Test
+	public void testAddNewClient() {
+		when(clientService.addClient(CLIENT_FIXTURE)).thenReturn(CLIENT_FIXTURE);
+		balanceController.newClient(CLIENT_FIXTURE);
+		InOrder inOrder = Mockito.inOrder(clientService, balanceView);
+		inOrder.verify(clientService).addClient(CLIENT_FIXTURE);
+		inOrder.verify(balanceView).clientAdded(CLIENT_FIXTURE);
 	}
 	
 }
