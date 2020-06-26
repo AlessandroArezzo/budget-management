@@ -115,7 +115,7 @@ public class InvoiceServiceTransactionalTest {
 			fail("Excpected a ClientNotFoundException to be thrown");
 		}
 		catch(ClientNotFoundException e) {
-			assertThat("Cliente "+CLIENT_FIXTURE.getIdentifier()+" non presente nel database")
+			assertThat("Il cliente con id "+CLIENT_FIXTURE.getId()+" non è presente nel database")
 					.isEqualTo(e.getMessage());
 		}
 	}
@@ -129,7 +129,7 @@ public class InvoiceServiceTransactionalTest {
 			fail("Excepted a ClientNotFoundException to be thrown");
 		}
 		catch(ClientNotFoundException e) {
-			assertThat("Il cliente con id "+CLIENT_FIXTURE.getId()+" è non presente nel database")
+			assertThat("Il cliente con id "+CLIENT_FIXTURE.getId()+" non è presente nel database")
 					.isEqualTo(e.getMessage());
 		}
 	}	

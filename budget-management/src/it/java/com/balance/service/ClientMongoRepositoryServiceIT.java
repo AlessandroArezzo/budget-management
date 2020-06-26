@@ -1,20 +1,20 @@
 package com.balance.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
+import org.bson.types.ObjectId;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.balance.exception.ClientNotFoundException;
 import com.balance.model.Client;
 import com.balance.repository.mongodb.ClientMongoRepository;
 import com.balance.transaction.TransactionManager;
 import com.balance.transaction.mongodb.TransactionMongoManager;
 import com.mongodb.MongoClient;
+
 
 public class ClientMongoRepositoryServiceIT {
 	
@@ -64,12 +64,26 @@ public class ClientMongoRepositoryServiceIT {
 	}
 	
 	@Test
-	public void testRemoveClient() {
+	public void testRemoveClientWhenClientIsPresentInDatabase() {
 		clientRepository.save(CLIENT_FIXTURE_1);
 		clientRepository.save(CLIENT_FIXTURE_2);
 		String idClientToRemove=clientRepository.findAll().get(0).getId();
 		clientService.removeClient(idClientToRemove);
 		assertThat(clientRepository.findById(idClientToRemove)).isNull();
+	}
+	
+	@Test
+	public void testRemoveClientWhenClientIsNotPresentInDatabase() {
+		clientRepository.save(CLIENT_FIXTURE_2);
+		String idClientNotPresent=new ObjectId().toString();
+		try {
+			clientService.removeClient(idClientNotPresent);
+			fail("Excpected a ClientNotFoundException to be thrown");
+		}
+		catch(ClientNotFoundException e) {
+			assertThat("Il cliente con id "+idClientNotPresent+" non è presente nel database")
+					.isEqualTo(e.getMessage());
+		}	
 	}
 	
 }

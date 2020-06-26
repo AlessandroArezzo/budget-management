@@ -285,7 +285,7 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 	}
 	
 	@Test @GUITest
-	public void testRemoveClientButton() {
+	public void testRemoveClientButtonSuccess() {
 		Client client1 = new Client(CLIENT_IDENTIFIER_1);
 		Client client2 = new Client(CLIENT_IDENTIFIER_2);
 		clientRepository.save(client1);
@@ -318,6 +318,41 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
 					INVOICE_REVENUE_2)+"€");
 	}
+	
+	@Test @GUITest
+	public void testRemoveClientButtonError() {
+		Client client1 = new Client(CLIENT_IDENTIFIER_1);
+		Client client2 = new Client(CLIENT_IDENTIFIER_2);
+		clientRepository.save(client1);
+		clientRepository.save(client2);
+		client1.setId(clientRepository.findAll().get(0).getId());
+		client2.setId(clientRepository.findAll().get(1).getId());
+		Invoice invoiceOfClient2=new Invoice(client2, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_2);
+		invoiceRepository.save(invoiceOfClient2);
+		GuiActionRunner.execute( () -> {
+				balanceController.yearsOfTheInvoices();
+				balanceController.allClients();
+			}
+		);
+		window.comboBox("yearsCombobox")
+			.selectItem(Pattern.compile(""+YEAR_FIXTURE));
+		window.list("clientsList").selectItem(Pattern.compile(CLIENT_IDENTIFIER_1));
+		clientRepository.delete(client1.getId());
+		window.button(JButtonMatcher.withText("Rimuovi cliente")).click();
+		assertThat(window.list("clientsList").contents())
+			.noneMatch(e -> e.contains(CLIENT_IDENTIFIER_1));
+		assertThat(window.comboBox("clientsCombobox").contents())
+			.noneMatch(e -> e.contains(CLIENT_IDENTIFIER_1));
+		assertThat(window.list("invoicesList").contents())
+			.containsOnly(invoiceOfClient2.toString());
+		window.label("revenueLabel").requireText(
+				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
+					INVOICE_REVENUE_2)+"€");
+		window.label("labelClientErrorMessage").requireText(""
+				+ "Cliente non più presente nel database: " + 
+				client1.getIdentifier());
+	}
+	
 	private static Date getDateFromYear(int year) {
 		Calendar cal = Calendar.getInstance();
 		cal.set(Calendar.YEAR, year);

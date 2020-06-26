@@ -143,8 +143,8 @@ public class InvoiceMongoRepositoryServiceIT {
 			fail("Excpected a ClientNotFoundException to be thrown");
 		}
 		catch(ClientNotFoundException e) {
-			assertThat("Cliente "+CLIENT_FIXTURE_1.getIdentifier()+" non presente nel database")
-					.isEqualTo(e.getMessage());
+			assertThat("Il cliente con id "+CLIENT_FIXTURE_1.getId()+" non è presente nel database")
+				.isEqualTo(e.getMessage());
 		}	
 	}
 	
@@ -159,7 +159,7 @@ public class InvoiceMongoRepositoryServiceIT {
 			fail("Excepted a ClientNotFoundException to be thrown");
 		}
 		catch(ClientNotFoundException e) {
-			assertThat("Cliente "+CLIENT_FIXTURE_1.getIdentifier()+" non presente nel database")
+			assertThat("Il cliente con id "+CLIENT_FIXTURE_1.getId()+" non è presente nel database")
 					.isEqualTo(e.getMessage());
 		}	
 	}
