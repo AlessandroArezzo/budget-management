@@ -69,6 +69,8 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		setBounds(100, 100, 450, 300);
+		setResizable(false);
+		setSize(500,600);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -143,7 +145,6 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		gbc_listClients.gridx = 1;
 		gbc_listClients.gridy = 4;
 		JScrollPane scrollPaneClientsList = new JScrollPane();
-		scrollPaneClientsList.setPreferredSize(new Dimension(200, 100));
 		scrollPaneClientsList.setViewportView(listClients);
 		contentPane.add(scrollPaneClientsList,gbc_listClients);
 		listInvoices = new JList<>(invoiceListModel);
