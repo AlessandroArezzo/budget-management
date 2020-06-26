@@ -82,8 +82,10 @@ public class InvoiceMongoRepository implements InvoiceRepository{
 	}
 
 	@Override
-	public void delete(String id) {
+	public Invoice delete(String id) {
+		Invoice invoiceToRemove=findById(id);
 		invoiceCollection.deleteOne(clientSession, Filters.eq(FIELD_PK, new ObjectId(id)));
+		return invoiceToRemove;
 	}
 	
 	@Override
