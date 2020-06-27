@@ -69,15 +69,6 @@ public class InvoiceServiceTransactionalTest {
 	}
 	
 	@Test
-	public void testGetTotalRevenueOfAnYear() {
-		double revenueOfYear=100.0;
-		when(invoiceRepository.getTotalRevenueOfAnYear(YEAR_FIXTURE)).thenReturn(
-				revenueOfYear);
-		assertThat(invoiceService.getTotalRevenueOfAnYear(YEAR_FIXTURE)).isEqualTo(
-				revenueOfYear);
-	}
-	
-	@Test
 	public void testGetYearsOfTheInvoicesInDatabase() {
 		List<Integer> years=Arrays.asList(YEAR_FIXTURE);
 		when(invoiceRepository.getYearsOfInvoicesInDatabase()).thenReturn(years);
@@ -97,37 +88,12 @@ public class InvoiceServiceTransactionalTest {
 	}
 	
 	@Test
-	public void testGetAnnualClientRevenue() {
-		when(clientRepository.findById(CLIENT_FIXTURE.getId()))
-			.thenReturn(CLIENT_FIXTURE);
-		double revenueOfYear=100.0;
-		when(invoiceRepository.getClientRevenueOfAnYear(CLIENT_FIXTURE, YEAR_FIXTURE))
-			.thenReturn(revenueOfYear);
-		assertThat(invoiceService.getAnnualClientRevenue(CLIENT_FIXTURE, YEAR_FIXTURE))
-			.isEqualTo(revenueOfYear);
-	}
-	
-	@Test
 	public void testFindInvoicesByClientAndYearWhenClientIsNotPresentInDatabase() {
 		when(clientRepository.findById(CLIENT_FIXTURE.getId()))
 			.thenReturn(null);
 		try {
 			invoiceService.findInvoicesByClientAndYear(CLIENT_FIXTURE, YEAR_FIXTURE);
 			fail("Excpected a ClientNotFoundException to be thrown");
-		}
-		catch(ClientNotFoundException e) {
-			assertThat("Il cliente con id "+CLIENT_FIXTURE.getId()+" non è presente nel database")
-					.isEqualTo(e.getMessage());
-		}
-	}
-	
-	@Test
-	public void testGetAnnualClientRevenueWhenClientIsNotPresentInDatabase() {
-		when(clientRepository.findById(CLIENT_FIXTURE.getId()))
-			.thenReturn(null);
-		try {
-			invoiceService.getAnnualClientRevenue(CLIENT_FIXTURE, YEAR_FIXTURE);
-			fail("Excepted a ClientNotFoundException to be thrown");
 		}
 		catch(ClientNotFoundException e) {
 			assertThat("Il cliente con id "+CLIENT_FIXTURE.getId()+" non è presente nel database")

@@ -88,24 +88,6 @@ public class InvoiceMongoRepositoryServiceIT {
 	}
 	
 	@Test
-	public void testGetTotalRevenueOfAnYear() {
-		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_1);
-		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_2);
-		invoiceRepository.save(INVOICE_OF_PREVIOUS_YEAR_FIXTURE);
-		assertThat(invoiceService.getTotalRevenueOfAnYear(YEAR_FIXTURE)).isEqualTo(
-				INVOICE_OF_YEAR_FIXTURE_1.getRevenue()+INVOICE_OF_YEAR_FIXTURE_2.getRevenue());
-	}
-	
-	@Test
-	public void testGetYearsOfInvoicesInDatabase() {
-		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_1);
-		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_2);
-		invoiceRepository.save(INVOICE_OF_PREVIOUS_YEAR_FIXTURE);
-		assertThat(invoiceService.getTotalRevenueOfAnYear(YEAR_FIXTURE)).isEqualTo(
-				INVOICE_OF_YEAR_FIXTURE_1.getRevenue()+INVOICE_OF_YEAR_FIXTURE_2.getRevenue());
-	}
-	
-	@Test
 	public void testFindYearsOfTheInvoices() {
 		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_1);
 		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_2);
@@ -124,15 +106,6 @@ public class InvoiceMongoRepositoryServiceIT {
 	}
 	
 	@Test
-	public void testGetAnnualClientRevenue() {
-		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_1);
-		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_2);
-		invoiceRepository.save(INVOICE_OF_PREVIOUS_YEAR_FIXTURE);
-		assertThat(invoiceService.getAnnualClientRevenue(CLIENT_FIXTURE_1, YEAR_FIXTURE))
-			.isEqualTo(INVOICE_OF_YEAR_FIXTURE_1.getRevenue());
-	}
-	
-	@Test
 	public void testFindInvoicesOfAClientAndYearWhenClientIsNotInDatabase() {
 		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_1);
 		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_2);
@@ -145,22 +118,6 @@ public class InvoiceMongoRepositoryServiceIT {
 		catch(ClientNotFoundException e) {
 			assertThat("Il cliente con id "+CLIENT_FIXTURE_1.getId()+" non è presente nel database")
 				.isEqualTo(e.getMessage());
-		}	
-	}
-	
-	@Test
-	public void testGetAnnualClientRevenueWhenClientIsNotInDatabase() {
-		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_1);
-		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_2);
-		invoiceRepository.save(INVOICE_OF_PREVIOUS_YEAR_FIXTURE);
-		clientRepository.delete(CLIENT_FIXTURE_1.getId());
-		try {
-			invoiceService.getAnnualClientRevenue(CLIENT_FIXTURE_1, YEAR_FIXTURE);
-			fail("Excepted a ClientNotFoundException to be thrown");
-		}
-		catch(ClientNotFoundException e) {
-			assertThat("Il cliente con id "+CLIENT_FIXTURE_1.getId()+" non è presente nel database")
-					.isEqualTo(e.getMessage());
 		}	
 	}
 	

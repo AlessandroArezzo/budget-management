@@ -111,29 +111,13 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		invoiceRepository.save(invoice1);
 		invoiceRepository.save(invoice2);
 		invoiceRepository.save(invoice3);
-		GuiActionRunner.execute( 
-				() -> balanceController.allInvoicesByYear(YEAR_FIXTURE) 
+		GuiActionRunner.execute( () -> {
+				balanceController.yearsOfTheInvoices();
+				balanceController.allInvoicesByYear(YEAR_FIXTURE);
+			}	
 		);
 		assertThat(window.list("invoicesList").contents())
 			.containsExactly(invoice1.toString(),invoice2.toString());
-	}
-	
-	@Test @GUITest
-	public void testGetTotalRevenueOfAnYear() {
-		Client client1=clientRepository.save(new Client(CLIENT_IDENTIFIER_1));
-		Client client2=clientRepository.save(new Client(CLIENT_IDENTIFIER_2));
-		Invoice invoice1=new Invoice(client1, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_1);
-		Invoice invoice2=new Invoice(client2, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_2);
-		Invoice invoice3=new Invoice(client2, DATE_OF_THE_PREVIOUS_YEAR_FIXTURE, INVOICE_REVENUE_3);
-		invoiceRepository.save(invoice1);
-		invoiceRepository.save(invoice2);
-		invoiceRepository.save(invoice3);
-		GuiActionRunner.execute( 
-				() -> balanceController.annualRevenue(YEAR_FIXTURE)
-		);
-		window.label("revenueLabel").requireText(
-				"Il ricavo totale del "+YEAR_FIXTURE+" è di "+String.format("%.2f", 
-						INVOICE_REVENUE_1+INVOICE_REVENUE_2)+"€");
 	}
 	
 	@Test @GUITest
@@ -176,8 +160,7 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		invoiceRepository.save(invoice3);
 		invoiceRepository.save(invoice4);
 		GuiActionRunner.execute( () -> {
-				balanceController.yearsOfTheInvoices();
-				balanceController.allClients();
+				balanceController.initializeView();
 			}
 		);	
 		window.comboBox("yearsCombobox")
@@ -201,11 +184,7 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		invoiceRepository.save(invoice1);
 		invoiceRepository.save(invoice2);
 		invoiceRepository.save(invoice3);
-		GuiActionRunner.execute( () -> {
-				balanceController.yearsOfTheInvoices();
-				balanceController.allClients();
-			}
-		);
+		GuiActionRunner.execute( () -> balanceController.initializeView() );
 		invoiceRepository.deleteAllInvoicesByClient(client1.getId());
 		clientRepository.delete(client1.getId());
 		window.comboBox("yearsCombobox")
@@ -233,11 +212,7 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		invoiceRepository.save(invoice1);
 		invoiceRepository.save(invoice2);
 		invoiceRepository.save(invoice3);
-		GuiActionRunner.execute( () -> {
-				balanceController.yearsOfTheInvoices();
-				balanceController.allClients();
-			}
-		);
+		GuiActionRunner.execute( () -> balanceController.initializeView() );
 		window.comboBox("yearsCombobox")
 			.selectItem(Pattern.compile(""+YEAR_FIXTURE));
 		window.list("clientsList").selectItem(Pattern.compile(CLIENT_IDENTIFIER_1));
@@ -270,11 +245,7 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		invoiceRepository.save(invoice1);
 		invoiceRepository.save(invoice2);
 		invoiceRepository.save(invoice3);
-		GuiActionRunner.execute( () -> {
-				balanceController.yearsOfTheInvoices();
-				balanceController.allClients();
-			}
-		);
+		GuiActionRunner.execute( () -> balanceController.initializeView() );
 		window.comboBox("yearsCombobox")
 			.selectItem(Pattern.compile(""+YEAR_FIXTURE));
 		window.list("clientsList").selectItem(Pattern.compile(CLIENT_IDENTIFIER_1));
@@ -296,11 +267,7 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		Client client2=clientRepository.save(new Client(CLIENT_IDENTIFIER_2));
 		Invoice invoiceOfClient2=new Invoice(client2, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_2);
 		invoiceRepository.save(invoiceOfClient2);
-		GuiActionRunner.execute( () -> {
-				balanceController.yearsOfTheInvoices();
-				balanceController.allClients();
-			}
-		);
+		GuiActionRunner.execute( () -> balanceController.initializeView() );
 		window.comboBox("yearsCombobox")
 			.selectItem(Pattern.compile(""+YEAR_FIXTURE));
 		window.list("clientsList").selectItem(Pattern.compile(CLIENT_IDENTIFIER_1));
@@ -331,11 +298,7 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		invoiceRepository.save(invoice1);
 		invoiceRepository.save(invoice2);
 		invoiceRepository.save(invoice3);
-		GuiActionRunner.execute( () -> {
-			balanceController.yearsOfTheInvoices();
-			balanceController.allClients();
-			}
-		);
+		GuiActionRunner.execute( () -> balanceController.initializeView() );
 		window.comboBox("yearsCombobox")
 			.selectItem(Pattern.compile(""+YEAR_FIXTURE));
 		window.comboBox("clientsCombobox").selectItem(Pattern.compile(CLIENT_IDENTIFIER_1));
@@ -363,11 +326,7 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		invoiceRepository.save(invoice1);
 		invoiceRepository.save(invoice2);
 		invoiceRepository.save(invoice3);
-		GuiActionRunner.execute( () -> {
-			balanceController.yearsOfTheInvoices();
-			balanceController.allClients();
-			}
-		);
+		GuiActionRunner.execute( () -> balanceController.initializeView() );
 		window.comboBox("yearsCombobox")
 			.selectItem(Pattern.compile(""+(YEAR_FIXTURE-1)));
 		window.comboBox("clientsCombobox").selectItem(Pattern.compile(CLIENT_IDENTIFIER_1));
