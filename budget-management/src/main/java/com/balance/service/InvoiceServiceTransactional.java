@@ -1,7 +1,6 @@
 package com.balance.service;
 
 import java.util.List;
-import java.util.function.IntPredicate;
 
 import com.balance.exception.ClientNotFoundException;
 import com.balance.model.Client;

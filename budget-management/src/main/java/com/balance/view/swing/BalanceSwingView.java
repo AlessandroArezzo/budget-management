@@ -22,13 +22,9 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -39,7 +35,6 @@ import javax.swing.JComboBox;
 import javax.swing.JButton;
 import javax.swing.JTextField;
 import java.awt.Component;
-import javax.swing.SwingConstants;
 
 public class BalanceSwingView extends JFrame implements BalanceView {
 
@@ -85,7 +80,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 
 		setBounds(100, 100, 450, 300);
 		setResizable(false);
-		setSize(1300,700);
+		setSize(800,500);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -600,9 +595,13 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		int yearSelected=(int) comboboxYears.getSelectedItem();
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(invoiceToAdd.getDate());
-		if(calendar.get(Calendar.YEAR)==yearSelected) {
+		int yearOfInvoice=calendar.get(Calendar.YEAR);
+		if(yearOfInvoice==yearSelected) {
 			invoiceListModel.addElement(invoiceToAdd);
 			balanceController.annualRevenue(yearSelected);
+		}
+		if(comboboxYearsModel.getIndexOf(yearOfInvoice)==-1) {
+			comboboxYearsModel.addElement(yearOfInvoice);
 		}
 		resetInvoiceErrorLabel();
 	}

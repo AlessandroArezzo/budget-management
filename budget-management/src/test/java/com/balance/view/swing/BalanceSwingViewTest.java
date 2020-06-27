@@ -430,13 +430,13 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		verify(balanceController,times(2)).annualRevenue(YEAR_FIXTURE);
 	}
 	
+	
 	@Test @GUITest
 	public void testInvoiceAddedWhenInvoiceIsNotOfTheYearSelectedAndResetErrorLabel() {
 		Invoice invoiceToAdd=new Invoice(CLIENT_FIXTURE_1, DateTestsUtil.getDateFromYear(YEAR_FIXTURE),
 										10);
 		GuiActionRunner.execute(() -> {
 			DefaultComboBoxModel<Integer> comboboxYearsModel=balanceSwingView.getComboboxYearsModel();
-			comboboxYearsModel.addElement(YEAR_FIXTURE);
 			comboboxYearsModel.addElement(CURRENT_YEAR);
 			comboboxYearsModel.setSelectedItem(CURRENT_YEAR);
 			balanceSwingView.invoiceAdded(invoiceToAdd);
@@ -444,8 +444,9 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		);
 		assertThat(window.list("invoicesList").contents()).noneMatch(
 				e -> e.contains(invoiceToAdd.toString()));
+		assertThat(window.comboBox("yearsCombobox").contents())
+			.contains((""+YEAR_FIXTURE));
 		window.label("labelInvoiceErrorMessage").requireText("");
-		verify(balanceController).annualRevenue(YEAR_FIXTURE);
 	}
 	
 	@Test @GUITest
@@ -646,6 +647,5 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).requireDisabled();
 		verifyNoMoreInteractions(balanceController);
 	}
-	
 	
 }
