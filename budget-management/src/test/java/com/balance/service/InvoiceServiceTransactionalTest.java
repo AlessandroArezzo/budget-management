@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.AdditionalAnswers.answer;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -132,6 +133,14 @@ public class InvoiceServiceTransactionalTest {
 			assertThat("Il cliente con id "+CLIENT_FIXTURE.getId()+" non è presente nel database")
 					.isEqualTo(e.getMessage());
 		}
-	}	
+	}
+	
+	@Test
+	public void testAddInvoice() {
+		Invoice invoiceToAdd=new Invoice(CLIENT_FIXTURE, new Date(), 10);
+		assertThat(invoiceService.addInvoice(invoiceToAdd))	
+			.isEqualTo(invoiceToAdd);
+		verify(invoiceRepository).save(invoiceToAdd);
+	}
 	
 }

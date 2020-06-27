@@ -73,6 +73,15 @@ public class InvoiceServiceTransactional implements InvoiceService{
 			});
 	}
 
+	public Invoice addInvoice(Invoice invoice) {
+		return transactionManager.doInTransaction(
+				factory -> { 
+					 ((InvoiceRepository) factory.createRepository(TypeRepository.INVOICE))
+						.save(invoice);
+					 return invoice;
+				});
+	}
+
 	
 	
 	

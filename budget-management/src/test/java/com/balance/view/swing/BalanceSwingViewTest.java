@@ -1,8 +1,10 @@
 package com.balance.view.swing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -29,6 +31,7 @@ import org.mockito.MockitoAnnotations;
 import com.balance.controller.BalanceController;
 import com.balance.model.Client;
 import com.balance.model.Invoice;
+import com.balance.utils.DateTestsUtil;
 
 @RunWith(GUITestRunner.class)
 public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
@@ -76,7 +79,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.label("revenueLabel");
 		window.comboBox("yearsCombobox");
 		window.label("labelClientErrorMessage").requireText("");
-		window.comboBox("clientsCombobox");
+		window.label("labelInvoiceErrorMessage").requireText("");
 		window.button(JButtonMatcher.withText("Vedi tutte le fatture"))
 			.requireNotVisible();
 		window.label(JLabelMatcher.withText("INSERISCI UN NUOVO CLIENTE"));
@@ -84,6 +87,16 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.textBox("textField_clientName").requireEnabled();
 		window.button(JButtonMatcher.withText("Aggiungi cliente")).requireDisabled();
 		window.button(JButtonMatcher.withText("Rimuovi cliente")).requireDisabled();
+		window.label(JLabelMatcher.withText("INSERISCI UNA NUOVA FATTURA"));
+		window.label(JLabelMatcher.withText("Cliente"));
+		window.comboBox("clientsCombobox");
+		window.label(JLabelMatcher.withText("Data"));
+		window.textBox("textField_dayOfDateInvoice").requireEnabled();
+		window.textBox("textField_monthOfDateInvoice").requireEnabled();
+		window.textBox("textField_yearOfDateInvoice").requireEnabled();
+		window.label(JLabelMatcher.withText("Importo (€)"));
+		window.textBox("textField_revenueInvoice").requireEnabled();
+		window.button(JButtonMatcher.withText("Aggiungi fattura")).requireDisabled();
 	}
 	
 	@Test @GUITest
@@ -360,7 +373,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 	}
 	
 	@Test @GUITest
-	public void testDeleteButtonShouldBeEnabledOnlyWhenAStudentIsSelected() {
+	public void testDeleteButtonShouldBeEnabledOnlyWhenAClientIsSelected() {
 		GuiActionRunner.execute(() -> balanceSwingView.getClientListModel().addElement(CLIENT_FIXTURE_1)); 
 		window.list("clientsList").selectItem(0); 
 		JButtonFixture deleteButton = window.button(JButtonMatcher.withText("Rimuovi cliente"));
@@ -370,7 +383,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 	}
 	
 	@Test @GUITest
-	public void testDeleteButtonShouldDelegateToSchoolControllerDeleteStudent() {
+	public void testDeleteButtonShouldDelegateToBalanceControllerDeleteClient() {
 		GuiActionRunner.execute(() -> {
 			DefaultListModel<Client> listClientsModel =balanceSwingView.getClientListModel();
 			listClientsModel.addElement(CLIENT_FIXTURE_1);
@@ -400,6 +413,239 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		verify(balanceController,times(2)).annualRevenue(CURRENT_YEAR-1);
 	}
 	
+	@Test @GUITest
+	public void testInvoiceAddedWhenInvoiceIsOfTheYearSelectedAndResetErrorLabel() {
+		Invoice invoiceToAdd=new Invoice(CLIENT_FIXTURE_1, DateTestsUtil.getDateFromYear(YEAR_FIXTURE),
+										10);
+		GuiActionRunner.execute(() -> {
+			DefaultComboBoxModel<Integer> comboboxYearsModel=balanceSwingView.getComboboxYearsModel();
+			comboboxYearsModel.addElement(YEAR_FIXTURE);
+			comboboxYearsModel.addElement(CURRENT_YEAR);
+			comboboxYearsModel.setSelectedItem(YEAR_FIXTURE);
+			balanceSwingView.invoiceAdded(invoiceToAdd);
+			}
+		);
+		assertThat(window.list("invoicesList").contents()).contains(invoiceToAdd.toString());
+		window.label("labelInvoiceErrorMessage").requireText("");
+		verify(balanceController,times(2)).annualRevenue(YEAR_FIXTURE);
+	}
 	
+	
+	@Test @GUITest
+	public void testInvoiceAddedWhenInvoiceIsNotOfTheYearSelectedAndResetErrorLabel() {
+		Invoice invoiceToAdd=new Invoice(CLIENT_FIXTURE_1, DateTestsUtil.getDateFromYear(YEAR_FIXTURE),
+										10);
+		GuiActionRunner.execute(() -> {
+			DefaultComboBoxModel<Integer> comboboxYearsModel=balanceSwingView.getComboboxYearsModel();
+			comboboxYearsModel.addElement(CURRENT_YEAR);
+			comboboxYearsModel.setSelectedItem(CURRENT_YEAR);
+			balanceSwingView.invoiceAdded(invoiceToAdd);
+			}
+		);
+		assertThat(window.list("invoicesList").contents()).noneMatch(
+				e -> e.contains(invoiceToAdd.toString()));
+		assertThat(window.comboBox("yearsCombobox").contents())
+			.contains((""+YEAR_FIXTURE));
+		window.label("labelInvoiceErrorMessage").requireText("");
+	}
+	
+	@Test @GUITest
+	public void testInsertOnlyCorrectNumberInDateAndRevenueTextFields() {
+		window.textBox("textField_dayOfDateInvoice").enterText("text");
+		window.textBox("textField_dayOfDateInvoice").requireEmpty();
+		window.textBox("textField_dayOfDateInvoice").enterText("203");
+		window.textBox("textField_dayOfDateInvoice").requireText("20");
+		window.textBox("textField_dayOfDateInvoice").setText("");
+		window.textBox("textField_dayOfDateInvoice").enterText("2 3");
+		window.textBox("textField_dayOfDateInvoice").requireText("23");
+		window.textBox("textField_dayOfDateInvoice").setText("");
+		window.textBox("textField_dayOfDateInvoice").enterText("20");
+		window.textBox("textField_dayOfDateInvoice").requireText("20");
+		
+		window.textBox("textField_monthOfDateInvoice").enterText("text");
+		window.textBox("textField_monthOfDateInvoice").requireEmpty();
+		window.textBox("textField_monthOfDateInvoice").enterText("203");
+		window.textBox("textField_monthOfDateInvoice").requireText("20");
+		window.textBox("textField_monthOfDateInvoice").setText("");
+		window.textBox("textField_monthOfDateInvoice").enterText("2 3");
+		window.textBox("textField_monthOfDateInvoice").requireText("23");
+		window.textBox("textField_monthOfDateInvoice").setText("");
+		window.textBox("textField_monthOfDateInvoice").enterText("20");
+		window.textBox("textField_monthOfDateInvoice").requireText("20");
+		
+		window.textBox("textField_yearOfDateInvoice").enterText("text");
+		window.textBox("textField_yearOfDateInvoice").requireEmpty();
+		window.textBox("textField_yearOfDateInvoice").enterText("20200");
+		window.textBox("textField_yearOfDateInvoice").requireText("2020");
+		window.textBox("textField_yearOfDateInvoice").setText("");
+		window.textBox("textField_yearOfDateInvoice").enterText("2 0 2 0");
+		window.textBox("textField_yearOfDateInvoice").requireText("2020");
+		window.textBox("textField_yearOfDateInvoice").setText("");
+		window.textBox("textField_yearOfDateInvoice").enterText("2020");
+		window.textBox("textField_yearOfDateInvoice").requireText("2020");
+		
+		window.textBox("textField_revenueInvoice").enterText("text");
+		window.textBox("textField_revenueInvoice").requireEmpty();
+		window.textBox("textField_revenueInvoice").enterText("5 00. 20");
+		window.textBox("textField_revenueInvoice").requireText("500.20");
+		window.textBox("textField_revenueInvoice").setText("");
+		window.textBox("textField_revenueInvoice").enterText("500.20");
+		window.textBox("textField_revenueInvoice").requireText("500.20");
+	}
+	
+	
+	@Test @GUITest
+	public void testWhenAClientIsSelectedAndTextFieldsIsNotEmptyThenAddInvoiceButtonShouldBeEnabled() {
+		GuiActionRunner.execute(() -> {
+			DefaultComboBoxModel<Client> comboboxClientsModel =balanceSwingView.getComboboxClientsModel();
+			comboboxClientsModel.addElement(CLIENT_FIXTURE_1);
+			}
+		);
+		window.comboBox("clientsCombobox").selectItem(0);
+		window.textBox("textField_dayOfDateInvoice").enterText("1");
+		window.textBox("textField_monthOfDateInvoice").enterText("5");
+		window.textBox("textField_yearOfDateInvoice").enterText("2020");
+		window.textBox("textField_revenueInvoice").enterText("10.20");
+		window.button(JButtonMatcher.withText("Aggiungi fattura")).requireEnabled();
+	}
+	
+	@Test @GUITest
+	public void testWhenNoClientSelectedOrTextFieldsIsEmptyThenAddInvoiceButtonShouldBeDisabled() {
+		GuiActionRunner.execute(() -> {
+			DefaultComboBoxModel<Client> comboboxClientsModel =balanceSwingView.getComboboxClientsModel();
+			comboboxClientsModel.addElement(CLIENT_FIXTURE_1);
+			}
+		);
+		window.comboBox("clientsCombobox").selectItem(0);
+		window.textBox("textField_dayOfDateInvoice").enterText("1");
+		window.textBox("textField_monthOfDateInvoice").enterText("5");
+		window.textBox("textField_yearOfDateInvoice").enterText("2020");
+		window.textBox("textField_revenueInvoice").enterText(" ");
+		window.button(JButtonMatcher.withText("Aggiungi fattura")).requireDisabled();
+		
+		window.textBox("textField_yearOfDateInvoice").setText("");
+		window.textBox("textField_revenueInvoice").setText("");
+		window.textBox("textField_yearOfDateInvoice").enterText(" ");
+		window.textBox("textField_revenueInvoice").enterText("10.20");
+		window.button(JButtonMatcher.withText("Aggiungi fattura")).requireDisabled();
+		
+		window.textBox("textField_monthOfDateInvoice").setText("");
+		window.textBox("textField_yearOfDateInvoice").setText("");
+		window.textBox("textField_monthOfDateInvoice").enterText(" ");
+		window.textBox("textField_yearOfDateInvoice").enterText("2020");
+		window.button(JButtonMatcher.withText("Aggiungi fattura")).requireDisabled();
+		
+		window.textBox("textField_dayOfDateInvoice").setText("");
+		window.textBox("textField_monthOfDateInvoice").setText("");
+		window.textBox("textField_dayOfDateInvoice").enterText(" ");
+		window.textBox("textField_monthOfDateInvoice").enterText("5");
+		window.button(JButtonMatcher.withText("Aggiungi fattura")).requireDisabled();
+		
+		window.comboBox("clientsCombobox").clearSelection();
+		window.textBox("textField_dayOfDateInvoice").setText("");
+		window.textBox("textField_dayOfDateInvoice").enterText("1");
+		window.button(JButtonMatcher.withText("Aggiungi fattura")).requireDisabled();
+	}
+	
+
+	@Test @GUITest
+	public void testAddInvoiceBtnShouldDelegateToControllerNewInvoiceWhenDateIsCorrectAndResetTextField() {
+		GuiActionRunner.execute(() -> {
+			DefaultComboBoxModel<Client> comboboxClientsModel =balanceSwingView.getComboboxClientsModel();
+			comboboxClientsModel.addElement(CLIENT_FIXTURE_1);
+			}
+		);
+		window.comboBox("clientsCombobox").selectItem(0);
+		window.textBox("textField_dayOfDateInvoice").enterText("1");
+		window.textBox("textField_monthOfDateInvoice").enterText("5");
+		window.textBox("textField_yearOfDateInvoice").enterText(""+YEAR_FIXTURE);
+		window.textBox("textField_revenueInvoice").enterText("10.20");
+		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
+		verify(balanceController).newInvoice(new Invoice(
+				CLIENT_FIXTURE_1, DateTestsUtil.getDate(1, 5, YEAR_FIXTURE), 10.20));
+		window.label("labelInvoiceErrorMessage").requireText("");
+		window.textBox("textField_dayOfDateInvoice").requireEmpty();
+		window.textBox("textField_monthOfDateInvoice").requireEmpty();
+		window.textBox("textField_yearOfDateInvoice").requireEmpty();
+		window.textBox("textField_revenueInvoice").requireEmpty();
+		window.comboBox("clientsCombobox").requireNoSelection();
+		window.button(JButtonMatcher.withText("Aggiungi fattura")).requireDisabled();
+	}
+
+	@Test @GUITest
+	public void testAddInvoiceBtnShouldDelegateToControllerNewInvoiceWhenYearIsNotCorrect() {
+		GuiActionRunner.execute(() -> {
+			DefaultComboBoxModel<Client> comboboxClientsModel =balanceSwingView.getComboboxClientsModel();
+			comboboxClientsModel.addElement(CLIENT_FIXTURE_1);
+			}
+		);
+		window.comboBox("clientsCombobox").selectItem(0);
+		window.textBox("textField_dayOfDateInvoice").enterText("1");
+		window.textBox("textField_monthOfDateInvoice").enterText("5");
+		window.textBox("textField_yearOfDateInvoice").enterText(""+(CURRENT_YEAR+1));
+		window.textBox("textField_revenueInvoice").enterText("10.20");
+		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
+		
+		window.textBox("textField_dayOfDateInvoice").requireEmpty();
+		window.textBox("textField_monthOfDateInvoice").requireEmpty();
+		window.textBox("textField_yearOfDateInvoice").requireEmpty();
+		window.label("labelInvoiceErrorMessage").requireText(
+				"La data 1/5/"+(CURRENT_YEAR+1)+" non è corretta");
+		window.button(JButtonMatcher.withText("Aggiungi fattura")).requireDisabled();
+		verifyNoMoreInteractions(balanceController);
+		
+		window.textBox("textField_dayOfDateInvoice").enterText("1");
+		window.textBox("textField_monthOfDateInvoice").enterText("5");
+		window.textBox("textField_yearOfDateInvoice").enterText(""+(CURRENT_YEAR-101));
+		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
+		window.label("labelInvoiceErrorMessage").requireText(
+				"La data 1/5/"+(CURRENT_YEAR-101)+" non è corretta");
+		window.button(JButtonMatcher.withText("Aggiungi fattura")).requireDisabled();
+		verifyNoMoreInteractions(balanceController);
+	}
+	
+	@Test @GUITest
+	public void testAddInvoiceBtnShouldDelegateToControllerNewInvoiceWhenMonthIsNotCorrect() {
+		GuiActionRunner.execute(() -> {
+			DefaultComboBoxModel<Client> comboboxClientsModel =balanceSwingView.getComboboxClientsModel();
+			comboboxClientsModel.addElement(CLIENT_FIXTURE_1);
+			}
+		);
+		window.comboBox("clientsCombobox").selectItem(0);
+		window.textBox("textField_dayOfDateInvoice").enterText("1");
+		window.textBox("textField_monthOfDateInvoice").enterText("13");
+		window.textBox("textField_yearOfDateInvoice").enterText("2020");
+		window.textBox("textField_revenueInvoice").enterText("10.20");
+		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
+		
+		window.textBox("textField_dayOfDateInvoice").requireEmpty();
+		window.textBox("textField_monthOfDateInvoice").requireEmpty();
+		window.textBox("textField_yearOfDateInvoice").requireEmpty();
+		window.label("labelInvoiceErrorMessage").requireText("La data 1/13/2020 non è corretta");
+		window.button(JButtonMatcher.withText("Aggiungi fattura")).requireDisabled();
+		verifyNoMoreInteractions(balanceController);
+	}
+	
+	@Test @GUITest
+	public void testAddInvoiceBtnShouldDelegateToControllerNewInvoiceWhenDayIsNotCorrect() {
+		GuiActionRunner.execute(() -> {
+			DefaultComboBoxModel<Client> comboboxClientsModel =balanceSwingView.getComboboxClientsModel();
+			comboboxClientsModel.addElement(CLIENT_FIXTURE_1);
+			}
+		);
+		window.comboBox("clientsCombobox").selectItem(0);
+		window.textBox("textField_dayOfDateInvoice").enterText("31");
+		window.textBox("textField_monthOfDateInvoice").enterText("2");
+		window.textBox("textField_yearOfDateInvoice").enterText("2020");
+		window.textBox("textField_revenueInvoice").enterText("10.20");
+		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
+		
+		window.textBox("textField_dayOfDateInvoice").requireEmpty();
+		window.textBox("textField_monthOfDateInvoice").requireEmpty();
+		window.textBox("textField_yearOfDateInvoice").requireEmpty();
+		window.label("labelInvoiceErrorMessage").requireText("La data 31/2/2020 non è corretta");
+		window.button(JButtonMatcher.withText("Aggiungi fattura")).requireDisabled();
+		verifyNoMoreInteractions(balanceController);
+	}
 	
 }

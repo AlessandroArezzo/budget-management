@@ -26,6 +26,7 @@ import com.balance.service.InvoiceService;
 import com.balance.service.InvoiceServiceTransactional;
 import com.balance.transaction.TransactionManager;
 import com.balance.transaction.mongodb.TransactionMongoManager;
+import com.balance.utils.DateTestsUtil;
 import com.mongodb.MongoClient;
 import com.mongodb.client.ClientSession;
 
@@ -92,10 +93,8 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 	
 	@Test @GUITest
 	public void testAllClients() {
-		Client client1 = new Client(CLIENT_IDENTIFIER_1);
-		Client client2 = new Client(CLIENT_IDENTIFIER_2);
-		clientRepository.save(client1);
-		clientRepository.save(client2);
+		Client client1=clientRepository.save(new Client(CLIENT_IDENTIFIER_1));
+		Client client2=clientRepository.save(new Client(CLIENT_IDENTIFIER_2));
 		GuiActionRunner.execute( 
 				() -> balanceController.allClients() );
 		assertThat(window.list("clientsList").contents())
@@ -104,12 +103,8 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 	
 	@Test @GUITest
 	public void testAllInvoicesByYear() {
-		Client client1 = new Client(CLIENT_IDENTIFIER_1);
-		Client client2 = new Client(CLIENT_IDENTIFIER_2);
-		clientRepository.save(client1);
-		clientRepository.save(client2);
-		client1.setId(clientRepository.findAll().get(0).getId());
-		client2.setId(clientRepository.findAll().get(1).getId());
+		Client client1=clientRepository.save(new Client(CLIENT_IDENTIFIER_1));
+		Client client2=clientRepository.save(new Client(CLIENT_IDENTIFIER_2));
 		Invoice invoice1=new Invoice(client1, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_1);
 		Invoice invoice2=new Invoice(client2, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_2);
 		Invoice invoice3=new Invoice(client2, DATE_OF_THE_PREVIOUS_YEAR_FIXTURE, INVOICE_REVENUE_3);
@@ -125,12 +120,8 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 	
 	@Test @GUITest
 	public void testGetTotalRevenueOfAnYear() {
-		Client client1 = new Client(CLIENT_IDENTIFIER_1);
-		Client client2 = new Client(CLIENT_IDENTIFIER_2);
-		clientRepository.save(client1);
-		clientRepository.save(client2);
-		client1.setId(clientRepository.findAll().get(0).getId());
-		client2.setId(clientRepository.findAll().get(1).getId());
+		Client client1=clientRepository.save(new Client(CLIENT_IDENTIFIER_1));
+		Client client2=clientRepository.save(new Client(CLIENT_IDENTIFIER_2));
 		Invoice invoice1=new Invoice(client1, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_1);
 		Invoice invoice2=new Invoice(client2, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_2);
 		Invoice invoice3=new Invoice(client2, DATE_OF_THE_PREVIOUS_YEAR_FIXTURE, INVOICE_REVENUE_3);
@@ -147,12 +138,8 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 	
 	@Test @GUITest
 	public void testViewInvoicesAndAnnualRevenueByYear() {
-		Client client1 = new Client(CLIENT_IDENTIFIER_1);
-		Client client2 = new Client(CLIENT_IDENTIFIER_2);
-		clientRepository.save(client1);
-		clientRepository.save(client2);
-		client1.setId(clientRepository.findAll().get(0).getId());
-		client2.setId(clientRepository.findAll().get(1).getId());
+		Client client1=clientRepository.save(new Client(CLIENT_IDENTIFIER_1));
+		Client client2=clientRepository.save(new Client(CLIENT_IDENTIFIER_2));
 		Invoice invoice1=new Invoice(client1, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_1);
 		Invoice invoice2=new Invoice(client2, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_2);
 		Invoice invoice3=new Invoice(client2, DATE_OF_THE_PREVIOUS_YEAR_FIXTURE, INVOICE_REVENUE_3);
@@ -177,12 +164,8 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 	
 	@Test @GUITest
 	public void testViewInvoicesAndAnnualRevenueByClientAndYear() {
-		Client client1 = new Client(CLIENT_IDENTIFIER_1);
-		Client client2 = new Client(CLIENT_IDENTIFIER_2);
-		clientRepository.save(client1);
-		clientRepository.save(client2);
-		client1.setId(clientRepository.findAll().get(0).getId());
-		client2.setId(clientRepository.findAll().get(1).getId());
+		Client client1=clientRepository.save(new Client(CLIENT_IDENTIFIER_1));
+		Client client2=clientRepository.save(new Client(CLIENT_IDENTIFIER_2));
 		Invoice invoice1=new Invoice(client1, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_1);
 		Invoice invoice2=new Invoice(client2, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_2);
 		Invoice invoice3=new Invoice(client2, DATE_OF_THE_PREVIOUS_YEAR_FIXTURE, INVOICE_REVENUE_3);
@@ -210,12 +193,8 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 	
 	@Test @GUITest
 	public void testViewInvoicesAndAnnualRevenueByClientAndYearWhenClientIsNotPresentInDatabase() {
-		Client client1 = new Client(CLIENT_IDENTIFIER_1);
-		Client client2 = new Client(CLIENT_IDENTIFIER_2);
-		clientRepository.save(client1);
-		clientRepository.save(client2);
-		client1.setId(clientRepository.findAll().get(0).getId());
-		client2.setId(clientRepository.findAll().get(1).getId());
+		Client client1=clientRepository.save(new Client(CLIENT_IDENTIFIER_1));
+		Client client2=clientRepository.save(new Client(CLIENT_IDENTIFIER_2));
 		Invoice invoice1=new Invoice(client1, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_1);
 		Invoice invoice2=new Invoice(client2, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_2);
 		Invoice invoice3=new Invoice(client1, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_3);
@@ -245,12 +224,8 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 	
 	@Test @GUITest
 	public void testViewAllInvoicesAndAnnualRevenueAfterSelectingAClient() {
-		Client client1 = new Client(CLIENT_IDENTIFIER_1);
-		Client client2 = new Client(CLIENT_IDENTIFIER_2);
-		clientRepository.save(client1);
-		clientRepository.save(client2);
-		client1.setId(clientRepository.findAll().get(0).getId());
-		client2.setId(clientRepository.findAll().get(1).getId());
+		Client client1=clientRepository.save(new Client(CLIENT_IDENTIFIER_1));
+		Client client2=clientRepository.save(new Client(CLIENT_IDENTIFIER_2));
 		Invoice invoice1=new Invoice(client1, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_1);
 		Invoice invoice2=new Invoice(client2, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_2);
 		Invoice invoice3=new Invoice(client1, DATE_OF_THE_PREVIOUS_YEAR_FIXTURE,
@@ -286,12 +261,8 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 	
 	@Test @GUITest
 	public void testRemoveClientButtonSuccess() {
-		Client client1 = new Client(CLIENT_IDENTIFIER_1);
-		Client client2 = new Client(CLIENT_IDENTIFIER_2);
-		clientRepository.save(client1);
-		clientRepository.save(client2);
-		client1.setId(clientRepository.findAll().get(0).getId());
-		client2.setId(clientRepository.findAll().get(1).getId());
+		Client client1=clientRepository.save(new Client(CLIENT_IDENTIFIER_1));
+		Client client2=clientRepository.save(new Client(CLIENT_IDENTIFIER_2));
 		Invoice invoice1=new Invoice(client1, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_1);
 		Invoice invoice2=new Invoice(client2, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_2);
 		Invoice invoice3=new Invoice(client1, DATE_OF_THE_PREVIOUS_YEAR_FIXTURE,
@@ -321,12 +292,8 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 	
 	@Test @GUITest
 	public void testRemoveClientButtonError() {
-		Client client1 = new Client(CLIENT_IDENTIFIER_1);
-		Client client2 = new Client(CLIENT_IDENTIFIER_2);
-		clientRepository.save(client1);
-		clientRepository.save(client2);
-		client1.setId(clientRepository.findAll().get(0).getId());
-		client2.setId(clientRepository.findAll().get(1).getId());
+		Client client1=clientRepository.save(new Client(CLIENT_IDENTIFIER_1));
+		Client client2=clientRepository.save(new Client(CLIENT_IDENTIFIER_2));
 		Invoice invoiceOfClient2=new Invoice(client2, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_2);
 		invoiceRepository.save(invoiceOfClient2);
 		GuiActionRunner.execute( () -> {
@@ -351,6 +318,71 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		window.label("labelClientErrorMessage").requireText(""
 				+ "Cliente non più presente nel database: " + 
 				client1.getIdentifier());
+	}
+	
+	@Test @GUITest
+	public void testAddInvoiceOfYearSelectedButtonSuccess() {
+		Client client1=clientRepository.save(new Client(CLIENT_IDENTIFIER_1));
+		Client client2=clientRepository.save(new Client(CLIENT_IDENTIFIER_2));
+		Invoice invoice1=new Invoice(client1, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_1);
+		Invoice invoice2=new Invoice(client2, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_2);
+		Invoice invoice3=new Invoice(client1, DATE_OF_THE_PREVIOUS_YEAR_FIXTURE,
+				INVOICE_REVENUE_3);
+		invoiceRepository.save(invoice1);
+		invoiceRepository.save(invoice2);
+		invoiceRepository.save(invoice3);
+		GuiActionRunner.execute( () -> {
+			balanceController.yearsOfTheInvoices();
+			balanceController.allClients();
+			}
+		);
+		window.comboBox("yearsCombobox")
+			.selectItem(Pattern.compile(""+YEAR_FIXTURE));
+		window.comboBox("clientsCombobox").selectItem(Pattern.compile(CLIENT_IDENTIFIER_1));
+		window.textBox("textField_dayOfDateInvoice").enterText("1");
+		window.textBox("textField_monthOfDateInvoice").enterText("5");
+		window.textBox("textField_yearOfDateInvoice").enterText(""+YEAR_FIXTURE);
+		window.textBox("textField_revenueInvoice").enterText("10.20");
+		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
+		assertThat(window.list("invoicesList").contents())
+			.contains(invoice1.toString(),invoice2.toString(),
+					new Invoice(client1,DateTestsUtil.getDate(1, 5, YEAR_FIXTURE),10.20).toString());
+		window.label("revenueLabel").requireText(
+				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
+						INVOICE_REVENUE_1+INVOICE_REVENUE_2+10.20)+"€");
+	}
+	
+	@Test @GUITest
+	public void testAddInvoiceOfNotYearSelectedButtonSuccess() {
+		Client client1=clientRepository.save(new Client(CLIENT_IDENTIFIER_1));
+		Client client2=clientRepository.save(new Client(CLIENT_IDENTIFIER_2));
+		Invoice invoice1=new Invoice(client1, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_1);
+		Invoice invoice2=new Invoice(client2, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_2);
+		Invoice invoice3=new Invoice(client1, DATE_OF_THE_PREVIOUS_YEAR_FIXTURE,
+				INVOICE_REVENUE_3);
+		invoiceRepository.save(invoice1);
+		invoiceRepository.save(invoice2);
+		invoiceRepository.save(invoice3);
+		GuiActionRunner.execute( () -> {
+			balanceController.yearsOfTheInvoices();
+			balanceController.allClients();
+			}
+		);
+		window.comboBox("yearsCombobox")
+			.selectItem(Pattern.compile(""+(YEAR_FIXTURE-1)));
+		window.comboBox("clientsCombobox").selectItem(Pattern.compile(CLIENT_IDENTIFIER_1));
+		window.textBox("textField_dayOfDateInvoice").enterText("1");
+		window.textBox("textField_monthOfDateInvoice").enterText("5");
+		window.textBox("textField_yearOfDateInvoice").enterText(""+YEAR_FIXTURE);
+		window.textBox("textField_revenueInvoice").enterText("10.20");
+		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
+		assertThat(window.list("invoicesList").contents())
+			.noneMatch( 
+				e-> e.contains(
+					new Invoice(client1,DateTestsUtil.getDate(1, 5, YEAR_FIXTURE),10.20).toString()));
+		window.label("revenueLabel").requireText(
+				"Il ricavo totale del "+(YEAR_FIXTURE-1)+" è di "+String.format("%.2f", 
+						INVOICE_REVENUE_3)+"€");
 	}
 	
 	private static Date getDateFromYear(int year) {

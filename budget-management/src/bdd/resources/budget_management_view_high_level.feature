@@ -86,6 +86,7 @@ Feature: Budget Management View High Level
 		Then The invoice list not contains the new invoice
 		And The initial total annual revenue of the selected year is shown
 		
+	@skipped
 	Scenario: Add a new invoice with no existing client in database
 	  Given The user selects a year from the year selection combobox
 		And The user provides invoice data in the text fields with the same year as the one selected
