@@ -28,15 +28,6 @@ public class InvoiceServiceTransactional implements InvoiceService{
 	}
 
 	@Override
-	public double getTotalRevenueOfAnYear(int year) {
-		return transactionManager.doInTransaction(
-				factory -> { 
-					InvoiceRepository invoiceRepository=(InvoiceRepository) factory.createRepository(TypeRepository.INVOICE);
-				    return invoiceRepository.getTotalRevenueOfAnYear(year);
-		});
-	}
-
-	@Override
 	public List<Integer> findYearsOfTheInvoices() {
 		return transactionManager.doInTransaction(
 				factory -> { 
@@ -57,20 +48,6 @@ public class InvoiceServiceTransactional implements InvoiceService{
 			    return invoiceRepository.findInvoicesByClientAndYear(client, year);
 			});
 		
-	}
-
-	@Override
-	public double getAnnualClientRevenue(Client client, int year){
-		return transactionManager.doInTransaction(
-				factory -> {
-					ClientRepository clientRepository=(ClientRepository) factory.createRepository(TypeRepository.CLIENT);
-					if(clientRepository.findById(client.getId())==null) {
-						throw new ClientNotFoundException("Il cliente con id "
-								+client.getId()+" non è presente nel database");
-					}
-					InvoiceRepository invoiceRepository=(InvoiceRepository) factory.createRepository(TypeRepository.INVOICE);
-				    return invoiceRepository.getClientRevenueOfAnYear(client, year);
-			});
 	}
 
 	public Invoice addInvoice(Invoice invoice) {

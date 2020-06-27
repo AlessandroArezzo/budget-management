@@ -11,13 +11,7 @@ public interface BalanceView {
 
 	public void showInvoices(List<Invoice> invoices);
 
-	public void setAnnualTotalRevenue(int year, double  totalRevenue);
-
 	public void setChoiceYearInvoices(List<Integer> yearsOfTheInvoices);
-
-	void setYearSelected(int year);
-
-	public void setAnnualClientRevenue(Client client, int year, double clientRevenue);
 	
 	public void clientRemoved(Client clientToRemove);
 	

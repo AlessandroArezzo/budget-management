@@ -79,7 +79,6 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		setBounds(100, 100, 450, 300);
-		setResizable(false);
 		setSize(800,500);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -136,12 +135,9 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 				if(listClients.getSelectedValue()!=null ) {
 					balanceController.allInvoicesByClientAndYear(
 							listClients.getSelectedValue(), yearSelected);
-					balanceController.annualClientRevenue(
-							listClients.getSelectedValue(), yearSelected);
 				}
 				else {
 					balanceController.allInvoicesByYear(yearSelected);
-					balanceController.annualRevenue(yearSelected);
 				}
 			}
 		});
@@ -162,6 +158,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		listInvoices.setName("invoicesList");
 		listInvoices.setSize(new Dimension(100, 400));
 		listInvoices.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
 		GridBagConstraints gbc_listInvoices = new GridBagConstraints();
 		gbc_listInvoices.gridwidth = 13;
 		gbc_listInvoices.insets = new Insets(0, 0, 5, 5);
@@ -369,17 +366,16 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		
 		comboboxYears.addActionListener(
 					e -> {
-					int yearSelected=(int) comboboxYears.getSelectedItem();
-					Client clientSelected=listClients.getSelectedValue();
-					if(clientSelected==null) {
-				    	balanceController.allInvoicesByYear(yearSelected);
-				    	balanceController.annualRevenue(yearSelected);
-					}
-					else {
-						balanceController.allInvoicesByClientAndYear(clientSelected, yearSelected);
-						balanceController.annualClientRevenue(clientSelected, yearSelected);
+					if(comboboxYears.getSelectedIndex()!=-1) {
+						int yearSelected=(int) comboboxYears.getSelectedItem();
+						Client clientSelected=listClients.getSelectedValue();
+						if(clientSelected==null) {
+					    	balanceController.allInvoicesByYear(yearSelected);
 						}
-					
+						else {
+							balanceController.allInvoicesByClientAndYear(clientSelected, yearSelected);
+						}					
+					}
 			});
 		
 		
@@ -491,6 +487,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 
 	@Override
 	public void showClients(List<Client> clients) {
+		clientListModel.removeAllElements();
 		clients.stream().forEach(clientListModel::addElement);
 		clients.stream().forEach(comboboxClientsModel::addElement);
 	}
@@ -498,23 +495,27 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 
 	@Override
 	public void showInvoices(List<Invoice> invoices) {
-		invoiceListModel.removeAllElements();
-		invoices.stream().forEach(invoiceListModel::addElement); 
+		if((int) comboboxYearsModel.getSelectedItem()!=CURRENT_YEAR && invoices.isEmpty() && 
+				listClients.getSelectedValue()==null) {
+			balanceController.yearsOfTheInvoices();
+		}
+		else {
+			invoiceListModel.removeAllElements();
+			invoices.stream().forEach(invoiceListModel::addElement);
+			this.setLabelTotalRevenue();
+		}
 	}
 
-
-	@Override
-	public void setAnnualTotalRevenue(int year, double totalRevenue) {
-		lblRevenue.setText("Il ricavo totale del "+year+" è di "+String.format("%.2f", totalRevenue)+"€");
-	}
 
 	@Override
 	public void setChoiceYearInvoices(List<Integer> yearsOfTheInvoices) {
+		comboboxYearsModel.removeAllElements();
 		List<Integer> yearsToAddInModel=new ArrayList<>(yearsOfTheInvoices);
 		if(!yearsToAddInModel.contains(CURRENT_YEAR)) {
 			yearsToAddInModel.add(CURRENT_YEAR);
 		}
 		yearsToAddInModel.stream().forEach(comboboxYearsModel::addElement); 
+		setCurrentYearSelected();
 	}
 	
 	public DefaultComboBoxModel<Integer> getComboboxYearsModel() {
@@ -532,18 +533,25 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 	public DefaultComboBoxModel<Client> getComboboxClientsModel() {
 		return comboboxClientsModel;
 	}
-
-	@Override
-	public void setYearSelected(int year) {
-		if(comboboxYearsModel.getIndexOf(year)!=-1) {
-			comboboxYearsModel.setSelectedItem(year);
+	
+	private void setLabelTotalRevenue() {
+		int yearSelected=(int) comboboxYears.getSelectedItem();
+		Client clientSelected=listClients.getSelectedValue();
+		double totalRevenue=0;
+		for(int i=0;i<invoiceListModel.getSize();i++) {
+			totalRevenue+=invoiceListModel.getElementAt(i).getRevenue();
+		}
+		if (clientSelected==null) {
+			lblRevenue.setText("Il ricavo totale del "+yearSelected+" è di "+String.format("%.2f", totalRevenue)+"€");
+		}
+		else {
+			lblRevenue.setText("Il ricavo totale delle fatture del cliente "+clientSelected.getIdentifier()+" "
+					+ "nel "+yearSelected+" è di "+String.format("%.2f", totalRevenue)+"€");
 		}
 	}
 
-	@Override
-	public void setAnnualClientRevenue(Client client, int year, double clientRevenue) {
-		lblRevenue.setText("Il ricavo totale delle fatture del cliente "+client.getIdentifier()+" "
-				+ "nel "+year+" è di "+String.format("%.2f", clientRevenue)+"€");
+	private void setCurrentYearSelected() {
+		comboboxYearsModel.setSelectedItem(CURRENT_YEAR);
 	}
 
 	@Override
@@ -598,7 +606,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		int yearOfInvoice=calendar.get(Calendar.YEAR);
 		if(yearOfInvoice==yearSelected) {
 			invoiceListModel.addElement(invoiceToAdd);
-			balanceController.annualRevenue(yearSelected);
+			this.setLabelTotalRevenue();
 		}
 		if(comboboxYearsModel.getIndexOf(yearOfInvoice)==-1) {
 			comboboxYearsModel.addElement(yearOfInvoice);

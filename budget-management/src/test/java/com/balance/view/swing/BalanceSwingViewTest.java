@@ -1,7 +1,7 @@
 package com.balance.view.swing;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -111,9 +111,25 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 	}
 	
 	@Test @GUITest
+	public void testShowAllClientsShouldAddClientsDescriptionsToTheClientsListAndResetPrevious(){ 
+		GuiActionRunner.execute(() -> {
+				balanceSwingView.getClientListModel().add(0,CLIENT_FIXTURE_1);
+				balanceSwingView.showClients(Arrays.asList(CLIENT_FIXTURE_2));
+			}
+		);
+		assertThat( window.list("clientsList").contents())
+			.containsExactly(CLIENT_FIXTURE_2.toString());
+		assertThat(window.comboBox("clientsCombobox").contents())
+			.containsExactly(CLIENT_FIXTURE_2.toString());
+	}
+	
+	@Test @GUITest
 	public void testShowAllInvoicesShouldAddInvoicesDescriptionsToTheInvoicesList(){ 
-		GuiActionRunner.execute(() -> 
-			balanceSwingView.showInvoices(Arrays.asList(INVOICE_FIXTURE_1, INVOICE_FIXTURE_2)) 
+		GuiActionRunner.execute(() -> {
+				balanceSwingView.setChoiceYearInvoices(Arrays.asList(CURRENT_YEAR));
+				balanceSwingView.getComboboxYearsModel().setSelectedItem(CURRENT_YEAR);
+				balanceSwingView.showInvoices(Arrays.asList(INVOICE_FIXTURE_1, INVOICE_FIXTURE_2));
+			}
 		);
 		String[] listContents = window.list("invoicesList").contents(); 
 		assertThat(listContents).containsExactly(INVOICE_FIXTURE_1.toString(), INVOICE_FIXTURE_2.toString());
@@ -122,6 +138,8 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 	@Test @GUITest
 	public void testShowAllInvoicesShouldAddInvoicesDescriptionsToTheInvoicesListAndResetPrevious(){ 
 		GuiActionRunner.execute(() -> {
+				balanceSwingView.setChoiceYearInvoices(Arrays.asList(CURRENT_YEAR));
+				balanceSwingView.getComboboxYearsModel().setSelectedItem(CURRENT_YEAR);
 				balanceSwingView.getInvoiceListModel().add(0,INVOICE_FIXTURE_1);
 				balanceSwingView.showInvoices(Arrays.asList(INVOICE_FIXTURE_2));
 			}
@@ -130,66 +148,31 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		assertThat(listContents).containsExactly(INVOICE_FIXTURE_2.toString());
 	}
 	
-	@Test @GUITest
-	public void testSetAnnualTotalRevenueWithoutNoZeroNotSignificant() {
-		GuiActionRunner.execute(() -> 
-				balanceSwingView.setAnnualTotalRevenue(2019,300.55)
-			);
-		window.label("revenueLabel").requireText(
-					"Il ricavo totale del 2019 è di 300.55€");
-	}
 	
 	@Test @GUITest
-	public void testSetAnnualTotalRevenueWithOneOrMoreZeroNotSignificant() {
-		GuiActionRunner.execute(() -> 
-			balanceSwingView.setAnnualTotalRevenue(2019,300.50)
-		);
-		window.label("revenueLabel").requireText(
-					"Il ricavo totale del 2019 è di 300.50€");
-	}
-	
-	@Test 
-	public void testSetYearSelectedInComboboxWhenYearIsInCombobox() {
+	public void testSetChoiceYearInvoicesAndResetWhenThereIsCurrentYear() {
 		GuiActionRunner.execute(() -> {
-				DefaultComboBoxModel<Integer> listYearsModel =balanceSwingView.getComboboxYearsModel();
-				listYearsModel.addElement(CURRENT_YEAR-1);
-				listYearsModel.addElement(CURRENT_YEAR);
-				listYearsModel.setSelectedItem(CURRENT_YEAR);
-				balanceSwingView.setYearSelected(CURRENT_YEAR-1);
+				balanceSwingView.getComboboxYearsModel().addElement(YEAR_FIXTURE);
+				balanceSwingView.setChoiceYearInvoices(Arrays.asList(YEAR_FIXTURE,CURRENT_YEAR));
 			}
 		);
-		window.comboBox("yearsCombobox").requireSelection(Pattern.compile(""+(CURRENT_YEAR-1)));
+		assertThat(window.comboBox("yearsCombobox").contents()).containsExactly(""+(YEAR_FIXTURE),
+				""+CURRENT_YEAR);
+		window.comboBox("yearsCombobox").requireSelection(Pattern.compile(""+CURRENT_YEAR));
 	}
-	@Test 
-	public void testSetYearSelectedInComboboxWhenYearIsNotInCombobox() {
+	
+	@Test @GUITest
+	public void testSetChoiceYearInvoicesAndResetWhenThereIsNotCurrentYear() {
 		GuiActionRunner.execute(() -> {
-				DefaultComboBoxModel<Integer> listYearsModel =balanceSwingView.getComboboxYearsModel();
-				listYearsModel.addElement(CURRENT_YEAR);
-				listYearsModel.setSelectedItem(CURRENT_YEAR);
-				balanceSwingView.setYearSelected(CURRENT_YEAR-1);
+				balanceSwingView.getComboboxYearsModel().addElement(YEAR_FIXTURE);
+				balanceSwingView.setChoiceYearInvoices(Arrays.asList(CURRENT_YEAR-1));
 			}
 		);
-		window.comboBox("yearsCombobox").requireSelection(Pattern.compile(""+(CURRENT_YEAR)));
-	}
-	
-	
-	@Test @GUITest
-	public void testSetChoiceYearInvoicesWhenThereIsCurrentYear() {
-		GuiActionRunner.execute(() -> 
-			balanceSwingView.setChoiceYearInvoices(Arrays.asList(CURRENT_YEAR-1,CURRENT_YEAR))
-		);
-		assertThat(window.comboBox("yearsCombobox").contents()).containsExactly(""+(CURRENT_YEAR-1),
+		assertThat(window.comboBox("yearsCombobox").contents()).containsExactly(""+(YEAR_FIXTURE),
 				""+CURRENT_YEAR);
+		window.comboBox("yearsCombobox").requireSelection(Pattern.compile(""+CURRENT_YEAR));
 	}
 	
-	@Test @GUITest
-	public void testSetChoiceYearInvoicesWhenThereIsNotCurrentYear() {
-		GuiActionRunner.execute(() -> 
-			balanceSwingView.setChoiceYearInvoices(Arrays.asList(CURRENT_YEAR-1))
-		);
-		assertThat(window.comboBox("yearsCombobox").contents()).containsExactly(""+(CURRENT_YEAR-1),
-				""+CURRENT_YEAR);
-	}
 	
 	@Test @GUITest
 	public void testSelectYearShouldDelegateToControllerFindYearsInvoices() {
@@ -201,7 +184,6 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		);
 		window.comboBox("yearsCombobox").selectItem(0);
 		verify(balanceController).allInvoicesByYear(CURRENT_YEAR-1);
-		verify(balanceController).annualRevenue(CURRENT_YEAR-1);
 	}
 	
 	@Test @GUITest
@@ -218,47 +200,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.list("clientsList").selectItem(1);
 		window.comboBox("yearsCombobox").selectItem(0);
 		verify(balanceController).allInvoicesByClientAndYear(CLIENT_FIXTURE_2, CURRENT_YEAR-1);
-		verify(balanceController).annualClientRevenue(CLIENT_FIXTURE_2, CURRENT_YEAR-1);
-	}
-	
-	@Test
-	public void testChangeClientSelectedShoulDelegateToControllerFindInvoicesAndRevenue(){ 
-		GuiActionRunner.execute(() -> {
-			DefaultListModel<Client> listClientsModel =balanceSwingView.getClientListModel();
-			listClientsModel.addElement(CLIENT_FIXTURE_1);
-			listClientsModel.addElement(CLIENT_FIXTURE_2);
-			DefaultComboBoxModel<Integer> listYearsModel =balanceSwingView.getComboboxYearsModel();
-			listYearsModel.addElement(CURRENT_YEAR-1);
-			listYearsModel.addElement(CURRENT_YEAR);
-			listYearsModel.setSelectedItem(CURRENT_YEAR-1);
-			}
-		);
-		window.list("clientsList").selectItem(0);
-		verify(balanceController).allInvoicesByClientAndYear(CLIENT_FIXTURE_1, CURRENT_YEAR-1);
-		verify(balanceController).annualClientRevenue(CLIENT_FIXTURE_1, CURRENT_YEAR-1);
-	}
-	
-	@Test @GUITest
-	public void testSetClientAnnualRevenueWithoutNoZeroNotSignificant() {
-		GuiActionRunner.execute(() -> 
-				balanceSwingView.setAnnualClientRevenue(CLIENT_FIXTURE_1,2019,300.55)
-			);
-		window.label("revenueLabel").requireText(
-					"Il ricavo totale delle fatture del cliente "
-							+CLIENT_FIXTURE_1.getIdentifier()+""
-							+ " nel 2019 è di 300.55€");
-	}
-	
-	@Test @GUITest
-	public void testSetClientAnnualRevenueWithOneOrMoreZeroNotSignificant() {
-		GuiActionRunner.execute(() -> 
-			balanceSwingView.setAnnualClientRevenue(CLIENT_FIXTURE_1,2019,300.50)
-		);
-		window.label("revenueLabel").requireText(
-				"Il ricavo totale delle fatture del cliente "
-						+CLIENT_FIXTURE_1.getIdentifier()+""
-						+ " nel 2019 è di 300.50€");
-	}
+	}	
 	
 	@Test @GUITest
 	public void testClientRemovedShouldRemoveTheClientFromTheListAndComboboxAndClearSelectionList(){
@@ -304,7 +246,6 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		assertThat(window.comboBox("clientsCombobox").contents())
 			.containsExactly(client2.toString());
 		window.list("clientsList").requireNoSelection();
-		
 	}
 	
 	@Test @GUITest
@@ -338,7 +279,6 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.comboBox("yearsCombobox").selectItem(1);
 		window.button(JButtonMatcher.withText("Vedi tutte le fatture")).click();
 		verify(balanceController).allInvoicesByYear(YEAR_FIXTURE);
-		verify(balanceController).annualRevenue(YEAR_FIXTURE);
 		window.list("clientsList").requireNoSelection();
 		window.button(JButtonMatcher.withText("Vedi tutte le fatture")).requireNotVisible();
 	}
@@ -410,7 +350,6 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.list("clientsList").selectItem(0);
 		window.list("clientsList").clearSelection();
 		verify(balanceController,times(2)).allInvoicesByYear(CURRENT_YEAR-1);
-		verify(balanceController,times(2)).annualRevenue(CURRENT_YEAR-1);
 	}
 	
 	@Test @GUITest
@@ -427,7 +366,6 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		);
 		assertThat(window.list("invoicesList").contents()).contains(invoiceToAdd.toString());
 		window.label("labelInvoiceErrorMessage").requireText("");
-		verify(balanceController,times(2)).annualRevenue(YEAR_FIXTURE);
 	}
 	
 	
@@ -639,13 +577,205 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.textBox("textField_yearOfDateInvoice").enterText("2020");
 		window.textBox("textField_revenueInvoice").enterText("10.20");
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
-		
 		window.textBox("textField_dayOfDateInvoice").requireEmpty();
 		window.textBox("textField_monthOfDateInvoice").requireEmpty();
 		window.textBox("textField_yearOfDateInvoice").requireEmpty();
 		window.label("labelInvoiceErrorMessage").requireText("La data 31/2/2020 non è corretta");
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).requireDisabled();
 		verifyNoMoreInteractions(balanceController);
+	}
+	
+	@Test @GUITest
+	public void testUpdateTotalRevenueWhenShowAllInvoicesAndAnyClientIsSelected() {
+		GuiActionRunner.execute(() -> {
+				DefaultComboBoxModel<Integer> comboboxYearModel=balanceSwingView.getComboboxYearsModel();
+				comboboxYearModel.addElement(CURRENT_YEAR);
+				comboboxYearModel.addElement(YEAR_FIXTURE);
+				comboboxYearModel.setSelectedItem(CURRENT_YEAR);
+				balanceSwingView.showInvoices(Arrays.asList(INVOICE_FIXTURE_1,INVOICE_FIXTURE_2));
+			}
+		);
+		window.label("revenueLabel").requireText(
+				"Il ricavo totale del "+CURRENT_YEAR+" è di "
+						+String.format("%.2f", INVOICE_FIXTURE_1.getRevenue()+
+								INVOICE_FIXTURE_2.getRevenue())+"€");
+	}
+	
+	@Test @GUITest
+	public void testUpdateTotalRevenueWhenShowAllInvoicesAndAClientIsSelected() {
+		GuiActionRunner.execute(() -> {
+				DefaultListModel<Client> listClientModel=balanceSwingView.getClientListModel();
+				listClientModel.addElement(CLIENT_FIXTURE_1);
+				DefaultComboBoxModel<Integer> comboboxYearModel=balanceSwingView.getComboboxYearsModel();
+				comboboxYearModel.addElement(CURRENT_YEAR);
+				comboboxYearModel.addElement(YEAR_FIXTURE);
+				comboboxYearModel.setSelectedItem(CURRENT_YEAR);
+				balanceSwingView.showInvoices(Arrays.asList(INVOICE_FIXTURE_1,INVOICE_FIXTURE_2));
+			}
+		);
+		window.list("clientsList").selectItem(0);
+		GuiActionRunner.execute(() -> {
+				DefaultComboBoxModel<Integer> comboboxYearModel=balanceSwingView.getComboboxYearsModel();
+				comboboxYearModel.addElement(CURRENT_YEAR);
+				comboboxYearModel.addElement(YEAR_FIXTURE);
+				comboboxYearModel.setSelectedItem(CURRENT_YEAR);
+				balanceSwingView.showInvoices(Arrays.asList(INVOICE_FIXTURE_1,INVOICE_FIXTURE_2));
+				}
+			);
+		window.label("revenueLabel").requireText(
+				"Il ricavo totale delle fatture del cliente "+ CLIENT_FIXTURE_1.getIdentifier()+" nel "
+						+CURRENT_YEAR+" è di "
+						+String.format("%.2f", INVOICE_FIXTURE_1.getRevenue()+
+								INVOICE_FIXTURE_2.getRevenue())+"€");
+	}
+	
+	@Test @GUITest
+	public void testUpdateTotalRevenueWhenInvoiceOfTheYearSelectedIsAddedAndAnyClientIsSelected() {
+		GuiActionRunner.execute(() -> {
+				DefaultComboBoxModel<Integer> comboboxYearModel=balanceSwingView.getComboboxYearsModel();
+				comboboxYearModel.addElement(CURRENT_YEAR);
+				comboboxYearModel.addElement(YEAR_FIXTURE);
+				comboboxYearModel.setSelectedItem(CURRENT_YEAR);
+				balanceSwingView.showInvoices(Arrays.asList(INVOICE_FIXTURE_1));
+				balanceSwingView.invoiceAdded(INVOICE_FIXTURE_2);
+			}
+		);
+		window.label("revenueLabel").requireText(
+				"Il ricavo totale del "+CURRENT_YEAR+" è di "
+						+String.format("%.2f", INVOICE_FIXTURE_1.getRevenue()+
+								INVOICE_FIXTURE_2.getRevenue())+"€");
+	}
+	
+	@Test @GUITest
+	public void testUpdateTotalRevenueWhenInvoiceNotOfTheYearSelectedIsAddedAndAnyClientIsSelected() {
+		GuiActionRunner.execute(() -> {
+				DefaultComboBoxModel<Integer> comboboxYearModel=balanceSwingView.getComboboxYearsModel();
+				comboboxYearModel.addElement(CURRENT_YEAR);
+				comboboxYearModel.addElement(YEAR_FIXTURE);
+				comboboxYearModel.setSelectedItem(CURRENT_YEAR);
+				balanceSwingView.showInvoices(Arrays.asList(INVOICE_FIXTURE_1));
+				balanceSwingView.invoiceAdded(
+						new Invoice(CLIENT_FIXTURE_1, DateTestsUtil.getDateFromYear(YEAR_FIXTURE), 10.20));
+			}
+		);
+		window.label("revenueLabel").requireText(
+				"Il ricavo totale del "+CURRENT_YEAR+" è di "
+						+String.format("%.2f", INVOICE_FIXTURE_1.getRevenue())+"€");
+	}
+	
+	@Test @GUITest
+	public void testUpdateTotalRevenueWhenInvoiceOfTheYearSelectedAndOfTheClientSelectedIsAdded() {
+		GuiActionRunner.execute(() -> {
+				DefaultListModel<Client> listClientModel=balanceSwingView.getClientListModel();
+				listClientModel.addElement(CLIENT_FIXTURE_1);
+				listClientModel.addElement(CLIENT_FIXTURE_2);
+			}
+		);
+		window.list("clientsList").selectItem(1);
+		GuiActionRunner.execute(() -> {
+			DefaultComboBoxModel<Integer> comboboxYearModel=balanceSwingView.getComboboxYearsModel();
+			comboboxYearModel.addElement(CURRENT_YEAR);
+			comboboxYearModel.addElement(YEAR_FIXTURE);
+			comboboxYearModel.setSelectedItem(CURRENT_YEAR);
+			balanceSwingView.invoiceAdded(INVOICE_FIXTURE_2);
+		}
+	);
+		window.label("revenueLabel").requireText(
+				"Il ricavo totale delle fatture del cliente "+ CLIENT_FIXTURE_2.getIdentifier()+" nel "
+						+CURRENT_YEAR+" è di "
+						+String.format("%.2f", INVOICE_FIXTURE_2.getRevenue())+"€");
+	}
+	
+	@Test @GUITest
+	public void testUpdateTotalRevenueWhenInvoiceNotOfTheYearSelectedAndOfTheClientSelectedIsAdded() {
+		GuiActionRunner.execute(() -> {
+				DefaultListModel<Client> listClientModel=balanceSwingView.getClientListModel();
+				listClientModel.addElement(CLIENT_FIXTURE_1);
+				listClientModel.addElement(CLIENT_FIXTURE_2);
+			}
+		);
+		window.list("clientsList").selectItem(0);
+		GuiActionRunner.execute(() -> {
+			DefaultComboBoxModel<Integer> comboboxYearModel=balanceSwingView.getComboboxYearsModel();
+			comboboxYearModel.addElement(CURRENT_YEAR);
+			comboboxYearModel.addElement(YEAR_FIXTURE);
+			comboboxYearModel.setSelectedItem(CURRENT_YEAR);
+			balanceSwingView.showInvoices(Arrays.asList(INVOICE_FIXTURE_1));
+			balanceSwingView.invoiceAdded(
+					new Invoice(CLIENT_FIXTURE_1, DateTestsUtil.getDateFromYear(YEAR_FIXTURE), 10.20));
+		}
+	);
+		window.label("revenueLabel").requireText(
+				"Il ricavo totale delle fatture del cliente "+ CLIENT_FIXTURE_1.getIdentifier()+" nel "
+						+CURRENT_YEAR+" è di "
+						+String.format("%.2f", INVOICE_FIXTURE_1.getRevenue())+"€");
+	}
+	
+	@Test @GUITest
+	public void testUpdateTotalRevenueWhenInvoiceNotOfTheYearSelectedAndNotOfTheClientSelectedIsAdded() {
+		GuiActionRunner.execute(() -> {
+				DefaultListModel<Client> listClientModel=balanceSwingView.getClientListModel();
+				listClientModel.addElement(CLIENT_FIXTURE_1);
+				listClientModel.addElement(CLIENT_FIXTURE_2);
+			}
+		);
+		window.list("clientsList").selectItem(0);
+		GuiActionRunner.execute(() -> {
+			DefaultComboBoxModel<Integer> comboboxYearModel=balanceSwingView.getComboboxYearsModel();
+			comboboxYearModel.addElement(CURRENT_YEAR);
+			comboboxYearModel.addElement(YEAR_FIXTURE);
+			comboboxYearModel.setSelectedItem(CURRENT_YEAR);
+			balanceSwingView.showInvoices(Arrays.asList(INVOICE_FIXTURE_1));
+			balanceSwingView.invoiceAdded(
+					new Invoice(CLIENT_FIXTURE_2, DateTestsUtil.getDateFromYear(YEAR_FIXTURE), 10.20));
+		}
+	);
+		window.label("revenueLabel").requireText(
+				"Il ricavo totale delle fatture del cliente "+ CLIENT_FIXTURE_1.getIdentifier()+" nel "
+						+CURRENT_YEAR+" è di "
+						+String.format("%.2f", INVOICE_FIXTURE_1.getRevenue())+"€");
+	}
+	
+	@Test @GUITest
+	public void testResetShowInvoiceOfCurrentYearWhenShowInvoiceIsCalledWithEmptyArgumentAndAnyClientIsSelected() {
+		GuiActionRunner.execute(() -> {
+				DefaultComboBoxModel<Integer> comboboxYearModel=balanceSwingView.getComboboxYearsModel();
+				comboboxYearModel.addElement(CURRENT_YEAR);
+				comboboxYearModel.addElement(YEAR_FIXTURE);
+				comboboxYearModel.setSelectedItem(YEAR_FIXTURE);
+				balanceSwingView.showInvoices(Arrays.asList());
+			}
+		);
+		verify(balanceController).yearsOfTheInvoices();
+	}
+	
+	@Test @GUITest
+	public void testNotResetShowInvoiceOfCurrentYearWhenShowInvoiceIsCalledWithEmptyArgumentAndAClientIsSelected() {
+		GuiActionRunner.execute(() -> {
+				DefaultComboBoxModel<Integer> comboboxYearModel=balanceSwingView.getComboboxYearsModel();
+				comboboxYearModel.addElement(CURRENT_YEAR);
+				comboboxYearModel.addElement(YEAR_FIXTURE);
+				comboboxYearModel.setSelectedItem(YEAR_FIXTURE);
+				DefaultListModel<Client> listClientModel=balanceSwingView.getClientListModel();
+				listClientModel.addElement(CLIENT_FIXTURE_1);				
+			}
+		);
+		window.list("clientsList").selectItem(0);
+		GuiActionRunner.execute(() -> balanceSwingView.showInvoices(Arrays.asList()) );
+		verify(balanceController, never()).yearsOfTheInvoices();
+	}
+	
+	@Test @GUITest
+	public void testNotResetShowInvoiceOfCurrentYearWhenShowInvoiceIsCalledWithEmptyArgumentAndCurrentYearIsSelected() {
+		GuiActionRunner.execute(() -> {
+				DefaultComboBoxModel<Integer> comboboxYearModel=balanceSwingView.getComboboxYearsModel();
+				comboboxYearModel.addElement(CURRENT_YEAR);
+				comboboxYearModel.addElement(YEAR_FIXTURE);
+				comboboxYearModel.setSelectedItem(CURRENT_YEAR);			
+				balanceSwingView.showInvoices(Arrays.asList());
+			}
+		);
+		verify(balanceController, never()).yearsOfTheInvoices();
 	}
 	
 }

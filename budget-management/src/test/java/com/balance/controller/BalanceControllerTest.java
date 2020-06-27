@@ -60,7 +60,6 @@ public class BalanceControllerTest {
 		balanceController.initializeView();
 		verify(balanceView).showClients(clients);
 		verify(balanceView).setChoiceYearInvoices(yearsOfTheinvoices);
-		verify(balanceView).setYearSelected(CURRENT_YEAR);
 	}
 	
 	@Test
@@ -77,14 +76,6 @@ public class BalanceControllerTest {
 		when(invoiceService.findAllInvoicesByYear(YEAR_FIXTURE)).thenReturn(invoices);
 		balanceController.allInvoicesByYear(YEAR_FIXTURE);
 		verify(balanceView).showInvoices(invoices);
-	}
-	
-	@Test
-	public void testAnnualRevenue() {
-		when(invoiceService.getTotalRevenueOfAnYear(YEAR_FIXTURE))
-			.thenReturn(TOTAL_REVENUE_FIXTURE);
-		balanceController.annualRevenue(YEAR_FIXTURE);
-		verify(balanceView).setAnnualTotalRevenue(YEAR_FIXTURE,TOTAL_REVENUE_FIXTURE);
 	}
 	
 	@Test
@@ -105,37 +96,12 @@ public class BalanceControllerTest {
 	}
 	
 	@Test
-	public void testAnnualClientRevenue() {
-		when(invoiceService.getAnnualClientRevenue(CLIENT_FIXTURE, YEAR_FIXTURE))
-			.thenReturn(TOTAL_REVENUE_FIXTURE);
-		balanceController.annualClientRevenue(CLIENT_FIXTURE, YEAR_FIXTURE);
-		verify(balanceView).setAnnualClientRevenue(
-				CLIENT_FIXTURE, YEAR_FIXTURE, TOTAL_REVENUE_FIXTURE);
-	}
-	
-	@Test
 	public void testInvoicesByClientAndYearWhenClientIsNotPresentInDatabase() {
 		List<Invoice> invoices = Arrays.asList(new Invoice());
 		when(invoiceService.findAllInvoicesByYear(YEAR_FIXTURE)).thenReturn(invoices);
-		when(invoiceService.getTotalRevenueOfAnYear(YEAR_FIXTURE))
-			.thenReturn(TOTAL_REVENUE_FIXTURE);
 		when(invoiceService.findInvoicesByClientAndYear(CLIENT_FIXTURE,YEAR_FIXTURE))
 			.thenThrow(new ClientNotFoundException("Client not found"));
 		balanceController.allInvoicesByClientAndYear(CLIENT_FIXTURE, YEAR_FIXTURE);
-		verify(balanceView).showClientError("Cliente non più presente nel database", 
-				CLIENT_FIXTURE);
-		verify(balanceView).clientRemoved(CLIENT_FIXTURE);
-	}
-	
-	@Test
-	public void testAnnualClientRevenueWhenClientIsNotPresentInDatabase() {
-		List<Invoice> invoices = Arrays.asList(new Invoice());
-		when(invoiceService.findAllInvoicesByYear(YEAR_FIXTURE)).thenReturn(invoices);
-		when(invoiceService.getTotalRevenueOfAnYear(YEAR_FIXTURE))
-			.thenReturn(TOTAL_REVENUE_FIXTURE);
-		when(invoiceService.getAnnualClientRevenue(CLIENT_FIXTURE,YEAR_FIXTURE))
-			.thenThrow(new ClientNotFoundException("Client not found"));
-		balanceController.annualClientRevenue(CLIENT_FIXTURE, YEAR_FIXTURE);
 		verify(balanceView).showClientError("Cliente non più presente nel database", 
 				CLIENT_FIXTURE);
 		verify(balanceView).clientRemoved(CLIENT_FIXTURE);

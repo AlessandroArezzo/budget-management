@@ -8,14 +8,10 @@ import com.balance.model.Invoice;
 public interface InvoiceService {
 
 	public List<Invoice> findAllInvoicesByYear(int year);
-
-	public double getTotalRevenueOfAnYear(int year);
 	
 	public List<Integer> findYearsOfTheInvoices();
 
 	public List<Invoice> findInvoicesByClientAndYear(Client client, int year);
-
-	public double getAnnualClientRevenue(Client client, int year);
 	
 	public Invoice addInvoice(Invoice invoice);
 	

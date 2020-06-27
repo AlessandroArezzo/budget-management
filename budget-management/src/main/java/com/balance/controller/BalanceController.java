@@ -31,11 +31,6 @@ public class BalanceController {
 		balanceView.showInvoices(invoiceService.findAllInvoicesByYear(year));
 	}
 
-	public void annualRevenue(int year) {
-		balanceView.setAnnualTotalRevenue(year, 
-				invoiceService.getTotalRevenueOfAnYear(year));
-	}
-
 	public void yearsOfTheInvoices() {		
 		balanceView.setChoiceYearInvoices( 
 				invoiceService.findYearsOfTheInvoices());
@@ -44,7 +39,6 @@ public class BalanceController {
 	public void initializeView() {
 		allClients();
 		yearsOfTheInvoices();
-		balanceView.setYearSelected(Calendar.getInstance().get(Calendar.YEAR));
 	}	
 	
 	public void allInvoicesByClientAndYear(Client client, int year) {
@@ -56,17 +50,6 @@ public class BalanceController {
 			balanceView.showClientError(CLIENT_NOT_FOUND_ERROR_LABEL, client);
 			balanceView.clientRemoved(client);
 		}		
-	}
-	
-	public void annualClientRevenue(Client client, int year) {
-		try {
-			balanceView.setAnnualClientRevenue(client,year,
-					invoiceService.getAnnualClientRevenue(client, year));
-		}
-		catch(ClientNotFoundException e) {
-			balanceView.showClientError(CLIENT_NOT_FOUND_ERROR_LABEL, client);
-			balanceView.clientRemoved(client);
-		}
 	}
 
 	public void newClient(Client client) {
