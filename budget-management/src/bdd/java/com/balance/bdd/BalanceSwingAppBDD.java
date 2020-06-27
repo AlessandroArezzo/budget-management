@@ -8,7 +8,7 @@ import cucumber.api.CucumberOptions;
 import cucumber.api.junit.Cucumber;
 
 @RunWith(Cucumber.class)
-@CucumberOptions(features="src/bdd/resources",monochrome=true)
+@CucumberOptions(features="src/bdd/resources",monochrome=true ,tags="not @skipped")
 public class BalanceSwingAppBDD {
 	
 	@BeforeClass

@@ -10,7 +10,9 @@ import org.assertj.swing.finder.WindowFinder;
 import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.launcher.ApplicationLauncher;
 
+import com.balance.model.Client;
 import com.balance.model.Invoice;
+import com.balance.utils.DateTestsUtil;
 
 import cucumber.api.java.After;
 import cucumber.api.java.en.Given;
@@ -200,40 +202,46 @@ public class BalanceSwingSteps {
 			.contains(NEW_CLIENT_IDENTIFIER);
 	}
 
-	@Given("The user selects a client from the list")
-	public void the_user_selects_a_client_from_the_list() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
-	}
-
 	@Given("The user provides invoice data in the text fields with the same year as the one selected")
 	public void the_user_provides_invoice_data_in_the_text_fields_with_the_same_year_as_the_one_selected() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
+		window.comboBox("clientsCombobox").selectItem(Pattern.compile(CLIENT_FIXTURE_2_IDENTIFIER));
+		window.textBox("textField_dayOfDateInvoice").enterText("1");
+		window.textBox("textField_monthOfDateInvoice").enterText("5");
+		window.textBox("textField_yearOfDateInvoice").enterText(""+YEAR_FIXTURE);
+		window.textBox("textField_revenueInvoice").enterText("100.25");
 	}
 
 	@Then("The invoice list contains the new invoice")
 	public void the_invoice_list_contains_the_new_invoice() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
+		assertThat(window.list("invoicesList").contents())
+			.contains(new Invoice(new Client(CLIENT_FIXTURE_2_ID, CLIENT_FIXTURE_2_IDENTIFIER), 
+					DateTestsUtil.getDate(1, 5, YEAR_FIXTURE), 100.25).toString());
 	}
 
 	@Then("The total annual revenue of the selected year is updated also considering the new invoice added")
 	public void the_total_annual_revenue_of_the_selected_year_is_updated_also_considering_the_new_invoice_added() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
+		window.label("revenueLabel").requireText(
+				"Il ricavo totale del "+YEAR_FIXTURE+" è di "+String.format("%.2f", 
+						INVOICE_OF_THE_YEAR_FIXTURE_1_REVENUE+INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE+
+						INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE+
+						100.25)+"€");
 	}
 
 	@Given("The user provides invoice data in the text fields with year other than the one selected")
 	public void the_user_provides_invoice_data_in_the_text_fields_with_year_other_than_the_one_selected() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
+		window.comboBox("clientsCombobox").selectItem(Pattern.compile(CLIENT_FIXTURE_2_IDENTIFIER));
+		window.textBox("textField_dayOfDateInvoice").enterText("1");
+		window.textBox("textField_monthOfDateInvoice").enterText("5");
+		window.textBox("textField_yearOfDateInvoice").enterText(""+(YEAR_FIXTURE-1));
+		window.textBox("textField_revenueInvoice").enterText("100.25");
 	}
 
 	@Then("The invoice list not contains the new invoice")
 	public void the_invoice_list_not_contains_the_new_invoice() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
+		assertThat(window.list("invoicesList").contents())
+			.noneMatch(e -> e.contains(
+				new Invoice(new Client(CLIENT_FIXTURE_2_ID, CLIENT_FIXTURE_2_IDENTIFIER), 
+				DateTestsUtil.getDate(1, 5, YEAR_FIXTURE), 100.25).toString()));
 	}
 
 	@Given("The user selects an invoice of the selected year from the list")
