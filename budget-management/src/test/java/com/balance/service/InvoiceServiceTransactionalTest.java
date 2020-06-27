@@ -93,7 +93,7 @@ public class InvoiceServiceTransactionalTest {
 			.thenReturn(null);
 		try {
 			invoiceService.findInvoicesByClientAndYear(CLIENT_FIXTURE, YEAR_FIXTURE);
-			fail("Excpected a ClientNotFoundException to be thrown");
+			fail("Expected a ClientNotFoundException to be thrown");
 		}
 		catch(ClientNotFoundException e) {
 			assertThat("Il cliente con id "+CLIENT_FIXTURE.getId()+" non è presente nel database")
@@ -102,11 +102,26 @@ public class InvoiceServiceTransactionalTest {
 	}
 	
 	@Test
-	public void testAddInvoice() {
+	public void testAddInvoiceWhenClientIsPresentInDatabase() {
 		Invoice invoiceToAdd=new Invoice(CLIENT_FIXTURE, new Date(), 10);
+		when(clientRepository.findById(CLIENT_FIXTURE.getId())).thenReturn(CLIENT_FIXTURE);
 		assertThat(invoiceService.addInvoice(invoiceToAdd))	
 			.isEqualTo(invoiceToAdd);
 		verify(invoiceRepository).save(invoiceToAdd);
+	}
+	
+	@Test
+	public void testAddInvoiceWhenClientIsNotPresentInDatabase() {
+		Invoice invoiceToAdd=new Invoice(CLIENT_FIXTURE, new Date(), 10);
+		when(clientRepository.findById(CLIENT_FIXTURE.getId())).thenReturn(null);
+		try {
+			invoiceService.addInvoice(invoiceToAdd);
+			fail("Expected a ClientNotFoundException to be thrown");
+		}
+		catch(ClientNotFoundException e) {
+			assertThat("Il cliente con id "+CLIENT_FIXTURE.getId()+" non è presente nel database")
+					.isEqualTo(e.getMessage());
+		}
 	}
 	
 }

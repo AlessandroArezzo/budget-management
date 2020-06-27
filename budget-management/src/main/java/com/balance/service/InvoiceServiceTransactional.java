@@ -53,6 +53,11 @@ public class InvoiceServiceTransactional implements InvoiceService{
 	public Invoice addInvoice(Invoice invoice) {
 		return transactionManager.doInTransaction(
 				factory -> { 
+					ClientRepository clientRepository=(ClientRepository) factory.createRepository(TypeRepository.CLIENT);
+					if(clientRepository.findById(invoice.getClient().getId())==null) {
+						throw new ClientNotFoundException("Il cliente con id "+
+								invoice.getClient().getId()+" non è presente nel database");
+					}
 					 ((InvoiceRepository) factory.createRepository(TypeRepository.INVOICE))
 						.save(invoice);
 					 return invoice;

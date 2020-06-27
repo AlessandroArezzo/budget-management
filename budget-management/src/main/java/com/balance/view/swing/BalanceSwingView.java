@@ -614,4 +614,17 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		resetInvoiceErrorLabel();
 	}
 
+	@Override
+	public void removeInvoicesOfClient(Client client) {
+		for(int i=0;i<invoiceListModel.getSize();i++) {
+			if(invoiceListModel.getElementAt(i).getClient()==client) {
+				invoiceListModel.remove(i--);
+			}
+		}
+		if(invoiceListModel.getSize()==0 && listClients.getSelectedValue()==null) {
+			balanceController.yearsOfTheInvoices();
+		}
+		
+	}
+
 }

@@ -65,7 +65,16 @@ public class BalanceController {
 	}
 
 	public void newInvoice(Invoice invoice) {
-		balanceView.invoiceAdded(invoiceService.addInvoice(invoice));
+		try {
+			balanceView.invoiceAdded(invoiceService.addInvoice(invoice));
+		}
+		catch(ClientNotFoundException e){
+			Client client=invoice.getClient();
+			balanceView.showClientError(CLIENT_NOT_FOUND_ERROR_LABEL, client);
+			balanceView.clientRemoved(client);
+			balanceView.removeInvoicesOfClient(client);
+		}
+		
 	}
 	
 }

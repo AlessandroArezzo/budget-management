@@ -21,4 +21,6 @@ public interface BalanceView {
 
 	public void invoiceAdded(Invoice invoiceToAdd);
 
+	public void removeInvoicesOfClient(Client client);
+
 }
