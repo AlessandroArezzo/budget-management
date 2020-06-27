@@ -17,4 +17,6 @@ public interface InvoiceService {
 
 	public double getAnnualClientRevenue(Client client, int year);
 	
+	public Invoice addInvoice(Invoice invoice);
+	
 }

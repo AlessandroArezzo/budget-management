@@ -1,6 +1,7 @@
 package com.balance.service;
 
 import java.util.List;
+import java.util.function.IntPredicate;
 
 import com.balance.exception.ClientNotFoundException;
 import com.balance.model.Client;
@@ -71,6 +72,15 @@ public class InvoiceServiceTransactional implements InvoiceService{
 					InvoiceRepository invoiceRepository=(InvoiceRepository) factory.createRepository(TypeRepository.INVOICE);
 				    return invoiceRepository.getClientRevenueOfAnYear(client, year);
 			});
+	}
+
+	public Invoice addInvoice(Invoice invoice) {
+		return transactionManager.doInTransaction(
+				factory -> { 
+					 ((InvoiceRepository) factory.createRepository(TypeRepository.INVOICE))
+						.save(invoice);
+					 return invoice;
+				});
 	}
 
 	

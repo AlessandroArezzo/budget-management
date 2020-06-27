@@ -4,6 +4,7 @@ import java.util.Calendar;
 
 import com.balance.exception.ClientNotFoundException;
 import com.balance.model.Client;
+import com.balance.model.Invoice;
 import com.balance.service.ClientService;
 import com.balance.service.InvoiceService;
 import com.balance.view.BalanceView;
@@ -80,6 +81,10 @@ public class BalanceController {
 			balanceView.showClientError(CLIENT_NOT_FOUND_ERROR_LABEL, clientToRemove);
 		}
 		balanceView.clientRemoved(clientToRemove);
+	}
+
+	public void newInvoice(Invoice invoice) {
+		balanceView.invoiceAdded(invoiceService.addInvoice(invoice));
 	}
 	
 }

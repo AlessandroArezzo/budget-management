@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.assertj.swing.annotation.GUITest;
@@ -43,6 +44,7 @@ public class BalanceControllerTest {
 	private static final int YEAR_FIXTURE=2019;
 	private static final double TOTAL_REVENUE_FIXTURE=50.6;
 	private static final Client CLIENT_FIXTURE=new Client("1", "test identifier");
+	private static final Invoice INVOICE_FIXTURE=new Invoice(CLIENT_FIXTURE, new Date(), 10);
 	
 	@Before
 	public void init() {
@@ -167,6 +169,15 @@ public class BalanceControllerTest {
 		InOrder inOrder = Mockito.inOrder(clientService, balanceView);
 		inOrder.verify(clientService).removeClient(CLIENT_FIXTURE.getId());
 		inOrder.verify(balanceView).clientRemoved(CLIENT_FIXTURE);
+	}
+	
+	@Test
+	public void testAddNewInvoice() {
+		when(invoiceService.addInvoice(INVOICE_FIXTURE)).thenReturn(INVOICE_FIXTURE);
+		balanceController.newInvoice(INVOICE_FIXTURE);
+		InOrder inOrder = Mockito.inOrder(invoiceService, balanceView);
+		inOrder.verify(invoiceService).addInvoice(INVOICE_FIXTURE);
+		inOrder.verify(balanceView).invoiceAdded(INVOICE_FIXTURE);
 	}
 	
 }
