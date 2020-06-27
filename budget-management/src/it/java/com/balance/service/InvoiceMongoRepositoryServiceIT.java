@@ -163,4 +163,10 @@ public class InvoiceMongoRepositoryServiceIT {
 					.isEqualTo(e.getMessage());
 		}	
 	}
+	
+	@Test
+	public void testAddNewInvoiceWhenClientIspresentInDatabase() {
+		Invoice invoiceAdded=invoiceService.addInvoice(INVOICE_OF_YEAR_FIXTURE_1);
+		assertThat(invoiceRepository.findById(invoiceAdded.getId())).isEqualTo(invoiceAdded);
+	}
 }

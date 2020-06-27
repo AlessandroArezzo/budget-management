@@ -557,19 +557,11 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.comboBox("clientsCombobox").selectItem(0);
 		window.textBox("textField_dayOfDateInvoice").enterText("1");
 		window.textBox("textField_monthOfDateInvoice").enterText("5");
-		window.textBox("textField_yearOfDateInvoice").enterText("2020");
+		window.textBox("textField_yearOfDateInvoice").enterText(""+YEAR_FIXTURE);
 		window.textBox("textField_revenueInvoice").enterText("10.20");
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
-		Calendar calendar = Calendar.getInstance();
-		calendar.set(Calendar.YEAR, 2020);
-		calendar.set(Calendar.MONTH, 4);
-		calendar.set(Calendar.DAY_OF_MONTH, 1);
-		calendar.set(Calendar.HOUR,  0);
-		calendar.set(Calendar.MINUTE,  0);
-		calendar.set(Calendar.SECOND,  0);
-		calendar.set(Calendar.MILLISECOND,  0);
 		verify(balanceController).newInvoice(new Invoice(
-				CLIENT_FIXTURE_1,calendar.getTime(), 10.20));
+				CLIENT_FIXTURE_1, DateTestsUtil.getDate(1, 5, YEAR_FIXTURE), 10.20));
 		window.label("labelInvoiceErrorMessage").requireText("");
 		window.textBox("textField_dayOfDateInvoice").requireEmpty();
 		window.textBox("textField_monthOfDateInvoice").requireEmpty();

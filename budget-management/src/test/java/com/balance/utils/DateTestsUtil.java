@@ -32,10 +32,20 @@ public class DateTestsUtil {
 		return parseDate(cal.getTime());
 	}
 	
+	public static Date getDate(int day, int month, int year) {
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.YEAR, year);
+		cal.set(Calendar.MONTH, month-1);
+		cal.set(Calendar.DAY_OF_MONTH, day); 
+		return parseDate(cal.getTime());
+	}
+	
 	private static Date parseDate(Date date) {
 		try {
 			date=FORMATTER.parse(FORMATTER.format(date));
 		} catch (ParseException e) {}
 		return date;
 	}
+	
+	
 }
