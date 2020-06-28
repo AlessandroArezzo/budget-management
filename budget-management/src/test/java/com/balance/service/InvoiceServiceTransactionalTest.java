@@ -8,9 +8,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -122,6 +120,13 @@ public class InvoiceServiceTransactionalTest {
 			assertThat("Il cliente con id "+CLIENT_FIXTURE.getId()+" non è presente nel database")
 					.isEqualTo(e.getMessage());
 		}
+	}
+	
+	@Test
+	public void testRemoveInvoiceWhenInvoiceAndClientExistingInDatabase() {
+		String idInvoiceToDelete="1";
+		invoiceService.removeInvoice(idInvoiceToDelete);
+		verify(invoiceRepository).delete(idInvoiceToDelete);
 	}
 	
 }

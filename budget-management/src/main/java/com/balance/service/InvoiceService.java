@@ -15,4 +15,5 @@ public interface InvoiceService {
 	
 	public Invoice addInvoice(Invoice invoice);
 	
+	public void removeInvoice(String invoiceId);
 }
