@@ -64,9 +64,15 @@ public class InvoiceServiceTransactional implements InvoiceService{
 				});
 	}
 
-	public void removeInvoice(String invoiceId) {
+	public void removeInvoice(Invoice invoice) {
 		transactionManager.doInTransaction(
 				factory -> {
+					String clientId=invoice.getClient().getId();
+					if (((ClientRepository) factory.createRepository(TypeRepository.CLIENT))
+							.findById(clientId)==null) {
+						throwClientNotFoundException(clientId);
+					}
+					String invoiceId=invoice.getId();
 					InvoiceRepository invoiceRepository=(InvoiceRepository) factory.createRepository(TypeRepository.INVOICE);
 					if(invoiceRepository.findById(invoiceId)==null) {
 						throwInvoiceNotFoundException(invoiceId);

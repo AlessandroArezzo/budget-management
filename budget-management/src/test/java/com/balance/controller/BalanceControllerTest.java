@@ -164,20 +164,33 @@ public class BalanceControllerTest {
 	public void testDeleteInvoiceWhenInvoiceAndClientExistingInDatabase() {
 		balanceController.deleteInvoice(INVOICE_FIXTURE);
 		InOrder inOrder = Mockito.inOrder(invoiceService, balanceView);
-		inOrder.verify(invoiceService).removeInvoice(INVOICE_FIXTURE.getId());
+		inOrder.verify(invoiceService).removeInvoice(INVOICE_FIXTURE);
 		inOrder.verify(balanceView).invoiceRemoved(INVOICE_FIXTURE);
 	}
 	
 	@Test
 	public void testDeleteInvoiceWhenInvoiceNoExistingInDatabase() {
 		doThrow(new InvoiceNotFoundException("Invoice not found"))
-			.when(invoiceService).removeInvoice(INVOICE_FIXTURE.getId());
+			.when(invoiceService).removeInvoice(INVOICE_FIXTURE);
 		balanceController.deleteInvoice(INVOICE_FIXTURE);
 		InOrder inOrder = Mockito.inOrder(invoiceService, balanceView);
-		inOrder.verify(invoiceService).removeInvoice(INVOICE_FIXTURE.getId());
+		inOrder.verify(invoiceService).removeInvoice(INVOICE_FIXTURE);
 		inOrder.verify(balanceView).showInvoiceError("Fattura non più presente nel database", 
 				INVOICE_FIXTURE);
 		inOrder.verify(balanceView).invoiceRemoved(INVOICE_FIXTURE);
+	}
+	
+	@Test
+	public void testDeleteInvoiceWhenClientNoExistingInDatabase() {
+		doThrow(new ClientNotFoundException("Client not found"))
+			.when(invoiceService).removeInvoice(INVOICE_FIXTURE);
+		balanceController.deleteInvoice(INVOICE_FIXTURE);
+		InOrder inOrder = Mockito.inOrder(invoiceService, balanceView);
+		inOrder.verify(invoiceService).removeInvoice(INVOICE_FIXTURE);
+		inOrder.verify(balanceView).showClientError("Cliente non più presente nel database", 
+				CLIENT_FIXTURE);
+		inOrder.verify(balanceView).clientRemoved(CLIENT_FIXTURE);
+		inOrder.verify(balanceView).removeInvoicesOfClient(CLIENT_FIXTURE);
 	}
 	
 }

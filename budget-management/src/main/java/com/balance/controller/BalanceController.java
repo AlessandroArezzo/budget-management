@@ -71,21 +71,28 @@ public class BalanceController {
 			balanceView.invoiceAdded(invoiceService.addInvoice(invoice));
 		}
 		catch(ClientNotFoundException e){
-			Client client=invoice.getClient();
-			balanceView.showClientError(CLIENT_NOT_FOUND_ERROR_LABEL, client);
-			balanceView.clientRemoved(client);
-			balanceView.removeInvoicesOfClient(client);
+			clientNoExistingInDatabase(invoice.getClient());
 		}	
 	}
 
 	public void deleteInvoice(Invoice invoice) {
 		try {
-			invoiceService.removeInvoice(invoice.getId());
+			invoiceService.removeInvoice(invoice);
+			balanceView.invoiceRemoved(invoice);
 		}
 		catch(InvoiceNotFoundException e){
 			balanceView.showInvoiceError(INVOICE_NOT_FOUND_ERROR_LABEL, invoice);
-		}	
-		balanceView.invoiceRemoved(invoice);
+			balanceView.invoiceRemoved(invoice);
+		}
+		catch(ClientNotFoundException e) {
+			clientNoExistingInDatabase(invoice.getClient());
+		}
+	}
+	
+	private void clientNoExistingInDatabase(Client client) {
+		balanceView.showClientError(CLIENT_NOT_FOUND_ERROR_LABEL, client);
+		balanceView.clientRemoved(client);
+		balanceView.removeInvoicesOfClient(client);
 	}
 	
 }

@@ -147,22 +147,21 @@ public class InvoiceMongoRepositoryServiceIT {
 	
 	@Test
 	public void testRemoveInvoiceWhenClientAndInvoiceExistingInDatabase() {
-		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_1);
+		Invoice invoiceToRemove=invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_1);
 		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_2);
-		String idInvoiceToRemove=invoiceRepository.findAll().get(0).getId();
-		invoiceService.removeInvoice(idInvoiceToRemove);
-		assertThat(invoiceRepository.findById(idInvoiceToRemove)).isNull();
+		invoiceService.removeInvoice(invoiceToRemove);
+		assertThat(invoiceRepository.findById(invoiceToRemove.getId())).isNull();
 	}
 	
 	@Test
 	public void testRemoveInvoiceWhenInvoiceNoExistingInDatabase() {
-		String idInvoiceToRemove=new ObjectId().toString();
+		Invoice invoiceToRemove=new Invoice(new ObjectId().toString(),CLIENT_FIXTURE_1,new Date(),10);
 		try {
-			invoiceService.removeInvoice(idInvoiceToRemove);
+			invoiceService.removeInvoice(invoiceToRemove);
 			fail("Excepted a InvoiceNotFoundException to be thrown");
 		}
 		catch(InvoiceNotFoundException e) {
-			assertThat("La fattura con id "+idInvoiceToRemove+" non è presente nel database")
+			assertThat("La fattura con id "+invoiceToRemove.getId()+" non è presente nel database")
 				.isEqualTo(e.getMessage());
 		}	
 	}
