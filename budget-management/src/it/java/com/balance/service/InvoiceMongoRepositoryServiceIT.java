@@ -117,7 +117,7 @@ public class InvoiceMongoRepositoryServiceIT {
 		clientRepository.delete(CLIENT_FIXTURE_1.getId());
 		try {
 			invoiceService.findInvoicesByClientAndYear(CLIENT_FIXTURE_1, YEAR_FIXTURE);
-			fail("Excepted a ClientNotFoundException to be thrown");
+			fail("Expected a ClientNotFoundException to be thrown");
 		}
 		catch(ClientNotFoundException e) {
 			assertThat("Il cliente con id "+CLIENT_FIXTURE_1.getId()+" non è presente nel database")
@@ -137,7 +137,7 @@ public class InvoiceMongoRepositoryServiceIT {
 		Invoice invoiceToAdd=new Invoice(clientOfInvoiceToAdd, new Date(),10);
 		try {
 			invoiceService.addInvoice(invoiceToAdd);
-			fail("Excepted a ClientNotFoundException to be thrown");
+			fail("Expected a ClientNotFoundException to be thrown");
 		}
 		catch(ClientNotFoundException e) {
 			assertThat("Il cliente con id "+clientOfInvoiceToAdd.getId()+" non è presente nel database")
@@ -147,22 +147,34 @@ public class InvoiceMongoRepositoryServiceIT {
 	
 	@Test
 	public void testRemoveInvoiceWhenClientAndInvoiceExistingInDatabase() {
-		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_1);
+		Invoice invoiceToRemove=invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_1);
 		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_2);
-		String idInvoiceToRemove=invoiceRepository.findAll().get(0).getId();
-		invoiceService.removeInvoice(idInvoiceToRemove);
-		assertThat(invoiceRepository.findById(idInvoiceToRemove)).isNull();
+		invoiceService.removeInvoice(invoiceToRemove);
+		assertThat(invoiceRepository.findById(invoiceToRemove.getId())).isNull();
 	}
 	
 	@Test
 	public void testRemoveInvoiceWhenInvoiceNoExistingInDatabase() {
-		String idInvoiceToRemove=new ObjectId().toString();
+		Invoice invoiceToRemove=new Invoice(new ObjectId().toString(),CLIENT_FIXTURE_1,new Date(),10);
 		try {
-			invoiceService.removeInvoice(idInvoiceToRemove);
-			fail("Excepted a InvoiceNotFoundException to be thrown");
+			invoiceService.removeInvoice(invoiceToRemove);
+			fail("Expected a InvoiceNotFoundException to be thrown");
 		}
 		catch(InvoiceNotFoundException e) {
-			assertThat("La fattura con id "+idInvoiceToRemove+" non è presente nel database")
+			assertThat("La fattura con id "+invoiceToRemove.getId()+" non è presente nel database")
+				.isEqualTo(e.getMessage());
+		}	
+	}
+	
+	@Test
+	public void testRemoveInvoiceWhenClientNoExistingInDatabase() {
+		clientRepository.delete(CLIENT_FIXTURE_1.getId());
+		try {
+			invoiceService.removeInvoice(INVOICE_OF_YEAR_FIXTURE_1);
+			fail("Expected a ClientNotFoundException to be thrown");
+		}
+		catch(ClientNotFoundException e) {
+			assertThat("Il cliente con id "+CLIENT_FIXTURE_1.getId()+" non è presente nel database")
 				.isEqualTo(e.getMessage());
 		}	
 	}
