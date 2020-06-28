@@ -159,10 +159,8 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		listInvoices.setName("invoicesList");
 		listInvoices.setSize(new Dimension(100, 400));
 		listInvoices.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		listInvoices.addListSelectionListener(e -> {
-			btnRemoveInvoice.setEnabled(
-					listInvoices.getSelectedIndex() != -1); 
-		});
+		listInvoices.addListSelectionListener(e -> 
+			btnRemoveInvoice.setEnabled(listInvoices.getSelectedIndex() != -1));
 		GridBagConstraints gbc_listInvoices = new GridBagConstraints();
 		gbc_listInvoices.gridwidth = 13;
 		gbc_listInvoices.insets = new Insets(0, 0, 5, 5);
