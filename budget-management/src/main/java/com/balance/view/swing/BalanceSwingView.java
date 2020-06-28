@@ -393,10 +393,10 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 						Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 						
 						Client clientOfInvoice=(Client) comboBoxClients.getSelectedItem();
-						balanceController.newInvoice(new Invoice(clientOfInvoice,
-								date,revenueOfInvoice));
 						resetInvoiceErrorLabel();
 						resetTextBoxAndComboBoxNewInvoice();
+						balanceController.newInvoice(new Invoice(clientOfInvoice,
+								date,revenueOfInvoice));
 					}
 					catch(DateTimeException ex) {
 						lblInvoiceError.setText("La data "+dayOfMonth+"/"+monthOfYear+"/"+yearOfDate+" non è corretta");
@@ -616,13 +616,18 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 
 	@Override
 	public void removeInvoicesOfClient(Client client) {
-		for(int i=0;i<invoiceListModel.getSize();i++) {
-			if(invoiceListModel.getElementAt(i).getClient()==client) {
-				invoiceListModel.remove(i--);
-			}
+		int counter=0;
+		while(counter<invoiceListModel.getSize()) {
+			if(invoiceListModel.getElementAt(counter).getClient().equals(client)) 
+				invoiceListModel.remove(counter);
+			else 
+				counter++;
 		}
 		if(invoiceListModel.getSize()==0 && listClients.getSelectedValue()==null) {
 			balanceController.yearsOfTheInvoices();
+		}
+		else if (listClients.getSelectedValue()==null){
+			this.setLabelTotalRevenue();
 		}
 		
 	}

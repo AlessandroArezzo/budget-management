@@ -68,7 +68,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window = new FrameFixture(robot(), balanceSwingView);
 		window.show();
 	}
-	/*
+	
 	@Test @GUITest
 	public void testControlInitialStates() {
 		window.label(JLabelMatcher.withText("CLIENTI")); 
@@ -777,9 +777,9 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		);
 		verify(balanceController, never()).yearsOfTheInvoices();
 	}
-	*/
+	
 	@Test @GUITest
-	public void testRemoveInvoicesOfAClientWhenInvoicesRemanentInListIsNotEmpty() {
+	public void testRemoveInvoicesOfAClientWhenInvoicesRemanentInListIsNotEmptyAndUpdateTotalRevenue() {
 		GuiActionRunner.execute(() -> {
 			DefaultComboBoxModel<Integer> comboboxYearModel=balanceSwingView.getComboboxYearsModel();
 			comboboxYearModel.addElement(CURRENT_YEAR);
@@ -787,10 +787,13 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 			DefaultListModel<Invoice> listInvoiceModel=balanceSwingView.getInvoiceListModel();
 			listInvoiceModel.addElement(INVOICE_FIXTURE_1);
 			listInvoiceModel.addElement(INVOICE_FIXTURE_2);
-			balanceSwingView.removeInvoicesOfClient(CLIENT_FIXTURE_1);
+			balanceSwingView.removeInvoicesOfClient(new Client(CLIENT_FIXTURE_1.getIdentifier()));
 			}
 		);
 		assertThat(window.list("invoicesList").contents()).containsOnly(INVOICE_FIXTURE_2.toString());
+		window.label("revenueLabel").requireText(
+				"Il ricavo totale del "+CURRENT_YEAR+" è di "
+						+String.format("%.2f", INVOICE_FIXTURE_2.getRevenue())+"€");
 	}
 	
 	@Test @GUITest
@@ -804,7 +807,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 			listInvoiceModel.addElement(INVOICE_FIXTURE_1);
 			listInvoiceModel.addElement(new Invoice(CLIENT_FIXTURE_1,
 					DateTestsUtil.getDateFromYear(YEAR_FIXTURE),10.20));
-			balanceSwingView.removeInvoicesOfClient(CLIENT_FIXTURE_1);
+			balanceSwingView.removeInvoicesOfClient(new Client(CLIENT_FIXTURE_1.getIdentifier()));
 			}
 		);
 		assertThat(window.list("invoicesList").contents()).isEmpty();
@@ -821,9 +824,16 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 			comboboxYearModel.addElement(YEAR_FIXTURE);
 			comboboxYearModel.addElement(CURRENT_YEAR);
 			comboboxYearModel.setSelectedItem(YEAR_FIXTURE);
+			DefaultListModel<Invoice> listInvoiceModel=balanceSwingView.getInvoiceListModel();
+			listInvoiceModel.addElement(INVOICE_FIXTURE_1);
+			listInvoiceModel.addElement(new Invoice(CLIENT_FIXTURE_1,
+					DateTestsUtil.getDateFromYear(YEAR_FIXTURE),10.20));
 			}
 		);
 		window.list("clientsList").selectItem(1);
+		GuiActionRunner.execute(() ->
+			balanceSwingView.removeInvoicesOfClient(new Client(CLIENT_FIXTURE_1.getIdentifier()))
+			);
 		assertThat(window.list("invoicesList").contents()).isEmpty();
 		verify(balanceController,never()).yearsOfTheInvoices();
 	}
