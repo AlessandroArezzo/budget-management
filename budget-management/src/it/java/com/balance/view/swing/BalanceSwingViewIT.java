@@ -12,6 +12,7 @@ import org.assertj.swing.edt.GuiActionRunner;
 import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.junit.runner.GUITestRunner;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
+import org.bson.types.ObjectId;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -420,6 +421,33 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
 						invoiceRemaining.getRevenue())+"€");
+	}
+	
+	@Test @GUITest
+	public void testRemoveInvoiceButtonErrorForNoExistingClientInDatabase() {
+		Client clientRemaining=clientRepository.save(new Client(CLIENT_IDENTIFIER_1));
+		Client clientToDeleted=clientRepository.save(new Client(CLIENT_IDENTIFIER_2));
+		Invoice invoiceClientRemaining=invoiceRepository.save(
+				new Invoice(clientRemaining, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_2));
+		Invoice invoiceClientToDeleted=invoiceRepository.save(
+				new Invoice(clientToDeleted, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_1));
+		GuiActionRunner.execute( () -> balanceController.initializeView() );
+		window.comboBox("yearsCombobox")
+			.selectItem(Pattern.compile(""+YEAR_FIXTURE));
+		window.list("invoicesList").selectItem(Pattern.compile(invoiceClientToDeleted.toString()));
+		clientRepository.delete(clientToDeleted.getId());
+		window.button(JButtonMatcher.withText("Rimuovi fattura")).click();
+		window.label("labelClientErrorMessage").requireText("Cliente non più presente nel database: "
+				+clientToDeleted.toString());
+		assertThat(window.list("clientsList").contents())
+			.noneMatch( e -> e.contains(clientToDeleted.toString()));
+		assertThat(window.comboBox("clientsCombobox").contents())
+			.noneMatch( e -> e.contains(clientToDeleted.toString()));
+		assertThat(window.list("invoicesList").contents())
+			.noneMatch(e -> e.contains(invoiceClientToDeleted.toString()));
+		window.label("revenueLabel").requireText(
+				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
+						invoiceClientRemaining.getRevenue())+"€");
 	}
 	
 	private static Date getDateFromYear(int year) {
