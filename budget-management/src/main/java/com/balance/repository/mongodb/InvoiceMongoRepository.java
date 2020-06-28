@@ -130,8 +130,7 @@ public class InvoiceMongoRepository implements InvoiceRepository{
 							        		  Projections.fields(
 							        		  Projections.computed("year", 
 						        				  	Document.parse("{ $year: '$date' }"))
-				        				  )),
-							  			Aggregates.sort(Sorts.ascending("year")))
+				        				  )))
 								  ).spliterator(), false)
 					.map(d -> d.getInteger("year"))
 					.collect(Collectors.toSet())

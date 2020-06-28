@@ -151,26 +151,25 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 	
 	
 	@Test @GUITest
-	public void testSetChoiceYearInvoicesAndResetWhenThereIsCurrentYear() {
+	public void testSetChoiceYearInvoicesInOrderAndResetWhenThereIsCurrentYear() {
 		GuiActionRunner.execute(() -> {
-				balanceSwingView.getComboboxYearsModel().addElement(YEAR_FIXTURE);
-				balanceSwingView.setChoiceYearInvoices(Arrays.asList(YEAR_FIXTURE,CURRENT_YEAR));
+				balanceSwingView.setChoiceYearInvoices(Arrays.asList(YEAR_FIXTURE,YEAR_FIXTURE-1,
+						CURRENT_YEAR));
 			}
 		);
-		assertThat(window.comboBox("yearsCombobox").contents()).containsExactly(""+(YEAR_FIXTURE),
-				""+CURRENT_YEAR);
+		assertThat(window.comboBox("yearsCombobox").contents()).containsExactly(""+CURRENT_YEAR
+				,""+(YEAR_FIXTURE),""+(YEAR_FIXTURE-1));
 		window.comboBox("yearsCombobox").requireSelection(Pattern.compile(""+CURRENT_YEAR));
 	}
 	
 	@Test @GUITest
 	public void testSetChoiceYearInvoicesAndResetWhenThereIsNotCurrentYear() {
 		GuiActionRunner.execute(() -> {
-				balanceSwingView.getComboboxYearsModel().addElement(YEAR_FIXTURE);
-				balanceSwingView.setChoiceYearInvoices(Arrays.asList(CURRENT_YEAR-1));
+				balanceSwingView.setChoiceYearInvoices(Arrays.asList(YEAR_FIXTURE, YEAR_FIXTURE-1));
 			}
 		);
-		assertThat(window.comboBox("yearsCombobox").contents()).containsExactly(""+(YEAR_FIXTURE),
-				""+CURRENT_YEAR);
+		assertThat(window.comboBox("yearsCombobox").contents()).containsExactly(""+CURRENT_YEAR
+				,""+(YEAR_FIXTURE),""+(YEAR_FIXTURE-1));
 		window.comboBox("yearsCombobox").requireSelection(Pattern.compile(""+CURRENT_YEAR));
 	}
 	
@@ -307,7 +306,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 	}
 	
 	@Test @GUITest
-	public void testAddClientButtonShouldDelegateToBalanceControllerNewClient() {
+	public void testAddClientButtonShouldDelegateToBalanceControllerNewClientAndResetClientErrorLabel() {
 		window.textBox("textField_clientName").enterText("test identifier 1");
 		window.button(JButtonMatcher.withText("Aggiungi cliente")).click();
 		verify(balanceController).newClient(new Client("test identifier 1"));
@@ -377,6 +376,8 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		GuiActionRunner.execute(() -> {
 			DefaultComboBoxModel<Integer> comboboxYearsModel=balanceSwingView.getComboboxYearsModel();
 			comboboxYearsModel.addElement(CURRENT_YEAR);
+			comboboxYearsModel.addElement(YEAR_FIXTURE-1);
+			comboboxYearsModel.addElement(YEAR_FIXTURE-2);
 			comboboxYearsModel.setSelectedItem(CURRENT_YEAR);
 			balanceSwingView.invoiceAdded(invoiceToAdd);
 			}
@@ -384,7 +385,8 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		assertThat(window.list("invoicesList").contents()).noneMatch(
 				e -> e.contains(invoiceToAdd.toString()));
 		assertThat(window.comboBox("yearsCombobox").contents())
-			.contains((""+YEAR_FIXTURE));
+			.containsExactly(""+CURRENT_YEAR,""+YEAR_FIXTURE,""+(YEAR_FIXTURE-1),""+(YEAR_FIXTURE-2));
+		window.comboBox("yearsCombobox").requireSelection(Pattern.compile(""+CURRENT_YEAR));
 		window.label("labelInvoiceErrorMessage").requireText("");
 	}
 	

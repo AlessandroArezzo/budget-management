@@ -27,6 +27,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -528,6 +529,8 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		if(!yearsToAddInModel.contains(CURRENT_YEAR)) {
 			yearsToAddInModel.add(CURRENT_YEAR);
 		}
+		Collections.sort(yearsToAddInModel);
+		Collections.reverse(yearsToAddInModel);
 		yearsToAddInModel.stream().forEach(comboboxYearsModel::addElement); 
 		setCurrentYearSelected();
 	}
@@ -623,9 +626,23 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 			this.setLabelTotalRevenue();
 		}
 		if(comboboxYearsModel.getIndexOf(yearOfInvoice)==-1) {
-			comboboxYearsModel.addElement(yearOfInvoice);
+			addYearsInOrderInCombobox(yearOfInvoice);
 		}
 		resetInvoiceErrorLabel();
+	}
+	
+	private void addYearsInOrderInCombobox(int yearToAdd) {
+		int yearSelected=(int) comboboxYearsModel.getSelectedItem();
+		comboboxYearsModel.addElement(yearToAdd);
+		List<Integer> yearsInCombobox=new ArrayList<>();
+		int count=0;
+		while(count<comboboxYearsModel.getSize())
+			yearsInCombobox.add(comboboxYearsModel.getElementAt(count++));
+		Collections.sort(yearsInCombobox);
+		Collections.reverse(yearsInCombobox);
+		comboboxYearsModel.removeAllElements();
+		yearsInCombobox.stream().forEach(comboboxYearsModel::addElement); 
+		comboboxYearsModel.setSelectedItem(yearSelected);
 	}
 
 	@Override

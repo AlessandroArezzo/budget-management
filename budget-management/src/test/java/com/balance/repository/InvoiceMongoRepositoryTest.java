@@ -201,7 +201,7 @@ public class InvoiceMongoRepositoryTest {
 		addTestInvoiceToDatabase(CLIENT_FIXTURE_2.getId(), DateTestsUtil.getDateFromYear(YEAR_FIXTURE), 30);
 		when(clientRepository.findById(CLIENT_FIXTURE_1.getId())).thenReturn(CLIENT_FIXTURE_1);
 		when(clientRepository.findById(CLIENT_FIXTURE_2.getId())).thenReturn(CLIENT_FIXTURE_2);
-		assertThat(invoiceRepository.getYearsOfInvoicesInDatabase()).containsExactly(
+		assertThat(invoiceRepository.getYearsOfInvoicesInDatabase()).contains(
 				YEAR_FIXTURE-1,YEAR_FIXTURE);
 	}
 	
