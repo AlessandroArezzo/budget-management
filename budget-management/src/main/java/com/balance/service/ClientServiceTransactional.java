@@ -41,17 +41,13 @@ public class ClientServiceTransactional implements ClientService {
 			factory -> { 
 				ClientRepository clientRepository=(ClientRepository) factory.createRepository(TypeRepository.CLIENT);
 				if(clientRepository.findById(clientId)==null) {
-					throwClientNotFoundException(clientId);
+					throw new ClientNotFoundException("Il cliente con id "+
+							clientId+" non è presente nel database");
 				}
 				InvoiceRepository invoiceRepository=(InvoiceRepository) factory.createRepository(TypeRepository.INVOICE);
 				invoiceRepository.deleteAllInvoicesByClient(clientId);
 				return clientRepository.delete(clientId);
 			});
-	}
-	
-	private void throwClientNotFoundException(String clientId) {
-		throw new ClientNotFoundException("Il cliente con id "+
-				clientId+" non è presente nel database");
 	}
 
 }

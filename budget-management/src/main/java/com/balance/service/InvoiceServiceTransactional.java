@@ -43,7 +43,8 @@ public class InvoiceServiceTransactional implements InvoiceService{
 			factory -> {
 				ClientRepository clientRepository=(ClientRepository) factory.createRepository(TypeRepository.CLIENT);
 				if(clientRepository.findById(client.getId())==null) {
-					throwClientNotFoundException(client.getId());
+					throw new ClientNotFoundException("Il cliente con id "+
+							client.getId()+" non è presente nel database");
 				}
 				InvoiceRepository invoiceRepository=(InvoiceRepository) factory.createRepository(TypeRepository.INVOICE);
 			    return invoiceRepository.findInvoicesByClientAndYear(client, year);
@@ -56,7 +57,8 @@ public class InvoiceServiceTransactional implements InvoiceService{
 				factory -> { 
 					ClientRepository clientRepository=(ClientRepository) factory.createRepository(TypeRepository.CLIENT);
 					if(clientRepository.findById(invoice.getClient().getId())==null) {
-						throwClientNotFoundException(invoice.getClient().getId());
+						throw new ClientNotFoundException("Il cliente con id "+
+								invoice.getClient().getId()+" non è presente nel database");
 					}
 					 ((InvoiceRepository) factory.createRepository(TypeRepository.INVOICE))
 						.save(invoice);
@@ -70,26 +72,17 @@ public class InvoiceServiceTransactional implements InvoiceService{
 					String clientId=invoice.getClient().getId();
 					if (((ClientRepository) factory.createRepository(TypeRepository.CLIENT))
 							.findById(clientId)==null) {
-						throwClientNotFoundException(clientId);
+						throw new ClientNotFoundException("Il cliente con id "+
+								clientId+" non è presente nel database");
 					}
 					String invoiceId=invoice.getId();
 					InvoiceRepository invoiceRepository=(InvoiceRepository) factory.createRepository(TypeRepository.INVOICE);
 					if(invoiceRepository.findById(invoiceId)==null) {
-						throwInvoiceNotFoundException(invoiceId);
+						throw new InvoiceNotFoundException("La fattura con id "+
+								invoiceId+" non è presente nel database");
 					}
 					return invoiceRepository.delete(invoiceId);
 				});
 	}
-	
-	private void throwClientNotFoundException(String clientId) {
-		throw new ClientNotFoundException("Il cliente con id "+
-				clientId+" non è presente nel database");
-	}
-	
-	private void throwInvoiceNotFoundException(String invoiceId) {
-		throw new InvoiceNotFoundException("La fattura con id "+
-					invoiceId+" non è presente nel database");
-	}
-	
 	
 }
