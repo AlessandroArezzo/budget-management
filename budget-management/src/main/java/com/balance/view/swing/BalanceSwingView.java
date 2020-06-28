@@ -656,4 +656,9 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		}
 	}
 
+	@Override
+	public void showInvoiceError(String message, Invoice invoice) {
+		lblInvoiceError.setText(message+": "+invoice.toString());
+	}
+
 }

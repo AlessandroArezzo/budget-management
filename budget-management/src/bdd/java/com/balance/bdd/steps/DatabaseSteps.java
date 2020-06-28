@@ -33,22 +33,27 @@ public class DatabaseSteps {
 	static final double INVOICE_OF_THE_YEAR_FIXTURE_1_REVENUE=10.0;
 	static final Date INVOICE_OF_THE_YEAR_FIXTURE_1_DATE=DateTestsUtil.getDateFromYear(YEAR_FIXTURE);
 	static Client INVOICE_OF_THE_YEAR_FIXTURE_1_CLIENT;
+	static String INVOICE_OF_THE_YEAR_FIXTURE_1_ID;
 	
 	static final double INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE=20.0;
 	static final Date INVOICE_OF_THE_YEAR_FIXTURE_2_DATE=DateTestsUtil.getDateFromYear(YEAR_FIXTURE);
 	static Client INVOICE_OF_THE_YEAR_FIXTURE_2_CLIENT;
+	static String INVOICE_OF_THE_YEAR_FIXTURE_2_ID;
 	
 	static final double INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE=30.0;
 	static final Date INVOICE_OF_THE_YEAR_FIXTURE_3_DATE=DateTestsUtil.getDateFromYear(YEAR_FIXTURE);
 	static Client INVOICE_OF_THE_YEAR_FIXTURE_3_CLIENT;
+	static String INVOICE_OF_THE_YEAR_FIXTURE_3_ID;
 	
 	static final double INVOICE_OF_THE_CURRENT_YEAR_1_REVENUE=10.0;
 	static final Date INVOICE_OF_THE_CURRENT_YEAR_1_DATE=DateTestsUtil.getDateFromYear(CURRENT_YEAR);
 	static Client INVOICE_OF_THE_CURRENT_YEAR_1_CLIENT;
+	static String INVOICE_OF_THE_CURRENT_YEAR_1_ID;
 	
 	static final double INVOICE_OF_THE_CURRENT_YEAR_2_REVENUE=20.0;
 	static final Date INVOICE_OF_THE_CURRENT_YEAR_2_DATE=DateTestsUtil.getDateFromYear(CURRENT_YEAR);
 	static Client INVOICE_OF_THE_CURRENT_YEAR_2_CLIENT;
+	static String INVOICE_OF_THE_CURRENT_YEAR_2_ID;
 	
 	private MongoClient mongoClient;
 	
@@ -79,15 +84,15 @@ public class DatabaseSteps {
 	
 	@Given("The database contains a few invoices of different years")
 	public void the_database_contains_a_few_invoices_of_different_years() {
-		addInvoiceToDatabase(INVOICE_OF_THE_YEAR_FIXTURE_1_CLIENT.getId(),INVOICE_OF_THE_YEAR_FIXTURE_1_DATE,
+		INVOICE_OF_THE_YEAR_FIXTURE_1_ID=addInvoiceToDatabase(INVOICE_OF_THE_YEAR_FIXTURE_1_CLIENT.getId(),INVOICE_OF_THE_YEAR_FIXTURE_1_DATE,
 				INVOICE_OF_THE_YEAR_FIXTURE_1_REVENUE);
-		addInvoiceToDatabase(INVOICE_OF_THE_YEAR_FIXTURE_2_CLIENT.getId(),INVOICE_OF_THE_YEAR_FIXTURE_2_DATE,
+		INVOICE_OF_THE_YEAR_FIXTURE_2_ID=addInvoiceToDatabase(INVOICE_OF_THE_YEAR_FIXTURE_2_CLIENT.getId(),INVOICE_OF_THE_YEAR_FIXTURE_2_DATE,
 				INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE);
-		addInvoiceToDatabase(INVOICE_OF_THE_YEAR_FIXTURE_3_CLIENT.getId(),INVOICE_OF_THE_YEAR_FIXTURE_3_DATE,
+		INVOICE_OF_THE_YEAR_FIXTURE_3_ID=addInvoiceToDatabase(INVOICE_OF_THE_YEAR_FIXTURE_3_CLIENT.getId(),INVOICE_OF_THE_YEAR_FIXTURE_3_DATE,
 				INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE);
-		addInvoiceToDatabase(INVOICE_OF_THE_CURRENT_YEAR_1_CLIENT.getId(),INVOICE_OF_THE_CURRENT_YEAR_1_DATE,
+		INVOICE_OF_THE_CURRENT_YEAR_1_ID=addInvoiceToDatabase(INVOICE_OF_THE_CURRENT_YEAR_1_CLIENT.getId(),INVOICE_OF_THE_CURRENT_YEAR_1_DATE,
 				INVOICE_OF_THE_CURRENT_YEAR_1_REVENUE);
-		addInvoiceToDatabase(INVOICE_OF_THE_CURRENT_YEAR_2_CLIENT.getId(),INVOICE_OF_THE_CURRENT_YEAR_2_DATE,
+		INVOICE_OF_THE_CURRENT_YEAR_2_ID=addInvoiceToDatabase(INVOICE_OF_THE_CURRENT_YEAR_2_CLIENT.getId(),INVOICE_OF_THE_CURRENT_YEAR_2_DATE,
 				INVOICE_OF_THE_CURRENT_YEAR_2_REVENUE);
 	}
 	
@@ -103,14 +108,18 @@ public class DatabaseSteps {
 	
 	@Given("The invoice is in meantime removed from the database")
 	public void the_invoice_is_in_meantime_removed_from_the_database() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
+		removeInvoiceFromDatabase(INVOICE_OF_THE_YEAR_FIXTURE_2_ID);
 	}
 	
 	@Given("The client of invoice selected is in meantime removed from the database")
 	public void the_client_of_invoice_selected_is_in_meantime_removed_from_the_database() {
 	    // Write code here that turns the phrase above into concrete actions
 	    throw new cucumber.api.PendingException();
+	}
+	
+	private void removeInvoiceFromDatabase(String invoiceId) {
+		mongoClient.getDatabase(DB_NAME).getCollection(COLLECTION_INVOICES_NAME)
+			.deleteOne( Filters.eq("_id", new ObjectId(invoiceId)));
 	}
 	
 	private void removeClientFromDatabase(String clientId) {

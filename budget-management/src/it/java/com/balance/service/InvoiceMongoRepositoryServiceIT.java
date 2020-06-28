@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.balance.exception.ClientNotFoundException;
+import com.balance.exception.InvoiceNotFoundException;
 import com.balance.model.Client;
 import com.balance.model.Invoice;
 import com.balance.repository.TypeRepository;
@@ -153,5 +154,17 @@ public class InvoiceMongoRepositoryServiceIT {
 		assertThat(invoiceRepository.findById(idInvoiceToRemove)).isNull();
 	}
 	
+	@Test
+	public void testRemoveInvoiceWhenInvoiceNoExistingInDatabase() {
+		String idInvoiceToRemove=new ObjectId().toString();
+		try {
+			invoiceService.removeInvoice(idInvoiceToRemove);
+			fail("Excepted a InvoiceNotFoundException to be thrown");
+		}
+		catch(InvoiceNotFoundException e) {
+			assertThat("La fattura con id "+idInvoiceToRemove+" non è presente nel database")
+				.isEqualTo(e.getMessage());
+		}	
+	}
 	
 }

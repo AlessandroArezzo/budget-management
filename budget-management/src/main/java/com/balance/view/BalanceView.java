@@ -25,4 +25,6 @@ public interface BalanceView {
 
 	public void invoiceRemoved(Invoice invoiceToRemove);
 
+	public void showInvoiceError(String message, Invoice invoice);
+
 }

@@ -1,6 +1,7 @@
 package com.balance.controller;
 
 import com.balance.exception.ClientNotFoundException;
+import com.balance.exception.InvoiceNotFoundException;
 import com.balance.model.Client;
 import com.balance.model.Invoice;
 import com.balance.service.ClientService;
@@ -10,6 +11,7 @@ import com.balance.view.BalanceView;
 public class BalanceController {
 	
 	private static final String CLIENT_NOT_FOUND_ERROR_LABEL="Cliente non più presente nel database";
+	private static final String INVOICE_NOT_FOUND_ERROR_LABEL="Fattura non più presente nel database";
 	private BalanceView balanceView;
 	private ClientService clientService;
 	private InvoiceService invoiceService;
@@ -77,7 +79,12 @@ public class BalanceController {
 	}
 
 	public void deleteInvoice(Invoice invoice) {
-		invoiceService.removeInvoice(invoice.getId());
+		try {
+			invoiceService.removeInvoice(invoice.getId());
+		}
+		catch(InvoiceNotFoundException e){
+			balanceView.showInvoiceError(INVOICE_NOT_FOUND_ERROR_LABEL, invoice);
+		}	
 		balanceView.invoiceRemoved(invoice);
 	}
 	

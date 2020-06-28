@@ -266,8 +266,10 @@ public class BalanceSwingSteps {
 
 	@Then("An error is shown containing the name of the selected invoice")
 	public void an_error_is_shown_containing_the_name_of_the_selected_invoice() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
+	   window.label("labelInvoiceErrorMessage").requireText("Fattura non più presente nel database: "
+			   +new Invoice(INVOICE_OF_THE_YEAR_FIXTURE_2_CLIENT,
+						INVOICE_OF_THE_YEAR_FIXTURE_2_DATE,
+						INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE).toString());
 	}
 
 

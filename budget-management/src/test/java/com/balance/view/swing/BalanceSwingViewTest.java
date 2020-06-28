@@ -898,4 +898,12 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		verify(balanceController).yearsOfTheInvoices();
 	}
 	
+	@Test @GUITest
+	public void testShowErrorInvoiceShouldShowTheMessageInTheInvoiceErrorLabel() {
+		GuiActionRunner.execute(
+				() -> balanceSwingView.showInvoiceError("error message", INVOICE_FIXTURE_1) );
+		window.label("labelInvoiceErrorMessage").requireText("error message: " + 
+				INVOICE_FIXTURE_1.toString());
+	}
+	
 }
