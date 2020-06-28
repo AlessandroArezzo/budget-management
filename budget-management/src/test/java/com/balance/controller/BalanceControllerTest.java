@@ -138,12 +138,27 @@ public class BalanceControllerTest {
 	}
 	
 	@Test
-	public void testAddNewInvoice() {
+	public void testAddNewInvoiceWhenClientIsPresentInDatabase() {
 		when(invoiceService.addInvoice(INVOICE_FIXTURE)).thenReturn(INVOICE_FIXTURE);
 		balanceController.newInvoice(INVOICE_FIXTURE);
 		InOrder inOrder = Mockito.inOrder(invoiceService, balanceView);
 		inOrder.verify(invoiceService).addInvoice(INVOICE_FIXTURE);
 		inOrder.verify(balanceView).invoiceAdded(INVOICE_FIXTURE);
 	}
+	
+	@Test
+	public void testAddNewInvoiceWhenClientIsNotPresentInDatabase() {
+		doThrow(new ClientNotFoundException("Client not found"))
+			.when(invoiceService).addInvoice(INVOICE_FIXTURE);
+		balanceController.newInvoice(INVOICE_FIXTURE);
+		InOrder inOrder = Mockito.inOrder(invoiceService, balanceView);
+		inOrder.verify(invoiceService).addInvoice(INVOICE_FIXTURE);
+		inOrder.verify(balanceView).showClientError("Cliente non più presente nel database", 
+				CLIENT_FIXTURE);
+		inOrder.verify(balanceView).clientRemoved(CLIENT_FIXTURE);
+		inOrder.verify(balanceView).removeInvoicesOfClient(CLIENT_FIXTURE);
+	}
+	
+	
 	
 }

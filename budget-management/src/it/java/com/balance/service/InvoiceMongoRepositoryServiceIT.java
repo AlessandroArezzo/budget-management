@@ -3,6 +3,9 @@ package com.balance.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
+import java.util.Date;
+
+import org.bson.types.ObjectId;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -106,14 +109,14 @@ public class InvoiceMongoRepositoryServiceIT {
 	}
 	
 	@Test
-	public void testFindInvoicesOfAClientAndYearWhenClientIsNotInDatabase() {
+	public void testFindInvoicesOfAClientAndYearWhenClientExistingInDatabase() {
 		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_1);
 		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_2);
 		invoiceRepository.save(INVOICE_OF_PREVIOUS_YEAR_FIXTURE);
 		clientRepository.delete(CLIENT_FIXTURE_1.getId());
 		try {
 			invoiceService.findInvoicesByClientAndYear(CLIENT_FIXTURE_1, YEAR_FIXTURE);
-			fail("Excpected a ClientNotFoundException to be thrown");
+			fail("Excepted a ClientNotFoundException to be thrown");
 		}
 		catch(ClientNotFoundException e) {
 			assertThat("Il cliente con id "+CLIENT_FIXTURE_1.getId()+" non è presente nel database")
@@ -122,8 +125,24 @@ public class InvoiceMongoRepositoryServiceIT {
 	}
 	
 	@Test
-	public void testAddNewInvoiceWhenClientIspresentInDatabase() {
+	public void testAddNewInvoiceWhenClientExistingInDatabase() {
 		Invoice invoiceAdded=invoiceService.addInvoice(INVOICE_OF_YEAR_FIXTURE_1);
 		assertThat(invoiceRepository.findById(invoiceAdded.getId())).isEqualTo(invoiceAdded);
 	}
+	
+	@Test
+	public void testAddNewInvoiceWhenClientNoExistingInDatabase() {
+		Client clientOfInvoiceToAdd=new Client(new ObjectId().toString(),"test identifier");
+		Invoice invoiceToAdd=new Invoice(clientOfInvoiceToAdd, new Date(),10);
+		try {
+			invoiceService.addInvoice(invoiceToAdd);
+			fail("Excepted a ClientNotFoundException to be thrown");
+		}
+		catch(ClientNotFoundException e) {
+			assertThat("Il cliente con id "+clientOfInvoiceToAdd.getId()+" non è presente nel database")
+				.isEqualTo(e.getMessage());
+		}	
+	}
+	
+	
 }

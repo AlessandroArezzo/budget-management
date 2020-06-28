@@ -344,6 +344,38 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 						INVOICE_REVENUE_3)+"€");
 	}
 	
+	@Test @GUITest
+	public void testAddInvoiceOfNotYearSelectedButtonError() {
+		Client client1=clientRepository.save(new Client(CLIENT_IDENTIFIER_1));
+		Client client2=clientRepository.save(new Client(CLIENT_IDENTIFIER_2));
+		Invoice invoice1=new Invoice(client1, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_1);
+		Invoice invoice2=new Invoice(client2, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_2);
+		Invoice invoice3=new Invoice(client1, DATE_OF_THE_PREVIOUS_YEAR_FIXTURE,
+				INVOICE_REVENUE_3);
+		invoiceRepository.save(invoice1);
+		invoiceRepository.save(invoice2);
+		invoiceRepository.save(invoice3);
+		GuiActionRunner.execute( () -> balanceController.initializeView() );
+		window.comboBox("yearsCombobox")
+			.selectItem(Pattern.compile(""+(YEAR_FIXTURE)));
+		window.comboBox("clientsCombobox").selectItem(Pattern.compile(CLIENT_IDENTIFIER_1));
+		window.textBox("textField_dayOfDateInvoice").enterText("1");
+		window.textBox("textField_monthOfDateInvoice").enterText("5");
+		window.textBox("textField_yearOfDateInvoice").enterText(""+YEAR_FIXTURE);
+		window.textBox("textField_revenueInvoice").enterText("10.20");
+		clientRepository.delete(client1.getId());
+		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
+		window.label("labelClientErrorMessage").requireText(""
+				+ "Cliente non più presente nel database: " + 
+				client1.getIdentifier());
+		assertThat(window.list("invoicesList").contents())
+			.containsOnly(invoice2.toString());
+		window.label("revenueLabel").requireText(
+				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
+						INVOICE_REVENUE_2)+"€");
+	}
+	
+	
 	private static Date getDateFromYear(int year) {
 		Calendar cal = Calendar.getInstance();
 		cal.set(Calendar.YEAR, year);
