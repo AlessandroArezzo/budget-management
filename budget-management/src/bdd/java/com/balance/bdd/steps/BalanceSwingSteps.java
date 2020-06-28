@@ -182,12 +182,7 @@ public class BalanceSwingSteps {
 
 	@When("The user clicks the {string} button")
 	public void the_user_clicks_the_button(String string) {
-		try {
-			window.button(JButtonMatcher.withText(string)).click();
-		}
-		catch(ComponentLookupException e) {
-			throw new cucumber.api.PendingException();
-		}
+		window.button(JButtonMatcher.withText(string)).click();
 	}
 
 	@Then("The client list contains the new client")
@@ -244,29 +239,30 @@ public class BalanceSwingSteps {
 				DateTestsUtil.getDate(1, 5, YEAR_FIXTURE), 100.25).toString()));
 	}
 
-	@Given("The user selects an invoice of the selected year from the list")
-	public void the_user_selects_an_invoice_of_the_selected_year_from_the_list() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
+	@Given("The user selects an invoice of the selected year from the invoice list")
+	public void the_user_selects_an_invoice_of_the_selected_year_from_the_invoice_list() {
+		window.list("invoicesList")
+		.selectItem(Pattern.compile(new Invoice(INVOICE_OF_THE_YEAR_FIXTURE_2_CLIENT,
+				INVOICE_OF_THE_YEAR_FIXTURE_2_DATE,
+				INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE).toString()));
 	}
-
+	
 	@Then("The invoice is removed from the invoice list")
 	public void the_invoice_is_removed_from_the_invoice_list() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
+		assertThat(window.list("invoicesList").contents())
+			.noneMatch(e -> e.contains(new Invoice(INVOICE_OF_THE_YEAR_FIXTURE_2_CLIENT,
+					INVOICE_OF_THE_YEAR_FIXTURE_2_DATE,
+					INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE).toString()));
 	}
 
 	@Then("The total annual revenue of the selected year is shown considering the invoice removed")
 	public void the_total_annual_revenue_of_the_selected_year_is_shown_considering_the_invoice_removed() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
+		window.label("revenueLabel").requireText(
+				"Il ricavo totale del "+YEAR_FIXTURE+" è di "+String.format("%.2f", 
+						INVOICE_OF_THE_YEAR_FIXTURE_1_REVENUE+
+						INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE)+"€");
 	}
 
-	@Given("The user selects an invoice of the selected year from the invoice list")
-	public void the_user_selects_an_invoice_of_the_selected_year_from_the_invoice_list() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new cucumber.api.PendingException();
-	}
 
 	@Then("An error is shown containing the name of the selected invoice")
 	public void an_error_is_shown_containing_the_name_of_the_selected_invoice() {

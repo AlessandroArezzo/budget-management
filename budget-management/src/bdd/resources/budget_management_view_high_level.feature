@@ -98,7 +98,7 @@ Feature: Budget Management View High Level
 		
 	Scenario: Delete an invoice
 		Given The user selects a year from the year selection combobox
-		And The user selects an invoice of the selected year from the list
+		And The user selects an invoice of the selected year from the invoice list
 		When The user clicks the "Rimuovi fattura" button
 		Then The invoice is removed from the invoice list
 		And The total annual revenue of the selected year is shown considering the invoice removed
