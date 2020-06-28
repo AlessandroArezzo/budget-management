@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.balance.exception.ClientNotFoundException;
+import com.balance.exception.InvoiceNotFoundException;
 import com.balance.model.Client;
 import com.balance.model.Invoice;
 import com.balance.repository.ClientRepository;
@@ -124,9 +125,24 @@ public class InvoiceServiceTransactionalTest {
 	
 	@Test
 	public void testRemoveInvoiceWhenInvoiceAndClientExistingInDatabase() {
+		Invoice invoiceToRemove=new Invoice("1",CLIENT_FIXTURE, new Date(), 10);
+		when(invoiceRepository.findById(invoiceToRemove.getId())).thenReturn(invoiceToRemove);
+		invoiceService.removeInvoice(invoiceToRemove.getId());
+		verify(invoiceRepository).delete(invoiceToRemove.getId());
+	}
+	
+	@Test
+	public void testRemoveInvoiceWhenInvoiceNoExistingInDatabase() {
 		String idInvoiceToDelete="1";
-		invoiceService.removeInvoice(idInvoiceToDelete);
-		verify(invoiceRepository).delete(idInvoiceToDelete);
+		when(invoiceRepository.findById(idInvoiceToDelete)).thenReturn(null);
+		try {
+			invoiceService.removeInvoice(idInvoiceToDelete);
+			fail("Expected a InvoiceNotFoundException to be thrown");
+		}
+		catch(InvoiceNotFoundException e) {
+			assertThat("La fattura con id "+idInvoiceToDelete+" non è presente nel database")
+					.isEqualTo(e.getMessage());
+		}
 	}
 	
 }

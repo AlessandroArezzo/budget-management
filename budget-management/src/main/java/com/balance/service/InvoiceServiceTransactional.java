@@ -3,6 +3,7 @@ package com.balance.service;
 import java.util.List;
 
 import com.balance.exception.ClientNotFoundException;
+import com.balance.exception.InvoiceNotFoundException;
 import com.balance.model.Client;
 import com.balance.model.Invoice;
 import com.balance.repository.ClientRepository;
@@ -66,10 +67,14 @@ public class InvoiceServiceTransactional implements InvoiceService{
 
 	public void removeInvoice(String invoiceId) {
 		transactionManager.doInTransaction(
-				factory ->  
-					((InvoiceRepository) factory.createRepository(TypeRepository.INVOICE))
-						 .delete(invoiceId)
-				);
+				factory -> {
+					InvoiceRepository invoiceRepository=(InvoiceRepository) factory.createRepository(TypeRepository.INVOICE);
+					if(invoiceRepository.findById(invoiceId)==null) {
+						throw new InvoiceNotFoundException("La fattura con id "+
+								invoiceId+" non è presente nel database");
+					}
+					return invoiceRepository.delete(invoiceId);
+				});
 	}
 
 	
