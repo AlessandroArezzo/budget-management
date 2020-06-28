@@ -64,6 +64,14 @@ public class InvoiceServiceTransactional implements InvoiceService{
 				});
 	}
 
+	public void removeInvoice(String invoiceId) {
+		transactionManager.doInTransaction(
+				factory ->  
+					((InvoiceRepository) factory.createRepository(TypeRepository.INVOICE))
+						 .delete(invoiceId)
+				);
+	}
+
 	
 	
 	

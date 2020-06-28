@@ -73,8 +73,12 @@ public class BalanceController {
 			balanceView.showClientError(CLIENT_NOT_FOUND_ERROR_LABEL, client);
 			balanceView.clientRemoved(client);
 			balanceView.removeInvoicesOfClient(client);
-		}
-		
+		}	
+	}
+
+	public void deleteInvoice(Invoice invoice) {
+		invoiceService.removeInvoice(invoice.getId());
+		balanceView.invoiceRemoved(invoice);
 	}
 	
 }

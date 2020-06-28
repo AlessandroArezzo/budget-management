@@ -97,6 +97,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.label(JLabelMatcher.withText("Importo (€)"));
 		window.textBox("textField_revenueInvoice").requireEnabled();
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).requireDisabled();
+		window.button(JButtonMatcher.withText("Rimuovi fattura")).requireDisabled();
 	}
 	
 	@Test @GUITest
@@ -313,7 +314,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 	}
 	
 	@Test @GUITest
-	public void testDeleteButtonShouldBeEnabledOnlyWhenAClientIsSelected() {
+	public void testDeleteClientButtonShouldBeEnabledOnlyWhenAClientIsSelected() {
 		GuiActionRunner.execute(() -> balanceSwingView.getClientListModel().addElement(CLIENT_FIXTURE_1)); 
 		window.list("clientsList").selectItem(0); 
 		JButtonFixture deleteButton = window.button(JButtonMatcher.withText("Rimuovi cliente"));
@@ -323,7 +324,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 	}
 	
 	@Test @GUITest
-	public void testDeleteButtonShouldDelegateToBalanceControllerDeleteClient() {
+	public void testDeleteClientButtonShouldDelegateToBalanceControllerDeleteClient() {
 		GuiActionRunner.execute(() -> {
 			DefaultListModel<Client> listClientsModel =balanceSwingView.getClientListModel();
 			listClientsModel.addElement(CLIENT_FIXTURE_1);
@@ -836,6 +837,65 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 			);
 		assertThat(window.list("invoicesList").contents()).isEmpty();
 		verify(balanceController,never()).yearsOfTheInvoices();
+	}
+	
+	@Test @GUITest
+	public void testDeleteInvoiceButtonShouldBeEnabledOnlyWhenAnInvoiceIsSelected() {
+		GuiActionRunner.execute(() -> balanceSwingView.getInvoiceListModel().addElement(INVOICE_FIXTURE_1)); 
+		window.list("invoicesList").selectItem(0); 
+		JButtonFixture deleteButton = window.button(JButtonMatcher.withText("Rimuovi fattura"));
+		deleteButton.requireEnabled();
+		window.list("invoicesList").clearSelection(); 
+		deleteButton.requireDisabled(); 
+	}
+	
+	@Test @GUITest
+	public void testDeleteInvoiceButtonShouldDelegateToBalanceControllerDeleteInvoice() {
+		GuiActionRunner.execute(() -> {
+			DefaultListModel<Invoice> listInvoiceModel =balanceSwingView.getInvoiceListModel();
+			listInvoiceModel.addElement(INVOICE_FIXTURE_1);
+			listInvoiceModel.addElement(INVOICE_FIXTURE_2);
+			}
+		);
+		window.list("invoicesList").selectItem(0);
+		window.button(JButtonMatcher.withText("Rimuovi fattura")).click();
+		verify(balanceController).deleteInvoice(new Invoice(INVOICE_FIXTURE_1.getClient(),
+				INVOICE_FIXTURE_1.getDate(), INVOICE_FIXTURE_1.getRevenue()));
+	}
+	
+	@Test @GUITest
+	public void testRemoveInvoiceWhenInvoicesRemanentInListIsNotEmptyAndUpdateTotalRevenue() {
+		GuiActionRunner.execute(() -> {
+			DefaultComboBoxModel<Integer> comboboxYearModel=balanceSwingView.getComboboxYearsModel();
+			comboboxYearModel.addElement(CURRENT_YEAR);
+			comboboxYearModel.setSelectedItem(CURRENT_YEAR);
+			DefaultListModel<Invoice> listInvoiceModel=balanceSwingView.getInvoiceListModel();
+			listInvoiceModel.addElement(INVOICE_FIXTURE_1);
+			listInvoiceModel.addElement(INVOICE_FIXTURE_2);
+			balanceSwingView.invoiceRemoved(new Invoice(INVOICE_FIXTURE_1.getClient(),
+					INVOICE_FIXTURE_1.getDate(), INVOICE_FIXTURE_1.getRevenue()));
+			}
+		);
+		assertThat(window.list("invoicesList").contents()).containsOnly(INVOICE_FIXTURE_2.toString());
+		window.label("revenueLabel").requireText(
+				"Il ricavo totale del "+CURRENT_YEAR+" è di "
+						+String.format("%.2f", INVOICE_FIXTURE_2.getRevenue())+"€");
+	}
+	
+	@Test @GUITest
+	public void testRemoveInvoiceWhenInvoicesRemanentInListIsEmpty() {
+		GuiActionRunner.execute(() -> {
+			DefaultComboBoxModel<Integer> comboboxYearModel=balanceSwingView.getComboboxYearsModel();
+			comboboxYearModel.addElement(YEAR_FIXTURE);
+			comboboxYearModel.addElement(CURRENT_YEAR);
+			comboboxYearModel.setSelectedItem(YEAR_FIXTURE);
+			balanceSwingView.getInvoiceListModel().addElement(INVOICE_FIXTURE_1);
+			balanceSwingView.invoiceRemoved(new Invoice(INVOICE_FIXTURE_1.getClient(),
+					INVOICE_FIXTURE_1.getDate(), INVOICE_FIXTURE_1.getRevenue()));
+			}
+		);
+		assertThat(window.list("invoicesList").contents()).isEmpty();
+		verify(balanceController).yearsOfTheInvoices();
 	}
 	
 }

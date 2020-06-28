@@ -345,7 +345,7 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 	}
 	
 	@Test @GUITest
-	public void testAddInvoiceOfNotYearSelectedButtonError() {
+	public void testAddInvoiceButtonErrorNoExistingClient() {
 		Client client1=clientRepository.save(new Client(CLIENT_IDENTIFIER_1));
 		Client client2=clientRepository.save(new Client(CLIENT_IDENTIFIER_2));
 		Invoice invoice1=new Invoice(client1, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_1);
@@ -370,11 +370,34 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 				client1.getIdentifier());
 		assertThat(window.list("invoicesList").contents())
 			.containsOnly(invoice2.toString());
+		assertThat(window.list("clientsList").contents())
+			.noneMatch( e -> e.contains(client1.toString()));
+		assertThat(window.comboBox("clientsCombobox").contents())
+			.noneMatch( e -> e.contains(client1.toString()));
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
 						INVOICE_REVENUE_2)+"€");
 	}
 	
+	@Test @GUITest
+	public void testRemoveInvoiceButtonSuccess() {
+		Client client1=clientRepository.save(new Client(CLIENT_IDENTIFIER_1));
+		Client client2=clientRepository.save(new Client(CLIENT_IDENTIFIER_2));
+		Invoice invoice1=new Invoice(client1, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_1);
+		Invoice invoice2=new Invoice(client2, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_2);
+		invoiceRepository.save(invoice1);
+		invoiceRepository.save(invoice2);
+		GuiActionRunner.execute( () -> balanceController.initializeView() );
+		window.comboBox("yearsCombobox")
+			.selectItem(Pattern.compile(""+YEAR_FIXTURE));
+		window.list("invoicesList").selectItem(Pattern.compile(invoice1.toString()));
+		window.button(JButtonMatcher.withText("Rimuovi fattura")).click();
+		assertThat(window.list("invoicesList").contents())
+			.noneMatch(e -> e.contains(invoice1.toString()));
+		window.label("revenueLabel").requireText(
+				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
+					INVOICE_REVENUE_2)+"€");
+	}
 	
 	private static Date getDateFromYear(int year) {
 		Calendar cal = Calendar.getInstance();

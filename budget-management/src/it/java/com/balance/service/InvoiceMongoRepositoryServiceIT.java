@@ -144,5 +144,14 @@ public class InvoiceMongoRepositoryServiceIT {
 		}	
 	}
 	
+	@Test
+	public void testRemoveInvoiceWhenClientAndInvoiceExistingInDatabase() {
+		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_1);
+		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_2);
+		String idInvoiceToRemove=invoiceRepository.findAll().get(0).getId();
+		invoiceService.removeInvoice(idInvoiceToRemove);
+		assertThat(invoiceRepository.findById(idInvoiceToRemove)).isNull();
+	}
+	
 	
 }

@@ -67,6 +67,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 	private JTextField textFieldRevenueNewInvoice;
 	private JButton btnNewInvoice;
 	private JLabel lblInvoiceError;
+	private JButton btnRemoveInvoice;
 	public void setBalanceController(BalanceController balanceController) {
 		this.balanceController = balanceController;
 	}
@@ -158,7 +159,8 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		listInvoices.setName("invoicesList");
 		listInvoices.setSize(new Dimension(100, 400));
 		listInvoices.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		
+		listInvoices.addListSelectionListener(e -> 
+			btnRemoveInvoice.setEnabled(listInvoices.getSelectedIndex() != -1));
 		GridBagConstraints gbc_listInvoices = new GridBagConstraints();
 		gbc_listInvoices.gridwidth = 13;
 		gbc_listInvoices.insets = new Insets(0, 0, 5, 5);
@@ -169,6 +171,18 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		scrollPaneInvoicesList.setPreferredSize(new Dimension(200, 100));
 		scrollPaneInvoicesList.setViewportView(listInvoices);
 		contentPane.add(scrollPaneInvoicesList, gbc_listInvoices);
+		
+		btnRemoveInvoice = new JButton("Rimuovi fattura");
+		btnRemoveInvoice.setEnabled(false);
+		GridBagConstraints gbc_btnRemoveInvoice = new GridBagConstraints();
+		gbc_btnRemoveInvoice.insets = new Insets(0, 0, 5, 5);
+		gbc_btnRemoveInvoice.gridx = 17;
+		gbc_btnRemoveInvoice.gridy = 5;
+		contentPane.add(btnRemoveInvoice, gbc_btnRemoveInvoice);
+		
+		btnRemoveInvoice.addActionListener(
+				e -> balanceController.deleteInvoice(listInvoices.getSelectedValue())
+			);
 		
 		lblInvoiceError = new JLabel("");
 		lblInvoiceError.setName("labelInvoiceErrorMessage");
@@ -629,7 +643,17 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		else if (listClients.getSelectedValue()==null){
 			this.setLabelTotalRevenue();
 		}
-		
+	}
+
+	@Override
+	public void invoiceRemoved(Invoice invoiceToRemove) {
+		invoiceListModel.removeElement(invoiceToRemove);
+		if(invoiceListModel.getSize()==0) {
+			balanceController.yearsOfTheInvoices();
+		}
+		else{
+			this.setLabelTotalRevenue();
+		}
 	}
 
 }

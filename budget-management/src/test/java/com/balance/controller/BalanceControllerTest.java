@@ -159,6 +159,12 @@ public class BalanceControllerTest {
 		inOrder.verify(balanceView).removeInvoicesOfClient(CLIENT_FIXTURE);
 	}
 	
-	
+	@Test
+	public void testDeleteInvoiceWhenInvoiceAndClientExistingInDatabase() {
+		balanceController.deleteInvoice(INVOICE_FIXTURE);
+		InOrder inOrder = Mockito.inOrder(invoiceService, balanceView);
+		inOrder.verify(invoiceService).removeInvoice(INVOICE_FIXTURE.getId());
+		inOrder.verify(balanceView).invoiceRemoved(INVOICE_FIXTURE);
+	}
 	
 }
