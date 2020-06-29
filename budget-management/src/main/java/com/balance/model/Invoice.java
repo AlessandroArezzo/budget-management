@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 
-public class Invoice extends BaseEntity{
+public class Invoice extends BaseEntity implements Comparable<Invoice>{
 	private Date date;
 	private double revenue;
 	
@@ -83,5 +83,10 @@ public class Invoice extends BaseEntity{
 				+ " Data="+getDateInString()+","
 				+ " Ricavo="+revenue+"€";
 	}
+	
+	@Override
+    public int compareTo(Invoice invoiceToCompare) {
+        return this.date.compareTo(invoiceToCompare.getDate());
+    }
 
 }

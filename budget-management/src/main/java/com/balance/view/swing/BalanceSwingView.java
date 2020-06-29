@@ -497,11 +497,11 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		return ch == '.';
 	}
 	
-	
-
 	@Override
 	public void showClients(List<Client> clients) {
 		clientListModel.removeAllElements();
+		comboboxClientsModel.removeAllElements();
+		Collections.sort(clients);
 		clients.stream().forEach(clientListModel::addElement);
 		clients.stream().forEach(comboboxClientsModel::addElement);
 	}
@@ -515,6 +515,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		}
 		else {
 			invoiceListModel.removeAllElements();
+			Collections.sort(invoices);
 			invoices.stream().forEach(invoiceListModel::addElement);
 			this.setLabelTotalRevenue();
 		}
@@ -582,8 +583,19 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 
 	@Override
 	public void clientAdded(Client clientToAdd) {
-		clientListModel.addElement(clientToAdd);
-		comboboxClientsModel.addElement(clientToAdd);
+		Client clientSelectedList=listClients.getSelectedValue();
+		Client clientSelectedCombobox=(Client) comboBoxClients.getSelectedItem();
+		List<Client> clients=new ArrayList<>();
+		for(int index=0;index<clientListModel.getSize();index++)
+			clients.add(clientListModel.getElementAt(index));
+		clients.add(clientToAdd);
+		showClients(clients);
+		if(clientSelectedList!=null) {
+			listClients.setSelectedValue(clientSelectedList, true);
+		}
+		if(clientSelectedCombobox!=null) {
+			comboBoxClients.setSelectedItem(clientSelectedCombobox);
+		}
 		resetTextBoxNewClient();
 		resetClientErrorLabel();
 	}
@@ -620,11 +632,19 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(invoiceToAdd.getDate());
 		int yearOfInvoice=calendar.get(Calendar.YEAR);
-		if(yearOfInvoice==yearSelected) {
-			invoiceListModel.addElement(invoiceToAdd);
-			this.setLabelTotalRevenue();
+		if(yearOfInvoice==yearSelected) {			
+			Invoice invoiceSelectedList=listInvoices.getSelectedValue();
+			List<Invoice> invoices=new ArrayList<>();
+			for(int index=0;index<invoiceListModel.getSize();index++)
+				invoices.add(invoiceListModel.getElementAt(index));
+			invoices.add(invoiceToAdd);
+			showInvoices(invoices);
+			if(invoiceSelectedList!=null) {
+				listInvoices.setSelectedValue(invoiceSelectedList, true);
+			}
+			setLabelTotalRevenue();
 		}
-		if(comboboxYearsModel.getIndexOf(yearOfInvoice)==-1) {
+		else if(comboboxYearsModel.getIndexOf(yearOfInvoice)==-1) {
 			addYearsInOrderInCombobox(yearOfInvoice);
 		}
 		resetInvoiceErrorLabel();
@@ -634,9 +654,8 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		int yearSelected=(int) comboboxYearsModel.getSelectedItem();
 		comboboxYearsModel.addElement(yearToAdd);
 		List<Integer> yearsInCombobox=new ArrayList<>();
-		int count=0;
-		while(count<comboboxYearsModel.getSize())
-			yearsInCombobox.add(comboboxYearsModel.getElementAt(count++));
+		for(int index=0;index<comboboxYearsModel.getSize();index++)
+			yearsInCombobox.add(comboboxYearsModel.getElementAt(index));
 		Collections.sort(yearsInCombobox);
 		Collections.reverse(yearsInCombobox);
 		comboboxYearsModel.removeAllElements();
