@@ -31,27 +31,27 @@ public class DatabaseSteps {
 	static final int YEAR_FIXTURE=2019;
 	
 	static final double INVOICE_OF_THE_YEAR_FIXTURE_1_REVENUE=10.0;
-	static final Date INVOICE_OF_THE_YEAR_FIXTURE_1_DATE=DateTestsUtil.getDateFromYear(YEAR_FIXTURE);
+	static final Date INVOICE_OF_THE_YEAR_FIXTURE_1_DATE=DateTestsUtil.getDate(1, 5, YEAR_FIXTURE);
 	static Client INVOICE_OF_THE_YEAR_FIXTURE_1_CLIENT;
 	static String INVOICE_OF_THE_YEAR_FIXTURE_1_ID;
 	
 	static final double INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE=20.0;
-	static final Date INVOICE_OF_THE_YEAR_FIXTURE_2_DATE=DateTestsUtil.getDateFromYear(YEAR_FIXTURE);
+	static final Date INVOICE_OF_THE_YEAR_FIXTURE_2_DATE=DateTestsUtil.getDate(2, 5, YEAR_FIXTURE);
 	static Client INVOICE_OF_THE_YEAR_FIXTURE_2_CLIENT;
 	static String INVOICE_OF_THE_YEAR_FIXTURE_2_ID;
 	
 	static final double INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE=30.0;
-	static final Date INVOICE_OF_THE_YEAR_FIXTURE_3_DATE=DateTestsUtil.getDateFromYear(YEAR_FIXTURE);
+	static final Date INVOICE_OF_THE_YEAR_FIXTURE_3_DATE=DateTestsUtil.getDate(3, 5, YEAR_FIXTURE);
 	static Client INVOICE_OF_THE_YEAR_FIXTURE_3_CLIENT;
 	static String INVOICE_OF_THE_YEAR_FIXTURE_3_ID;
 	
 	static final double INVOICE_OF_THE_CURRENT_YEAR_1_REVENUE=10.0;
-	static final Date INVOICE_OF_THE_CURRENT_YEAR_1_DATE=DateTestsUtil.getDateFromYear(CURRENT_YEAR);
+	static final Date INVOICE_OF_THE_CURRENT_YEAR_1_DATE=DateTestsUtil.getDate(15, 10, CURRENT_YEAR);
 	static Client INVOICE_OF_THE_CURRENT_YEAR_1_CLIENT;
 	static String INVOICE_OF_THE_CURRENT_YEAR_1_ID;
 	
 	static final double INVOICE_OF_THE_CURRENT_YEAR_2_REVENUE=20.0;
-	static final Date INVOICE_OF_THE_CURRENT_YEAR_2_DATE=DateTestsUtil.getDateFromYear(CURRENT_YEAR);
+	static final Date INVOICE_OF_THE_CURRENT_YEAR_2_DATE=DateTestsUtil.getDate(20, 10, CURRENT_YEAR);
 	static Client INVOICE_OF_THE_CURRENT_YEAR_2_CLIENT;
 	static String INVOICE_OF_THE_CURRENT_YEAR_2_ID;
 	

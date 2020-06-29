@@ -2,7 +2,7 @@ package com.balance.model;
 
 import java.util.Objects;
 
-public class Client extends BaseEntity{
+public class Client extends BaseEntity implements Comparable<Client>{
 	private String identifier; // name and surname of the client or company name
 	
 	public Client(String id, String identifier) {
@@ -54,4 +54,10 @@ public class Client extends BaseEntity{
 	public String toString() {
 		return identifier;
 	}
+	
+	@Override
+    public int compareTo(Client clientToCompare) {
+        return this.identifier.compareTo(clientToCompare.getIdentifier());
+    }
+	
 }
