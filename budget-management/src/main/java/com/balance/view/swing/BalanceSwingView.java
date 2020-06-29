@@ -405,8 +405,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 							throw new DateTimeException("Wrong year");
 						}
 						LocalDate localDate = LocalDate.of( yearOfDate, monthOfYear, dayOfMonth);
-						Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-						
+						Date date = Date.from(localDate.atStartOfDay(ZoneId.of("Z")).toInstant());
 						Client clientOfInvoice=(Client) comboBoxClients.getSelectedItem();
 						resetInvoiceErrorLabel();
 						resetTextBoxAndComboBoxNewInvoice();

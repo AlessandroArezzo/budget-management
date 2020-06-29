@@ -1,51 +1,30 @@
 package com.balance.utils;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
+import java.util.Random;
 
 public class DateTestsUtil {
 	private DateTestsUtil() { }
 	
-	private static final DateFormat FORMATTER = new SimpleDateFormat("dd/MM/yyyy"); 
-
 	public static Date getFirstDayOfYear(int year) {
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.YEAR, year);
-		cal.set(Calendar.DAY_OF_YEAR, 1); 
-		return parseDate(cal.getTime());
+		return getDate(1,1,year);
 	}
 	
 	public static Date getLastDayOfYear(int year) {
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.YEAR, year);
-		cal.set(Calendar.MONTH, 11); 
-		cal.set(Calendar.DAY_OF_MONTH, 31);
-		return parseDate(cal.getTime());
+		return getDate(31,12,year);
 	}
 	
 	public static Date getDateFromYear(int year) {
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.YEAR, year);
-		return parseDate(cal.getTime());
+		Random random=new Random();
+		LocalDate localDate = LocalDate.ofYearDay(year, random.nextInt(365)+1);
+		return Date.from(localDate.atStartOfDay(ZoneId.of("Z")).toInstant());
 	}
 	
 	public static Date getDate(int day, int month, int year) {
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.YEAR, year);
-		cal.set(Calendar.MONTH, month-1);
-		cal.set(Calendar.DAY_OF_MONTH, day); 
-		return parseDate(cal.getTime());
+		LocalDate localDate = LocalDate.of( year, month, day);
+		return Date.from(localDate.atStartOfDay(ZoneId.of("Z")).toInstant());
 	}
-	
-	private static Date parseDate(Date date) {
-		try {
-			date=FORMATTER.parse(FORMATTER.format(date));
-		} catch (ParseException e) {}
-		return date;
-	}
-	
 	
 }
