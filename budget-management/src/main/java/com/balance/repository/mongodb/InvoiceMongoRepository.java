@@ -1,5 +1,7 @@
 package com.balance.repository.mongodb;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -101,22 +103,13 @@ public class InvoiceMongoRepository implements InvoiceRepository{
 	}
 	
 	private Date getFirstDayOfYear(int year) {
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.YEAR, year);
-		cal.set(Calendar.DAY_OF_YEAR, 1); 
-		cal.set(Calendar.HOUR_OF_DAY, 0); 
-		cal.set(Calendar.MINUTE, 0); 
-		cal.set(Calendar.SECOND, 0); 
-		cal.set(Calendar.MILLISECOND, 0); 
-		return cal.getTime();
+		LocalDate localDate = LocalDate.of( year, 1, 1);
+		return Date.from(localDate.atStartOfDay(ZoneId.of("Z")).toInstant());
 	}
 	
 	private Date getLastDayOfYear(int year) {
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.YEAR, year);
-		cal.set(Calendar.MONTH, 11); 
-		cal.set(Calendar.DAY_OF_MONTH, 31);
-		return cal.getTime();
+		LocalDate localDate = LocalDate.of( year, 12, 31);
+		return Date.from(localDate.atStartOfDay(ZoneId.of("Z")).toInstant());
 	}
 
 	@Override

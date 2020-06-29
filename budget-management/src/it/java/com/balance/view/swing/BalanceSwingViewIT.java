@@ -42,10 +42,11 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 	private static final String CLIENT_IDENTIFIER_2="test identifier 2";
 	
 	private static final int YEAR_FIXTURE=2019;
+	private static final int CURRENT_YEAR=Calendar.getInstance().get(Calendar.YEAR);
 	
-	private static final Date DATE_OF_THE_YEAR_FIXTURE=getDateFromYear(YEAR_FIXTURE);
-	private static final Date DATE_OF_THE_PREVIOUS_YEAR_FIXTURE=getDateFromYear(YEAR_FIXTURE-1);
-	private static final Date DATE_OF_THE_NEXT_YEAR_FIXTURE=getDateFromYear(YEAR_FIXTURE+1);
+	private static final Date DATE_OF_THE_YEAR_FIXTURE=DateTestsUtil.getDateFromYear(YEAR_FIXTURE);
+	private static final Date DATE_OF_THE_PREVIOUS_YEAR_FIXTURE=DateTestsUtil.getDateFromYear(YEAR_FIXTURE-1);
+	private static final Date DATE_OF_THE_NEXT_YEAR_FIXTURE=DateTestsUtil.getDateFromYear(YEAR_FIXTURE+1);
 	
 	private static final double INVOICE_REVENUE_1=10.0;
 	private static final double INVOICE_REVENUE_2=20.0;
@@ -346,6 +347,52 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 	}
 	
 	@Test @GUITest
+	public void testAddInvoiceOfFirstDayOfYearButtonSuccess() {
+		Client client1=clientRepository.save(new Client(CLIENT_IDENTIFIER_1));	
+		invoiceRepository.save(new Invoice(client1, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_1));
+		GuiActionRunner.execute( () -> balanceController.initializeView() );
+		window.comboBox("yearsCombobox")
+			.selectItem(Pattern.compile(""+YEAR_FIXTURE));
+		window.comboBox("clientsCombobox").selectItem(Pattern.compile(CLIENT_IDENTIFIER_1));
+		window.textBox("textField_dayOfDateInvoice").enterText("1");
+		window.textBox("textField_monthOfDateInvoice").enterText("1");
+		window.textBox("textField_yearOfDateInvoice").enterText(""+YEAR_FIXTURE);
+		window.textBox("textField_revenueInvoice").enterText("10.20");
+		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
+		assertThat(window.list("invoicesList").contents())
+			.contains(new Invoice(client1,DateTestsUtil.getDate(1, 1, YEAR_FIXTURE),10.20).toString());
+		window.label("revenueLabel").requireText(
+				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
+						INVOICE_REVENUE_1+10.20)+"€");
+		GuiActionRunner.execute( () -> balanceController.yearsOfTheInvoices());
+		assertThat(window.comboBox("yearsCombobox").contents())
+			.containsExactly(""+CURRENT_YEAR,""+YEAR_FIXTURE);
+	}
+	
+	@Test @GUITest
+	public void testAddInvoiceOfLastDayOfYearButtonSuccess() {
+		Client client1=clientRepository.save(new Client(CLIENT_IDENTIFIER_1));	
+		invoiceRepository.save(new Invoice(client1, DATE_OF_THE_YEAR_FIXTURE, INVOICE_REVENUE_1));
+		GuiActionRunner.execute( () -> balanceController.initializeView() );
+		window.comboBox("yearsCombobox")
+			.selectItem(Pattern.compile(""+YEAR_FIXTURE));
+		window.comboBox("clientsCombobox").selectItem(Pattern.compile(CLIENT_IDENTIFIER_1));
+		window.textBox("textField_dayOfDateInvoice").enterText("31");
+		window.textBox("textField_monthOfDateInvoice").enterText("12");
+		window.textBox("textField_yearOfDateInvoice").enterText(""+YEAR_FIXTURE);
+		window.textBox("textField_revenueInvoice").enterText("10.20");
+		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
+		assertThat(window.list("invoicesList").contents())
+			.contains(new Invoice(client1,DateTestsUtil.getDate(31, 12, YEAR_FIXTURE),10.20).toString());
+		window.label("revenueLabel").requireText(
+				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
+						INVOICE_REVENUE_1+10.20)+"€");
+		GuiActionRunner.execute( () -> balanceController.yearsOfTheInvoices());
+		assertThat(window.comboBox("yearsCombobox").contents())
+			.containsExactly(""+CURRENT_YEAR,""+YEAR_FIXTURE);
+	}
+	
+	@Test @GUITest
 	public void testAddInvoiceButtonErrorNoExistingClient() {
 		Client client1=clientRepository.save(new Client(CLIENT_IDENTIFIER_1));
 		Client client2=clientRepository.save(new Client(CLIENT_IDENTIFIER_2));
@@ -448,12 +495,6 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
 						invoiceClientRemaining.getRevenue())+"€");
-	}
-	
-	private static Date getDateFromYear(int year) {
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.YEAR, year);
-		return cal.getTime();
 	}
 	
 }
