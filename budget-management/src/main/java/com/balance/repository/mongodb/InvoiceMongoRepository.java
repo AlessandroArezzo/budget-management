@@ -21,7 +21,6 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
-import com.mongodb.client.model.Sorts;
 
 public class InvoiceMongoRepository implements InvoiceRepository{
 
@@ -130,8 +129,7 @@ public class InvoiceMongoRepository implements InvoiceRepository{
 							        		  Projections.fields(
 							        		  Projections.computed("year", 
 						        				  	Document.parse("{ $year: '$date' }"))
-				        				  )),
-							  			Aggregates.sort(Sorts.ascending("year")))
+				        				  )))
 								  ).spliterator(), false)
 					.map(d -> d.getInteger("year"))
 					.collect(Collectors.toSet())
