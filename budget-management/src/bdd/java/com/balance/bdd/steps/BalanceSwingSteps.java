@@ -200,7 +200,7 @@ public class BalanceSwingSteps {
 	@Given("The user provides invoice data in the text fields with the same year as the one selected")
 	public void the_user_provides_invoice_data_in_the_text_fields_with_the_same_year_as_the_one_selected() {
 		window.comboBox("clientsCombobox").selectItem(Pattern.compile(CLIENT_FIXTURE_2_IDENTIFIER));
-		window.textBox("textField_dayOfDateInvoice").enterText("1");
+		window.textBox("textField_dayOfDateInvoice").enterText("4");
 		window.textBox("textField_monthOfDateInvoice").enterText("5");
 		window.textBox("textField_yearOfDateInvoice").enterText(""+YEAR_FIXTURE);
 		window.textBox("textField_revenueInvoice").enterText("100.25");
@@ -210,7 +210,7 @@ public class BalanceSwingSteps {
 	public void the_invoice_list_contains_the_new_invoice() {
 		assertThat(window.list("invoicesList").contents())
 			.contains(new Invoice(new Client(CLIENT_FIXTURE_2_ID, CLIENT_FIXTURE_2_IDENTIFIER), 
-					DateTestsUtil.getDate(1, 5, YEAR_FIXTURE), 100.25).toString());
+					DateTestsUtil.getDate(4, 5, YEAR_FIXTURE), 100.25).toString());
 	}
 
 	@Then("The total annual revenue of the selected year is updated also considering the new invoice added")
@@ -236,7 +236,7 @@ public class BalanceSwingSteps {
 		assertThat(window.list("invoicesList").contents())
 			.noneMatch(e -> e.contains(
 				new Invoice(new Client(CLIENT_FIXTURE_2_ID, CLIENT_FIXTURE_2_IDENTIFIER), 
-				DateTestsUtil.getDate(1, 5, YEAR_FIXTURE), 100.25).toString()));
+				DateTestsUtil.getDate(1, 5, YEAR_FIXTURE-1), 100.25).toString()));
 	}
 
 	@Given("The user selects an invoice of the selected year from the invoice list")

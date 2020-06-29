@@ -510,7 +510,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 	@Override
 	public void showInvoices(List<Invoice> invoices) {
 		if((int) comboboxYearsModel.getSelectedItem()!=CURRENT_YEAR && invoices.isEmpty() && 
-				listClients.getSelectedValue()==null) {
+			listClients.getSelectedValue()==null) {
 			balanceController.yearsOfTheInvoices();
 		}
 		else {
@@ -554,16 +554,25 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 	private void setLabelTotalRevenue() {
 		int yearSelected=(int) comboboxYears.getSelectedItem();
 		Client clientSelected=listClients.getSelectedValue();
-		double totalRevenue=0;
-		for(int i=0;i<invoiceListModel.getSize();i++) {
-			totalRevenue+=invoiceListModel.getElementAt(i).getRevenue();
+		int numberOfInvoices=invoiceListModel.getSize();
+		if(numberOfInvoices==0 && clientSelected==null) {
+			lblRevenue.setText("Non sono presenti fatture per il "+yearSelected);
 		}
-		if (clientSelected==null) {
-			lblRevenue.setText("Il ricavo totale del "+yearSelected+" è di "+String.format("%.2f", totalRevenue)+"€");
+		else if(numberOfInvoices==0 && clientSelected!=null) {
+			lblRevenue.setText("Non sono presenti fatture del "+yearSelected+" per il cliente "+clientSelected.getIdentifier());
 		}
 		else {
-			lblRevenue.setText("Il ricavo totale delle fatture del cliente "+clientSelected.getIdentifier()+" "
-					+ "nel "+yearSelected+" è di "+String.format("%.2f", totalRevenue)+"€");
+			double totalRevenue=0;
+			for(int i=0;i<numberOfInvoices;i++) {
+				totalRevenue+=invoiceListModel.getElementAt(i).getRevenue();
+			}
+			if (clientSelected==null) {
+				lblRevenue.setText("Il ricavo totale del "+yearSelected+" è di "+String.format("%.2f", totalRevenue)+"€");
+			}
+			else {
+				lblRevenue.setText("Il ricavo totale delle fatture del cliente "+clientSelected.getIdentifier()+" "
+						+ "nel "+yearSelected+" è di "+String.format("%.2f", totalRevenue)+"€");
+			}
 		}
 	}
 

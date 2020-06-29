@@ -843,6 +843,8 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		);
 		window.list("clientsList").selectItem(0);
 		GuiActionRunner.execute(() -> balanceSwingView.showInvoices(Arrays.asList()) );
+		window.label("revenueLabel").requireText("Non sono presenti fatture del "+YEAR_FIXTURE+
+				" per il cliente "+CLIENT_FIXTURE_1.getIdentifier());
 		verify(balanceController, never()).yearsOfTheInvoices();
 	}
 	
@@ -856,6 +858,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 				balanceSwingView.showInvoices(Arrays.asList());
 			}
 		);
+		window.label("revenueLabel").requireText("Non sono presenti fatture per il "+CURRENT_YEAR);
 		verify(balanceController, never()).yearsOfTheInvoices();
 	}
 	
@@ -985,4 +988,5 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.label("labelInvoiceErrorMessage").requireText("error message: " + 
 				INVOICE_FIXTURE_1.toString());
 	}
+	
 }
