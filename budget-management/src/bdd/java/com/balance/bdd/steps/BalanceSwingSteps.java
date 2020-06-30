@@ -141,7 +141,7 @@ public class BalanceSwingSteps {
 
 	@Then("An error is shown containing the name of the selected client")
 	public void an_error_is_shown_containing_the_name_of_the_selected_client() {
-		assertThat(window.label("labelClientErrorMessage").text())
+		assertThat(window.textBox("paneClientErrorMessage").text())
 			.contains(CLIENT_FIXTURE_2_IDENTIFIER); 
 	}
 
@@ -182,7 +182,10 @@ public class BalanceSwingSteps {
 
 	@When("The user clicks the {string} button")
 	public void the_user_clicks_the_button(String string) {
-		window.button(JButtonMatcher.withText(string)).click();
+		String patternTextBtn=".*";
+		for(String word: string.split(" "))
+			patternTextBtn+=word+".*";
+		window.button(JButtonMatcher.withText(patternTextBtn)).click();
 	}
 
 	@Then("The client list contains the new client")
@@ -266,7 +269,7 @@ public class BalanceSwingSteps {
 
 	@Then("An error is shown containing the name of the selected invoice")
 	public void an_error_is_shown_containing_the_name_of_the_selected_invoice() {
-	   window.label("labelInvoiceErrorMessage").requireText("Fattura non più presente nel database: "
+	   window.textBox("paneInvoiceErrorMessage").requireText("Fattura non più presente nel database: "
 			   +new Invoice(INVOICE_OF_THE_YEAR_FIXTURE_2_CLIENT,
 						INVOICE_OF_THE_YEAR_FIXTURE_2_DATE,
 						INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE).toString());

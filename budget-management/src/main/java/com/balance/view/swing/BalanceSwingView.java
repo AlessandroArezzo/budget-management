@@ -3,13 +3,20 @@ package com.balance.view.swing;
 
 import java.awt.Dimension;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
+import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.border.SoftBevelBorder;
 
 import com.balance.controller.BalanceController;
 import com.balance.model.Client;
@@ -35,7 +42,13 @@ import javax.swing.JList;
 import javax.swing.JComboBox;
 import javax.swing.JButton;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
+
 import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Font;
 
 public class BalanceSwingView extends JFrame implements BalanceView {
 
@@ -52,7 +65,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 	private JComboBox<Integer> comboboxYears;
 	private DefaultComboBoxModel<Integer> comboboxYearsModel;
 	private JLabel lblRevenue;
-	private JLabel lbClientError;
+	private JTextPane paneClientError;
 	private JComboBox<Client> comboBoxClients;
 	private DefaultComboBoxModel<Client> comboboxClientsModel;
 	private JButton btnShowAllInvoices;
@@ -67,8 +80,9 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 	private JTextField textFieldYearNewInvoice;
 	private JTextField textFieldRevenueNewInvoice;
 	private JButton btnNewInvoice;
-	private JLabel lblInvoiceError;
+	private JTextPane paneInvoiceError;
 	private JButton btnRemoveInvoice;
+	
 	public void setBalanceController(BalanceController balanceController) {
 		this.balanceController = balanceController;
 	}
@@ -77,56 +91,71 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 	 * Create the frame.
 	 */
 	public BalanceSwingView() {
+		setPreferredSize(new Dimension(850, 700));
 		setTitle("Budget Management View");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		setBounds(100, 100, 450, 300);
-		setSize(800,500);
+		setBackground(Color.WHITE);
+		setResizable(false);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 855, 700);
 		contentPane = new JPanel();
+		contentPane.setBackground(Color.WHITE);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
-		GridBagLayout gbl_contentPane = new GridBagLayout();
-		gbl_contentPane.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-		gbl_contentPane.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-		gbl_contentPane.columnWeights = new double[]{1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_contentPane.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		contentPane.setLayout(gbl_contentPane);
+		contentPane.setLayout(null);
 		
-		JLabel lblManagement = new JLabel("GESTIONE RICAVI");
-		GridBagConstraints gbc_lblManagement = new GridBagConstraints();
-		gbc_lblManagement.insets = new Insets(0, 0, 5, 5);
-		gbc_lblManagement.gridx = 10;
-		gbc_lblManagement.gridy = 0;
-		contentPane.add(lblManagement, gbc_lblManagement);
+		JPanel panel_clientManagement = new JPanel();
+		panel_clientManagement.setBackground(new Color(23, 35, 51));
+		panel_clientManagement.setBounds(0, 52, 304, 626);
+		contentPane.add(panel_clientManagement);
+		panel_clientManagement.setLayout(null);
 		
-		JLabel lblClient = new JLabel("CLIENTI");
-		GridBagConstraints gbc_lblClient = new GridBagConstraints();
-		gbc_lblClient.gridwidth = 5;
-		gbc_lblClient.insets = new Insets(0, 0, 5, 5);
-		gbc_lblClient.gridx = 0;
-		gbc_lblClient.gridy = 1;
-		contentPane.add(lblClient, gbc_lblClient);
+		JPanel panel_clientTitle = new JPanel();
+		panel_clientTitle.setForeground(Color.WHITE);
+		panel_clientTitle.setBounds(0, 0, 304, 58);
+		panel_clientTitle.setBackground(new Color(47, 73, 106));
+		panel_clientManagement.add(panel_clientTitle);
+		panel_clientTitle.setLayout(null);
 		
-		JLabel lblInvoice = new JLabel("FATTURE");
-		GridBagConstraints gbc_lblInvoice = new GridBagConstraints();
-		gbc_lblInvoice.insets = new Insets(0, 0, 5, 5);
-		gbc_lblInvoice.gridx = 10;
-		gbc_lblInvoice.gridy = 2;
-		contentPane.add(lblInvoice, gbc_lblInvoice);
+		JLabel lblClientsTitle = new JLabel("CLIENTI");
+		lblClientsTitle.setFont(new Font("Lucida Grande", Font.BOLD, 17));
+		lblClientsTitle.setHorizontalAlignment(SwingConstants.CENTER);
+		lblClientsTitle.setBounds(0, 0, 304, 58);
+		lblClientsTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+		lblClientsTitle.setForeground(Color.WHITE);
+		panel_clientTitle.add(lblClientsTitle);
 		
-		clientListModel=new DefaultListModel<>();
-		comboboxYearsModel=new DefaultComboBoxModel<>();
-	    comboboxYears = new JComboBox<>(comboboxYearsModel);
-		comboboxYears.setName("yearsCombobox");
-		GridBagConstraints gbc_comboboxYears = new GridBagConstraints();
-		gbc_comboboxYears.insets = new Insets(0, 0, 5, 5);
-		gbc_comboboxYears.fill = GridBagConstraints.HORIZONTAL;
-		gbc_comboboxYears.gridx = 10;
-		gbc_comboboxYears.gridy = 3;
-		contentPane.add(comboboxYears, gbc_comboboxYears);
-		
-		invoiceListModel=new DefaultListModel<>();
+		JScrollPane scrollPaneClientsList = new JScrollPane();
+		scrollPaneClientsList.setBorder(null);
+		scrollPaneClientsList.setBounds(0, 58, 304, 301);
+		panel_clientManagement.add(scrollPaneClientsList);
+		clientListModel=new DefaultListModel<Client>();
 		listClients = new JList<>(clientListModel);
+		listClients.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
+		listClients.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		listClients.setBorder(null);
+		listClients.setName("clientsList");
+		listClients.setSelectionBackground(Color.LIGHT_GRAY);
+		listClients.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		listClients.setBackground(new Color(220, 228, 239));
+		listClients.setFixedCellHeight(35);
+		scrollPaneClientsList.setViewportView(listClients);
+		
+		listClients.setCellRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value, int index,
+                      boolean isSelected, boolean cellHasFocus) {
+                 Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                 setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+                 if (index % 2 == 0) setBackground(new Color(203, 214, 231));
+                 if(isSelected) {
+                	 setForeground(Color.white);
+                	 setBackground(new Color(23, 35, 51));
+                 }
+                 return this;
+            }
+        });
 		listClients.addListSelectionListener(e -> {
 			btnShowAllInvoices.setVisible(
 					listClients.getSelectedIndex() != -1);
@@ -143,283 +172,338 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 				}
 			}
 		});
-		listClients.setName("clientsList");
-		listClients.setSize(new Dimension(300, 400));
-		listClients.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
-		GridBagConstraints gbc_listClients = new GridBagConstraints();
-		gbc_listClients.gridwidth = 6;
-		gbc_listClients.insets = new Insets(0, 0, 5, 5);
-		gbc_listClients.fill = GridBagConstraints.BOTH;
-		gbc_listClients.gridx = 0;
-		gbc_listClients.gridy = 4;
-		JScrollPane scrollPaneClientsList = new JScrollPane();
-		scrollPaneClientsList.setViewportView(listClients);
-		contentPane.add(scrollPaneClientsList,gbc_listClients);
-		listInvoices = new JList<>(invoiceListModel);
-		listInvoices.setName("invoicesList");
-		listInvoices.setSize(new Dimension(100, 400));
-		listInvoices.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		listInvoices.addListSelectionListener(e -> 
-			btnRemoveInvoice.setEnabled(listInvoices.getSelectedIndex() != -1));
-		GridBagConstraints gbc_listInvoices = new GridBagConstraints();
-		gbc_listInvoices.gridwidth = 13;
-		gbc_listInvoices.insets = new Insets(0, 0, 5, 5);
-		gbc_listInvoices.fill = GridBagConstraints.BOTH;
-		gbc_listInvoices.gridx = 10;
-		gbc_listInvoices.gridy = 4;
-		JScrollPane scrollPaneInvoicesList = new JScrollPane();
-		scrollPaneInvoicesList.setPreferredSize(new Dimension(200, 100));
-		scrollPaneInvoicesList.setViewportView(listInvoices);
-		contentPane.add(scrollPaneInvoicesList, gbc_listInvoices);
-		
-		btnRemoveInvoice = new JButton("Rimuovi fattura");
-		btnRemoveInvoice.setEnabled(false);
-		GridBagConstraints gbc_btnRemoveInvoice = new GridBagConstraints();
-		gbc_btnRemoveInvoice.insets = new Insets(0, 0, 5, 5);
-		gbc_btnRemoveInvoice.gridx = 17;
-		gbc_btnRemoveInvoice.gridy = 5;
-		contentPane.add(btnRemoveInvoice, gbc_btnRemoveInvoice);
-		
-		btnRemoveInvoice.addActionListener(
-				e -> balanceController.deleteInvoice(listInvoices.getSelectedValue())
-			);
-		
-		lblInvoiceError = new JLabel("");
-		lblInvoiceError.setName("labelInvoiceErrorMessage");
-		GridBagConstraints gbc_lblInvoiceErrorMessage = new GridBagConstraints();
-		gbc_lblInvoiceErrorMessage.gridwidth = 13;
-		gbc_lblInvoiceErrorMessage.insets = new Insets(0, 0, 5, 5);
-		gbc_lblInvoiceErrorMessage.gridx = 10;
-		gbc_lblInvoiceErrorMessage.gridy = 6;
-		contentPane.add(lblInvoiceError, gbc_lblInvoiceErrorMessage);
-		
-		btnRemoveClient=new JButton("Rimuovi cliente");
+		btnRemoveClient = new JButton("Rimuovi cliente");
+		btnRemoveClient.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		btnRemoveClient.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		btnRemoveClient.setEnabled(false);
-		btnRemoveClient.setName("btnRemoveClient");
-		GridBagConstraints gbc_btnRemoveClient = new GridBagConstraints();
-		gbc_btnRemoveClient.fill = GridBagConstraints.HORIZONTAL;
-		gbc_btnRemoveClient.insets = new Insets(0, 0, 5, 5);
-		gbc_btnRemoveClient.gridx = 0;
-		gbc_btnRemoveClient.gridy = 8;
-		contentPane.add(btnRemoveClient, gbc_btnRemoveClient);
-		
+		btnRemoveClient.setFont(new Font("Arial", Font.BOLD, 14));
+		btnRemoveClient.setForeground(Color.WHITE);
+		btnRemoveClient.setBounds(10, 369, 288, 29);
+		panel_clientManagement.add(btnRemoveClient);
 		btnRemoveClient.addActionListener(
 				e -> balanceController.deleteClient(listClients.getSelectedValue())
 			);
 		
-		JLabel lblnewInvoice=new JLabel("INSERISCI UNA NUOVA FATTURA");
-		GridBagConstraints gbc_lblNewInvoice = new GridBagConstraints();
-		gbc_lblNewInvoice.gridwidth = 13;
-		gbc_lblNewInvoice.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewInvoice.gridx = 10;
-		gbc_lblNewInvoice.gridy = 10;
-		contentPane.add(lblnewInvoice, gbc_lblNewInvoice);
+		paneClientError = new JTextPane();
+		paneClientError.setText("");
+		paneClientError.setName("paneClientErrorMessage");
+		paneClientError.setForeground(new Color(255, 102, 102));
+		paneClientError.setBackground(new Color(23, 35, 51));
+		paneClientError.setBounds(10, 410, 288, 43);
+		panel_clientManagement.add(paneClientError);
 		
-		JLabel lblClientNewInvoice=new JLabel("Cliente");
-		GridBagConstraints gbc_lblClientNewInvoice = new GridBagConstraints();
-		gbc_lblClientNewInvoice.insets = new Insets(0, 0, 5, 5);
-		gbc_lblClientNewInvoice.gridx = 9;
-		gbc_lblClientNewInvoice.gridy = 11;
-		contentPane.add(lblClientNewInvoice, gbc_lblClientNewInvoice);
-		comboboxClientsModel=new DefaultComboBoxModel<>();
-		comboBoxClients = new JComboBox<>(comboboxClientsModel);
-		comboBoxClients.setName("clientsCombobox");
+		JPanel panel_newClient = new JPanel();
+		panel_newClient.setBounds(0, 477, 304, 143);
+		panel_newClient.setBackground(new Color(23, 35, 51));
+		panel_clientManagement.add(panel_newClient);
+		panel_newClient.setLayout(null);
 		
-		GridBagConstraints gbc_comboBoxClients = new GridBagConstraints();
-		gbc_comboBoxClients.gridwidth = 13;
-		gbc_comboBoxClients.insets = new Insets(0, 0, 5, 5);
-		gbc_comboBoxClients.fill = GridBagConstraints.HORIZONTAL;
-		gbc_comboBoxClients.gridx = 10;
-		gbc_comboBoxClients.gridy = 11;
-		contentPane.add(comboBoxClients, gbc_comboBoxClients);
+		lblNewClient = new JLabel("NUOVO CLIENTE");
+		lblNewClient.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewClient.setBounds(6, 18, 292, 17);
+		lblNewClient.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
+		lblNewClient.setForeground(Color.WHITE);
+		panel_newClient.add(lblNewClient);
 		
-		lblClientName=new JLabel("Identificativo");
-		GridBagConstraints gbc_lblClientName = new GridBagConstraints();
-		gbc_lblClientName.insets = new Insets(0, 0, 5, 5);
-		gbc_lblClientName.gridx = 0;
-		gbc_lblClientName.gridy = 12;
-		contentPane.add(lblClientName, gbc_lblClientName);
+		JSeparator separator = new JSeparator();
+		separator.setForeground(Color.WHITE);
+		separator.setBounds(133, 69, 159, 17);
+		panel_newClient.add(separator);
 		
-		textFieldNewClient=new JTextField();
+		textFieldNewClient = new JTextField();
+		textFieldNewClient.setFont(new Font("Lucida Grande", Font.BOLD, 13));
+		textFieldNewClient.setHorizontalAlignment(SwingConstants.CENTER);
+		textFieldNewClient.setForeground(Color.WHITE);
 		textFieldNewClient.setName("textField_clientName");
-		textFieldNewClient.setColumns(4);
-		GridBagConstraints gbc_txtFieldClientName = new GridBagConstraints();
-		gbc_txtFieldClientName.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtFieldClientName.gridwidth = 5;
-		gbc_txtFieldClientName.insets = new Insets(0, 0, 5, 5);
-		gbc_txtFieldClientName.gridx = 1;
-		gbc_txtFieldClientName.gridy = 12;
-		contentPane.add(textFieldNewClient, gbc_txtFieldClientName);
+		textFieldNewClient.setBorder(null);
+		textFieldNewClient.setBounds(133, 58, 165, 16);
+		textFieldNewClient.setBackground(new Color(23, 35, 51));
+		textFieldNewClient.setCaretColor(Color.white);
+		panel_newClient.add(textFieldNewClient);
+		textFieldNewClient.setColumns(10);
 		
-		JLabel lblDateNewInvoice=new JLabel("Data");
-		lblDateNewInvoice.setMaximumSize(new Dimension(10, 16));
-		lblDateNewInvoice.setMinimumSize(new Dimension(10, 16));
-		lblDateNewInvoice.setAlignmentY(Component.TOP_ALIGNMENT);
-		lblDateNewInvoice.setBorder(null);
-		GridBagConstraints gbc_lblDateNewInvoice = new GridBagConstraints();
-		gbc_lblDateNewInvoice.insets = new Insets(0, 0, 5, 5);
-		gbc_lblDateNewInvoice.gridx = 9;
-		gbc_lblDateNewInvoice.gridy = 12;
-		contentPane.add(lblDateNewInvoice, gbc_lblDateNewInvoice);
+		lblClientName = new JLabel("Identificativo");
+		lblClientName.setHorizontalAlignment(SwingConstants.CENTER);
+		lblClientName.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
+		lblClientName.setForeground(Color.WHITE);
+		lblClientName.setBounds(6, 58, 115, 22);
+		panel_newClient.add(lblClientName);
 		
-		textFieldDayNewInvoice=new JTextField();
-		textFieldDayNewInvoice.setMinimumSize(new Dimension(50, 26));
-		textFieldDayNewInvoice.setName("textField_dayOfDateInvoice");
-		GridBagConstraints gbc_txtFieldDayNewInvoice = new GridBagConstraints();
-		gbc_txtFieldDayNewInvoice.insets = new Insets(0, 0, 5, 5);
-		gbc_txtFieldDayNewInvoice.gridx = 10;
-		gbc_txtFieldDayNewInvoice.gridy = 12;
-		contentPane.add(textFieldDayNewInvoice, gbc_txtFieldDayNewInvoice);
-		textFieldMonthNewInvoice=new JTextField();
-		textFieldMonthNewInvoice.setName("textField_monthOfDateInvoice");
-		
-		JLabel lblSlashDate1NewInvoice=new JLabel("/");
-		GridBagConstraints gbc_lblSlashDate1NewInvoice = new GridBagConstraints();
-		gbc_lblSlashDate1NewInvoice.insets = new Insets(0, 0, 5, 5);
-		gbc_lblSlashDate1NewInvoice.gridx = 11;
-		gbc_lblSlashDate1NewInvoice.gridy = 12;
-		contentPane.add(lblSlashDate1NewInvoice, gbc_lblSlashDate1NewInvoice);
-		textFieldMonthNewInvoice.setName("textField_monthOfDateInvoice");
-		
-		GridBagConstraints gbc_txtFieldMonthNewInvoice = new GridBagConstraints();
-		gbc_txtFieldMonthNewInvoice.gridwidth = 3;
-		gbc_txtFieldMonthNewInvoice.insets = new Insets(0, 0, 5, 5);
-		gbc_txtFieldMonthNewInvoice.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtFieldMonthNewInvoice.gridx = 12;
-		gbc_txtFieldMonthNewInvoice.gridy = 12;
-		contentPane.add(textFieldMonthNewInvoice, gbc_txtFieldMonthNewInvoice);
-		
-		JLabel lblSlashDate2NewInvoice=new JLabel("/");
-		GridBagConstraints gbc_lblSlashDate2NewInvoice = new GridBagConstraints();
-		gbc_lblSlashDate2NewInvoice.insets = new Insets(0, 0, 5, 5);
-		gbc_lblSlashDate2NewInvoice.gridx = 15;
-		gbc_lblSlashDate2NewInvoice.gridy = 12;
-		contentPane.add(lblSlashDate2NewInvoice, gbc_lblSlashDate2NewInvoice);
-		
-		textFieldYearNewInvoice=new JTextField();
-		textFieldYearNewInvoice.setName("textField_yearOfDateInvoice");
-		GridBagConstraints gbc_txtFieldYearNewInvoice = new GridBagConstraints();
-		gbc_txtFieldYearNewInvoice.gridwidth = 2;
-		gbc_txtFieldYearNewInvoice.insets = new Insets(0, 0, 5, 0);
-		gbc_txtFieldYearNewInvoice.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtFieldYearNewInvoice.gridx = 35;
-		gbc_txtFieldYearNewInvoice.gridy = 12;
-		contentPane.add(textFieldYearNewInvoice, gbc_txtFieldYearNewInvoice);
-		
-		btnNewClient=new JButton("Aggiungi cliente");
+		btnNewClient = new JButton("Aggiungi cliente");
+		btnNewClient.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btnNewClient.setEnabled(false);
+		btnNewClient.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		btnNewClient.setForeground(Color.WHITE);
+		btnNewClient.setFont(new Font("Arial", Font.BOLD, 14));
+		btnNewClient.setBounds(12, 98, 286, 29);
 		btnNewClient.setName("btnAddClient");
-		GridBagConstraints gbc_btnNewClient = new GridBagConstraints();
-		gbc_btnNewClient.gridwidth = 6;
-		gbc_btnNewClient.fill = GridBagConstraints.HORIZONTAL;
-		gbc_btnNewClient.insets = new Insets(0, 0, 5, 5);
-		gbc_btnNewClient.gridx = 0;
-		gbc_btnNewClient.gridy = 13;
-		contentPane.add(btnNewClient, gbc_btnNewClient);
+		panel_newClient.add(btnNewClient);
+		
 		btnNewClient.addActionListener(
 				e -> balanceController.newClient(new Client(textFieldNewClient.getText()))
 			);
 		
-		JLabel lblRevenueNewInvoice=new JLabel("Importo (€)");
-		GridBagConstraints gbc_lblRevenueNewInvoice = new GridBagConstraints();
-		gbc_lblRevenueNewInvoice.insets = new Insets(0, 0, 5, 5);
-		gbc_lblRevenueNewInvoice.gridx = 9;
-		gbc_lblRevenueNewInvoice.gridy = 13;
-		contentPane.add(lblRevenueNewInvoice, gbc_lblRevenueNewInvoice);
+		JSeparator separator_2 = new JSeparator();
+		separator_2.setForeground(Color.WHITE);
+		separator_2.setBounds(10, 460, 286, 17);
+		panel_clientManagement.add(separator_2);
 		
-		textFieldRevenueNewInvoice=new JTextField();
-		textFieldRevenueNewInvoice.setName("textField_revenueInvoice");
-		GridBagConstraints gbc_txtFieldRevenueNewInvoice = new GridBagConstraints();
-		gbc_txtFieldRevenueNewInvoice.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtFieldRevenueNewInvoice.insets = new Insets(0, 0, 5, 5);
-		gbc_txtFieldRevenueNewInvoice.gridx = 10;
-		gbc_txtFieldRevenueNewInvoice.gridy = 13;
-		contentPane.add(textFieldRevenueNewInvoice, gbc_txtFieldRevenueNewInvoice);
+		JPanel panel_invoiceManagement = new JPanel();
+		panel_invoiceManagement.setBackground(Color.WHITE);
+		panel_invoiceManagement.setBounds(302, 52, 553, 626);
+		contentPane.add(panel_invoiceManagement);
+		panel_invoiceManagement.setLayout(null);
 		
-		btnNewInvoice=new JButton("Aggiungi fattura");
-		btnNewInvoice.setEnabled(false);
-		btnNewInvoice.setName("btnAddInvoice");
-		GridBagConstraints gbc_btnAddInvoice = new GridBagConstraints();
-		gbc_btnAddInvoice.fill = GridBagConstraints.HORIZONTAL;
-		gbc_btnAddInvoice.insets = new Insets(0, 0, 0, 5);
-		gbc_btnAddInvoice.gridx = 10;
-		gbc_btnAddInvoice.gridy = 14;
-		contentPane.add(btnNewInvoice, gbc_btnAddInvoice);
-				
-		btnShowAllInvoices = new JButton("Vedi tutte le fatture");
-		btnShowAllInvoices.setVisible(false);
-		GridBagConstraints gbc_btnShowAllInvoices = new GridBagConstraints();
-		gbc_btnShowAllInvoices.insets = new Insets(0, 0, 5, 5);
-		gbc_btnShowAllInvoices.gridx = 10;
-		gbc_btnShowAllInvoices.gridy = 7;
-		contentPane.add(btnShowAllInvoices, gbc_btnShowAllInvoices);
-		
-		lbClientError = new JLabel("");
-		lbClientError.setName("labelClientErrorMessage");
-		GridBagConstraints gbc_lbClientError = new GridBagConstraints();
-		gbc_lbClientError.insets = new Insets(0, 0, 5, 5);
-		gbc_lbClientError.gridx = 0;
-		gbc_lbClientError.gridy = 9;
-		contentPane.add(lbClientError, gbc_lbClientError);
+		JPanel panel_revenueLabel = new JPanel();
+		panel_revenueLabel.setBorder(null);
+		panel_revenueLabel.setBounds(0, 30, 551, 88);
+		panel_revenueLabel.setBackground(new Color(245,245,245));
+		panel_invoiceManagement.add(panel_revenueLabel);
+		panel_revenueLabel.setLayout(null);
 		
 		lblRevenue = new JLabel("");
+		lblRevenue.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
+		lblRevenue.setForeground(new Color(89, 89, 89));
+		lblRevenue.setHorizontalAlignment(SwingConstants.CENTER);
+		lblRevenue.setBounds(2, 0, 549, 88);
 		lblRevenue.setName("revenueLabel");
-		GridBagConstraints gbc_lblRevenue = new GridBagConstraints();
-		gbc_lblRevenue.insets = new Insets(0, 0, 5, 5);
-		gbc_lblRevenue.gridx = 10;
-		gbc_lblRevenue.gridy = 9;
-		contentPane.add(lblRevenue, gbc_lblRevenue);
+		panel_revenueLabel.add(lblRevenue);
 		
-		lblNewClient=new JLabel("INSERISCI UN NUOVO CLIENTE");
-		GridBagConstraints gbc_lblNewClient = new GridBagConstraints();
-		gbc_lblNewClient.gridwidth = 7;
-		gbc_lblNewClient.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewClient.gridx = 0;
-		gbc_lblNewClient.gridy = 10;
-		contentPane.add(lblNewClient, gbc_lblNewClient);
+		JPanel panel_invoiceViewAndAdd = new JPanel();
+		panel_invoiceViewAndAdd.setBackground(Color.WHITE);
+		panel_invoiceViewAndAdd.setBounds(27, 130, 515, 418);
+		panel_invoiceManagement.add(panel_invoiceViewAndAdd);
+		panel_invoiceViewAndAdd.setLayout(null);
+		
+		comboboxYearsModel=new DefaultComboBoxModel<>();
+	    comboboxYears = new JComboBox<>(comboboxYearsModel);
+		comboboxYears.setBounds(302, 0, 101, 27);
+		panel_invoiceViewAndAdd.add(comboboxYears);
+		comboboxYears.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+		comboboxYears.setName("yearsCombobox");
+		comboboxYears.setBorder(null);
+		comboboxYears.setBackground(new Color(245,245,245));
+		
+		JScrollPane scrollPaneInvoicesList = new JScrollPane();
+		scrollPaneInvoicesList.setBackground(new Color(255, 255, 255));
+		scrollPaneInvoicesList.setBorder(null);
+		scrollPaneInvoicesList.setBounds(0, 23, 403, 242);
+		panel_invoiceViewAndAdd.add(scrollPaneInvoicesList);
+		
+		invoiceListModel=new DefaultListModel<Invoice>();
+		listInvoices = new JList<>(invoiceListModel);
+		listInvoices.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
+		listInvoices.setName("invoicesList");
+		listInvoices.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		listInvoices.setFixedCellHeight(20);
+		scrollPaneInvoicesList.setViewportView(listInvoices);
+		listInvoices.addListSelectionListener(e -> 
+			btnRemoveInvoice.setEnabled(listInvoices.getSelectedIndex() != -1));
+		
+		listInvoices.setCellRenderer(new DefaultListCellRenderer() {
+
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value, int index,
+                      boolean isSelected, boolean cellHasFocus) {
+                 Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                 setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+                 if (index % 2 == 0) setBackground(new Color(247, 247, 247));
+                 if(isSelected) {
+                	 setForeground(Color.white);
+                	 setBackground(Color.BLACK);
+                 }
+                 return this;
+            }
+
+       });
+		
+		btnRemoveInvoice = new JButton();
+		btnRemoveInvoice.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		btnRemoveInvoice.setHorizontalTextPosition(SwingConstants.CENTER);
+		btnRemoveInvoice.setText("<html><center>Rimuovi<br>fattura</center></html>");
+		btnRemoveInvoice.setBounds(401, 146, 114, 121);
+		panel_invoiceViewAndAdd.add(btnRemoveInvoice);
+		btnRemoveInvoice.setEnabled(false);
+		btnRemoveInvoice.setFont(new Font("Lucida Grande", Font.BOLD, 14));
+		btnRemoveInvoice.addActionListener(
+				e -> balanceController.deleteInvoice(listInvoices.getSelectedValue())
+			);
+		
+		btnShowAllInvoices = new JButton("<html><center>Vedi tutte<br>le fatture</center></html>");
+		btnShowAllInvoices.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		btnShowAllInvoices.setVisible(false);
+		btnShowAllInvoices.setHorizontalTextPosition(SwingConstants.CENTER);
+		btnShowAllInvoices.setBounds(401, 23, 114, 121);
+		panel_invoiceViewAndAdd.add(btnShowAllInvoices);
+		btnShowAllInvoices.setFont(new Font("Lucida Grande", Font.BOLD, 14));
+		
+		JPanel panel_newInvoice = new JPanel();
+		panel_newInvoice.setBounds(0, 264, 515, 154);
+		panel_invoiceViewAndAdd.add(panel_newInvoice);
+		panel_newInvoice.setBorder(null);
+		panel_newInvoice.setBackground(new Color(245,245,245));
+		panel_newInvoice.setLayout(null);
+		
+		JLabel lblNewInvoice = new JLabel("NUOVA FATTURA");
+		lblNewInvoice.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewInvoice.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
+		lblNewInvoice.setBounds(6, 6, 503, 22);
+		panel_newInvoice.add(lblNewInvoice);
+		
+		JLabel lblClientNewInvoice = new JLabel("Cliente");
+		lblClientNewInvoice.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
+		lblClientNewInvoice.setBounds(33, 47, 84, 16);
+		panel_newInvoice.add(lblClientNewInvoice);
+		
+		comboboxClientsModel=new DefaultComboBoxModel<>();
+		comboBoxClients = new JComboBox<>(comboboxClientsModel);
+		comboBoxClients.setName("clientsCombobox");
+		comboBoxClients.setBounds(99, 43, 193, 27);
+		panel_newInvoice.add(comboBoxClients);
+		
+		JLabel lblDateNewInvoice = new JLabel("Data");
+		lblDateNewInvoice.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
+		lblDateNewInvoice.setBounds(33, 91, 84, 16);
+		panel_newInvoice.add(lblDateNewInvoice);
+		
+		JSeparator separator_1 = new JSeparator();
+		separator_1.setForeground(Color.BLACK);
+		separator_1.setBounds(124, 103, 33, 12);
+		panel_newInvoice.add(separator_1);
+		
+		JLabel lblSlashDate1NewInvoice = new JLabel("/");
+		lblSlashDate1NewInvoice.setFont(new Font("Lucida Grande", Font.PLAIN, 16));
+		lblSlashDate1NewInvoice.setBounds(159, 93, 8, 16);
+		panel_newInvoice.add(lblSlashDate1NewInvoice);
+		
+		JSeparator separator_1_1 = new JSeparator();
+		separator_1_1.setForeground(Color.BLACK);
+		separator_1_1.setBounds(167, 103, 33, 12);
+		panel_newInvoice.add(separator_1_1);
+		
+		JLabel lblSlashDate2NewInvoice = new JLabel("/");
+		lblSlashDate2NewInvoice.setFont(new Font("Lucida Grande", Font.PLAIN, 16));
+		lblSlashDate2NewInvoice.setBounds(201, 93, 8, 16);
+		panel_newInvoice.add(lblSlashDate2NewInvoice);
+		
+		JSeparator separator_1_1_1 = new JSeparator();
+		separator_1_1_1.setForeground(Color.BLACK);
+		separator_1_1_1.setBounds(211, 103, 57, 12);
+		panel_newInvoice.add(separator_1_1_1);
+		
+		textFieldDayNewInvoice = new JTextField();
+		textFieldDayNewInvoice.setHorizontalAlignment(SwingConstants.CENTER);
+		textFieldDayNewInvoice.setName("textField_dayOfDateInvoice");
+		textFieldDayNewInvoice.setBorder(null);
+		textFieldDayNewInvoice.setBounds(125, 88, 31, 22);
+		textFieldDayNewInvoice.setBackground(new Color(245,245,245));
+		panel_newInvoice.add(textFieldDayNewInvoice);
+		textFieldDayNewInvoice.setColumns(10);
+		
+		textFieldMonthNewInvoice = new JTextField();
+		textFieldMonthNewInvoice.setHorizontalAlignment(SwingConstants.CENTER);
+		textFieldMonthNewInvoice.setName("textField_monthOfDateInvoice");
+		textFieldMonthNewInvoice.setColumns(10);
+		textFieldMonthNewInvoice.setBorder(null);
+		textFieldMonthNewInvoice.setBounds(169, 88, 31, 22);
+		textFieldMonthNewInvoice.setBackground(new Color(245,245,245));
+		panel_newInvoice.add(textFieldMonthNewInvoice);
+		
+		textFieldYearNewInvoice = new JTextField();
+		textFieldYearNewInvoice.setHorizontalAlignment(SwingConstants.CENTER);
+		textFieldYearNewInvoice.setName("textField_yearOfDateInvoice");
+		textFieldYearNewInvoice.setColumns(10);
+		textFieldYearNewInvoice.setBorder(null);
+		textFieldYearNewInvoice.setBounds(212, 88, 56, 22);
+		textFieldYearNewInvoice.setBackground(new Color(245,245,245));
+		panel_newInvoice.add(textFieldYearNewInvoice);
+		
+		JLabel lblRevenueNewInvoice = new JLabel("Importo");
+		lblRevenueNewInvoice.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
+		lblRevenueNewInvoice.setBounds(33, 129, 84, 16);
+		panel_newInvoice.add(lblRevenueNewInvoice);
+		
+		JSeparator separator_1_1_1_1 = new JSeparator();
+		separator_1_1_1_1.setForeground(Color.BLACK);
+		separator_1_1_1_1.setBounds(118, 140, 150, 12);
+		panel_newInvoice.add(separator_1_1_1_1);
+		
+		btnNewInvoice = new JButton("Aggiungi fattura");
+		btnNewInvoice.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		btnNewInvoice.setEnabled(false);
+		btnNewInvoice.setBorder(new LineBorder(new Color(23, 35, 51), 1, true));
+		btnNewInvoice.setFont(new Font("Lucida Grande", Font.BOLD, 14));
+		btnNewInvoice.setBounds(335, 53, 180, 101);
+		panel_newInvoice.add(btnNewInvoice);
+		
+		textFieldRevenueNewInvoice = new JTextField();
+		textFieldRevenueNewInvoice.setHorizontalAlignment(SwingConstants.CENTER);
+		textFieldRevenueNewInvoice.setName("textField_revenueInvoice");
+		textFieldRevenueNewInvoice.setColumns(10);
+		textFieldRevenueNewInvoice.setBorder(null);
+		textFieldRevenueNewInvoice.setBounds(118, 125, 150, 22);
+		textFieldRevenueNewInvoice.setBackground(new Color(245,245,245));
+		panel_newInvoice.add(textFieldRevenueNewInvoice);
+		
+		JLabel lblRevenueNewInvoice_1 = new JLabel("€");
+		lblRevenueNewInvoice_1.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
+		lblRevenueNewInvoice_1.setBounds(270, 129, 15, 16);
+		panel_newInvoice.add(lblRevenueNewInvoice_1);
+		
+		paneInvoiceError = new JTextPane();
+		paneInvoiceError.setText("");
+		paneInvoiceError.setForeground(new Color(255, 51, 51));
+		paneInvoiceError.setName("paneInvoiceErrorMessage");
+		paneInvoiceError.setBounds(27, 560, 514, 48);
+		panel_invoiceManagement.add(paneInvoiceError);
+		
+		JPanel panel_headBar = new JPanel();
+		panel_headBar.setBackground(new Color(23, 35, 51));
+		panel_headBar.setBounds(0, 0, 855, 53);
+		contentPane.add(panel_headBar);
 		
 		comboboxYears.addActionListener(
-					e -> {
-					if(comboboxYears.getSelectedIndex()!=-1) {
-						int yearSelected=(int) comboboxYears.getSelectedItem();
-						Client clientSelected=listClients.getSelectedValue();
-						if(clientSelected==null) {
-					    	balanceController.allInvoicesByYear(yearSelected);
-						}
-						else {
-							balanceController.allInvoicesByClientAndYear(clientSelected, yearSelected);
-						}					
-					}
-			});
-		
-		
-		btnNewInvoice.addActionListener(
 				e -> {
-					int yearOfDate=Integer.parseInt(textFieldYearNewInvoice.getText());
-					int monthOfYear=Integer.parseInt(textFieldMonthNewInvoice.getText());
-					int dayOfMonth=Integer.parseInt(textFieldDayNewInvoice.getText());
-					double revenueOfInvoice=Double.parseDouble(textFieldRevenueNewInvoice.getText());
-					try {
-						if(yearOfDate<CURRENT_YEAR-100 || yearOfDate>CURRENT_YEAR) {
-							throw new DateTimeException("Wrong year");
-						}
-						LocalDate localDate = LocalDate.of( yearOfDate, monthOfYear, dayOfMonth);
-						Date date = Date.from(localDate.atStartOfDay(ZoneId.of("Z")).toInstant());
-						Client clientOfInvoice=(Client) comboBoxClients.getSelectedItem();
-						resetInvoiceErrorLabel();
-						resetTextBoxAndComboBoxNewInvoice();
-						balanceController.newInvoice(new Invoice(clientOfInvoice,
-								date,revenueOfInvoice));
+				if(comboboxYears.getSelectedIndex()!=-1) {
+					int yearSelected=(int) comboboxYears.getSelectedItem();
+					Client clientSelected=listClients.getSelectedValue();
+					if(clientSelected==null) {
+				    	balanceController.allInvoicesByYear(yearSelected);
 					}
-					catch(DateTimeException ex) {
-						lblInvoiceError.setText("La data "+dayOfMonth+"/"+monthOfYear+"/"+yearOfDate+" non è corretta");
-						resetTextBoxDateNewInvoice();
-						btnNewInvoice.setEnabled(false);
-					}
+					else {
+						balanceController.allInvoicesByClientAndYear(clientSelected, yearSelected);
+					}					
 				}
-				);
-		
+		});
+	
+	
+	btnNewInvoice.addActionListener(
+			e -> {
+				int yearOfDate=Integer.parseInt(textFieldYearNewInvoice.getText());
+				int monthOfYear=Integer.parseInt(textFieldMonthNewInvoice.getText());
+				int dayOfMonth=Integer.parseInt(textFieldDayNewInvoice.getText());
+				double revenueOfInvoice=Double.parseDouble(textFieldRevenueNewInvoice.getText());
+				try {
+					if(yearOfDate<CURRENT_YEAR-100 || yearOfDate>CURRENT_YEAR) {
+						throw new DateTimeException("Wrong year");
+					}
+					LocalDate localDate = LocalDate.of( yearOfDate, monthOfYear, dayOfMonth);
+					Date date = Date.from(localDate.atStartOfDay(ZoneId.of("Z")).toInstant());
+					Client clientOfInvoice=(Client) comboBoxClients.getSelectedItem();
+					resetInvoiceErrorLabel();
+					resetTextBoxAndComboBoxNewInvoice();
+					balanceController.newInvoice(new Invoice(clientOfInvoice,
+							date,revenueOfInvoice));
+				}
+				catch(DateTimeException ex) {
+					paneInvoiceError.setText("La data "+dayOfMonth+"/"+monthOfYear+"/"+yearOfDate+" non è corretta");
+					resetTextBoxDateNewInvoice();
+					btnNewInvoice.setEnabled(false);
+				}
+			}
+			);
+	
 		btnShowAllInvoices.addActionListener(
 				e -> {
 					btnShowAllInvoices.setVisible(false);
@@ -487,6 +571,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 	                e.consume();
 	        }
 		});
+		
 	}
 	
 	private boolean isNumber(char ch){
@@ -587,7 +672,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 	}
 
 	public void showClientError(String message, Client client) {
-		lbClientError.setText(message+": "+client.getIdentifier());
+		paneClientError.setText(message+": "+client.getIdentifier());
 	}
 
 	@Override
@@ -610,11 +695,11 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 	}
 	
 	private void resetClientErrorLabel() {
-		lbClientError.setText("");
+		paneClientError.setText("");
 	}
 	
 	private void resetInvoiceErrorLabel() {
-		lblInvoiceError.setText("");
+		paneInvoiceError.setText("");
 	}
 	
 	private void resetTextBoxNewClient() {
@@ -702,7 +787,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 
 	@Override
 	public void showInvoiceError(String message, Invoice invoice) {
-		lblInvoiceError.setText(message+": "+invoice.toString());
+		paneInvoiceError.setText(message+": "+invoice.toString());
 	}
 
 }

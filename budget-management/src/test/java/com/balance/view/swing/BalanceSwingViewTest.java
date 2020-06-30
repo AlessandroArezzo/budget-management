@@ -6,6 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+import java.awt.Dimension;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -72,32 +73,31 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 	@Test @GUITest
 	public void testControlInitialStates() {
 		window.label(JLabelMatcher.withText("CLIENTI")); 
-		window.label(JLabelMatcher.withText("GESTIONE RICAVI")); 
-		window.label(JLabelMatcher.withText("FATTURE"));
 		window.list("clientsList");
 		window.list("invoicesList");
 		window.label("revenueLabel");
 		window.comboBox("yearsCombobox");
-		window.label("labelClientErrorMessage").requireText("");
-		window.label("labelInvoiceErrorMessage").requireText("");
-		window.button(JButtonMatcher.withText("Vedi tutte le fatture"))
+		window.textBox("paneClientErrorMessage").requireText("");
+		window.textBox("paneInvoiceErrorMessage").requireText("");
+		window.button(JButtonMatcher.withText(Pattern.compile(".*Vedi tutte.*le fatture.*")))
 			.requireNotVisible();
-		window.label(JLabelMatcher.withText("INSERISCI UN NUOVO CLIENTE"));
+		window.label(JLabelMatcher.withText("NUOVO CLIENTE"));
 		window.label(JLabelMatcher.withText("Identificativo"));
 		window.textBox("textField_clientName").requireEnabled();
 		window.button(JButtonMatcher.withText("Aggiungi cliente")).requireDisabled();
 		window.button(JButtonMatcher.withText("Rimuovi cliente")).requireDisabled();
-		window.label(JLabelMatcher.withText("INSERISCI UNA NUOVA FATTURA"));
+		window.label(JLabelMatcher.withText("NUOVA FATTURA"));
 		window.label(JLabelMatcher.withText("Cliente"));
 		window.comboBox("clientsCombobox");
 		window.label(JLabelMatcher.withText("Data"));
 		window.textBox("textField_dayOfDateInvoice").requireEnabled();
 		window.textBox("textField_monthOfDateInvoice").requireEnabled();
 		window.textBox("textField_yearOfDateInvoice").requireEnabled();
-		window.label(JLabelMatcher.withText("Importo (€)"));
+		window.label(JLabelMatcher.withText("Importo"));
+		window.label(JLabelMatcher.withText("€"));
 		window.textBox("textField_revenueInvoice").requireEnabled();
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).requireDisabled();
-		window.button(JButtonMatcher.withText("Rimuovi fattura")).requireDisabled();
+		window.button(JButtonMatcher.withText(Pattern.compile(".*Rimuovi.*fattura.*"))).requireDisabled();
 	}
 	
 	@Test @GUITest
@@ -198,7 +198,6 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.comboBox("yearsCombobox").requireSelection(Pattern.compile(""+CURRENT_YEAR));
 	}
 	
-	
 	@Test @GUITest
 	public void testSelectYearShouldDelegateToControllerFindYearsInvoices() {
 		GuiActionRunner.execute(() -> {
@@ -277,7 +276,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 	public void testShowErrorClientShouldShowTheMessageInTheClientErrorLabel() {
 		GuiActionRunner.execute(
 				() -> balanceSwingView.showClientError("error message", CLIENT_FIXTURE_1) );
-		window.label("labelClientErrorMessage").requireText("error message: " + 
+		window.textBox("paneClientErrorMessage").requireText("error message: " + 
 				CLIENT_FIXTURE_1.getIdentifier());
 	}
 	
@@ -287,7 +286,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 				.addElement(CLIENT_FIXTURE_1)); 
 		window.list("clientsList").selectItem(0); 
 		JButtonFixture deleteButton = 
-				window.button(JButtonMatcher.withText("Vedi tutte le fatture"));
+				window.button(JButtonMatcher.withText(Pattern.compile(".*Vedi tutte.*le fatture.*")));
 		deleteButton.requireVisible();
 		window.list("clientsList").clearSelection(); 
 		deleteButton.requireNotVisible();
@@ -302,10 +301,10 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		}); 
 		window.list("clientsList").selectItem(0);
 		window.comboBox("yearsCombobox").selectItem(1);
-		window.button(JButtonMatcher.withText("Vedi tutte le fatture")).click();
+		window.button(JButtonMatcher.withText(Pattern.compile(".*Vedi tutte.*le fatture.*"))).click();
 		verify(balanceController).allInvoicesByYear(YEAR_FIXTURE);
 		window.list("clientsList").requireNoSelection();
-		window.button(JButtonMatcher.withText("Vedi tutte le fatture")).requireNotVisible();
+		window.button(JButtonMatcher.withText(".*Vedi tutte.*le fatture.*")).requireNotVisible();
 	}
 	
 	@Test @GUITest
@@ -325,7 +324,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 			.contains(CLIENT_FIXTURE_1.toString());
 		assertThat(window.comboBox("clientsCombobox").contents())
 			.contains(CLIENT_FIXTURE_1.toString());
-		window.label("labelClientErrorMessage").requireText("");
+		window.textBox("paneClientErrorMessage").requireText("");
 		window.textBox(("textField_clientName")).requireText("");
 		window.button("btnAddClient").requireDisabled();
 	}
@@ -348,7 +347,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		assertThat(window.comboBox("clientsCombobox").contents())
 			.containsExactly(client1.toString(),client2.toString());
 		window.comboBox("clientsCombobox").requireSelection(Pattern.compile(client2.getIdentifier()));
-		window.label("labelClientErrorMessage").requireText("");
+		window.textBox("paneClientErrorMessage").requireText("");
 		window.textBox(("textField_clientName")).requireText("");
 		window.button("btnAddClient").requireDisabled();
 	}
@@ -414,7 +413,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 			}
 		);
 		assertThat(window.list("invoicesList").contents()).contains(invoiceToAdd.toString());
-		window.label("labelInvoiceErrorMessage").requireText("");
+		window.textBox("paneInvoiceErrorMessage").requireText("");
 	}
 	
 	@Test @GUITest
@@ -443,7 +442,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 					invoiceToAdd.toString(),
 					invoiceExistingNext.toString());
 		window.list("invoicesList").requireSelection(Pattern.compile(invoiceExistingNext.toString()));
-		window.label("labelInvoiceErrorMessage").requireText("");
+		window.textBox("paneInvoiceErrorMessage").requireText("");
 	}
 	
 	
@@ -465,7 +464,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		assertThat(window.comboBox("yearsCombobox").contents())
 			.containsExactly(""+CURRENT_YEAR,""+YEAR_FIXTURE,""+(YEAR_FIXTURE-1),""+(YEAR_FIXTURE-2));
 		window.comboBox("yearsCombobox").requireSelection(Pattern.compile(""+CURRENT_YEAR));
-		window.label("labelInvoiceErrorMessage").requireText("");
+		window.textBox("paneInvoiceErrorMessage").requireText("");
 	}
 	
 	@Test @GUITest
@@ -582,7 +581,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
 		verify(balanceController).newInvoice(new Invoice(
 				CLIENT_FIXTURE_1, DateTestsUtil.getDate(1, 5, YEAR_FIXTURE), 10.20));
-		window.label("labelInvoiceErrorMessage").requireText("");
+		window.textBox("paneInvoiceErrorMessage").requireText("");
 		window.textBox("textField_dayOfDateInvoice").requireEmpty();
 		window.textBox("textField_monthOfDateInvoice").requireEmpty();
 		window.textBox("textField_yearOfDateInvoice").requireEmpty();
@@ -608,7 +607,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.textBox("textField_dayOfDateInvoice").requireEmpty();
 		window.textBox("textField_monthOfDateInvoice").requireEmpty();
 		window.textBox("textField_yearOfDateInvoice").requireEmpty();
-		window.label("labelInvoiceErrorMessage").requireText(
+		window.textBox("paneInvoiceErrorMessage").requireText(
 				"La data 1/5/"+(CURRENT_YEAR+1)+" non è corretta");
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).requireDisabled();
 		verifyNoMoreInteractions(balanceController);
@@ -617,7 +616,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.textBox("textField_monthOfDateInvoice").enterText("5");
 		window.textBox("textField_yearOfDateInvoice").enterText(""+(CURRENT_YEAR-101));
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
-		window.label("labelInvoiceErrorMessage").requireText(
+		window.label("paneInvoiceErrorMessage").requireText(
 				"La data 1/5/"+(CURRENT_YEAR-101)+" non è corretta");
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).requireDisabled();
 		verifyNoMoreInteractions(balanceController);
@@ -640,7 +639,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.textBox("textField_dayOfDateInvoice").requireEmpty();
 		window.textBox("textField_monthOfDateInvoice").requireEmpty();
 		window.textBox("textField_yearOfDateInvoice").requireEmpty();
-		window.label("labelInvoiceErrorMessage").requireText("La data 1/13/2020 non è corretta");
+		window.textBox("paneInvoiceErrorMessage").requireText("La data 1/13/2020 non è corretta");
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).requireDisabled();
 		verifyNoMoreInteractions(balanceController);
 	}
@@ -661,7 +660,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.textBox("textField_dayOfDateInvoice").requireEmpty();
 		window.textBox("textField_monthOfDateInvoice").requireEmpty();
 		window.textBox("textField_yearOfDateInvoice").requireEmpty();
-		window.label("labelInvoiceErrorMessage").requireText("La data 31/2/2020 non è corretta");
+		window.textBox("paneInvoiceErrorMessage").requireText("La data 31/2/2020 non è corretta");
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).requireDisabled();
 		verifyNoMoreInteractions(balanceController);
 	}
@@ -926,7 +925,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 	public void testDeleteInvoiceButtonShouldBeEnabledOnlyWhenAnInvoiceIsSelected() {
 		GuiActionRunner.execute(() -> balanceSwingView.getInvoiceListModel().addElement(INVOICE_FIXTURE_1)); 
 		window.list("invoicesList").selectItem(0); 
-		JButtonFixture deleteButton = window.button(JButtonMatcher.withText("Rimuovi fattura"));
+		JButtonFixture deleteButton = window.button(JButtonMatcher.withText(Pattern.compile(".*Rimuovi.*fattura.*")));
 		deleteButton.requireEnabled();
 		window.list("invoicesList").clearSelection(); 
 		deleteButton.requireDisabled(); 
@@ -941,7 +940,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 			}
 		);
 		window.list("invoicesList").selectItem(0);
-		window.button(JButtonMatcher.withText("Rimuovi fattura")).click();
+		window.button(JButtonMatcher.withText(Pattern.compile(".*Rimuovi.*fattura.*"))).click();
 		verify(balanceController).deleteInvoice(new Invoice(INVOICE_FIXTURE_1.getClient(),
 				INVOICE_FIXTURE_1.getDate(), INVOICE_FIXTURE_1.getRevenue()));
 	}
@@ -985,7 +984,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 	public void testShowErrorInvoiceShouldShowTheMessageInTheInvoiceErrorLabel() {
 		GuiActionRunner.execute(
 				() -> balanceSwingView.showInvoiceError("error message", INVOICE_FIXTURE_1) );
-		window.label("labelInvoiceErrorMessage").requireText("error message: " + 
+		window.textBox("paneInvoiceErrorMessage").requireText("error message: " + 
 				INVOICE_FIXTURE_1.toString());
 	}
 	

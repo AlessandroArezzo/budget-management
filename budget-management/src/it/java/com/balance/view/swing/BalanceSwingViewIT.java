@@ -192,7 +192,7 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		window.comboBox("yearsCombobox")
 			.selectItem(Pattern.compile(""+YEAR_FIXTURE)); 
 		window.list("clientsList").selectItem(Pattern.compile(CLIENT_IDENTIFIER_1));
-		window.label("labelClientErrorMessage").requireText(""
+		window.textBox("paneClientErrorMessage").requireText(""
 				+ "Cliente non più presente nel database: " + 
 				client1.getIdentifier());
 		assertThat(window.list("clientsList").contents()).doesNotContain(client1.toString());
@@ -218,7 +218,7 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		window.comboBox("yearsCombobox")
 			.selectItem(Pattern.compile(""+YEAR_FIXTURE));
 		window.list("clientsList").selectItem(Pattern.compile(CLIENT_IDENTIFIER_1));
-		window.button(JButtonMatcher.withText("Vedi tutte le fatture")).click();
+		window.button(JButtonMatcher.withText(".*Vedi tutte.*le fatture.*")).click();
 		assertThat(window.list("invoicesList").contents())
 			.containsExactly(invoice1.toString(),invoice2.toString());
 		window.label("revenueLabel").requireText(
@@ -284,7 +284,7 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
 					INVOICE_REVENUE_2)+"€");
-		window.label("labelClientErrorMessage").requireText(""
+		window.textBox("paneClientErrorMessage").requireText(""
 				+ "Cliente non più presente nel database: " + 
 				client1.getIdentifier());
 	}
@@ -413,7 +413,7 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		window.textBox("textField_revenueInvoice").enterText("10.20");
 		clientRepository.delete(client1.getId());
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
-		window.label("labelClientErrorMessage").requireText(""
+		window.textBox("paneClientErrorMessage").requireText(""
 				+ "Cliente non più presente nel database: " + 
 				client1.getIdentifier());
 		assertThat(window.list("invoicesList").contents())
@@ -439,7 +439,7 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		window.comboBox("yearsCombobox")
 			.selectItem(Pattern.compile(""+YEAR_FIXTURE));
 		window.list("invoicesList").selectItem(Pattern.compile(invoice1.toString()));
-		window.button(JButtonMatcher.withText("Rimuovi fattura")).click();
+		window.button(JButtonMatcher.withText(".*Rimuovi.*fattura.*")).click();
 		assertThat(window.list("invoicesList").contents())
 			.noneMatch(e -> e.contains(invoice1.toString()));
 		window.label("revenueLabel").requireText(
@@ -460,8 +460,8 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 			.selectItem(Pattern.compile(""+YEAR_FIXTURE));
 		window.list("invoicesList").selectItem(Pattern.compile(invoiceToDeleted.toString()));
 		invoiceRepository.delete(invoiceToDeleted.getId());
-		window.button(JButtonMatcher.withText("Rimuovi fattura")).click();
-		window.label("labelInvoiceErrorMessage").requireText("Fattura non più presente nel database: "
+		window.button(JButtonMatcher.withText(".*Rimuovi.*fattura.*")).click();
+		window.textBox("paneInvoiceErrorMessage").requireText("Fattura non più presente nel database: "
 				+invoiceToDeleted.toString());
 		assertThat(window.list("invoicesList").contents())
 			.noneMatch(e -> e.contains(invoiceToDeleted.toString()));
@@ -483,8 +483,8 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 			.selectItem(Pattern.compile(""+YEAR_FIXTURE));
 		window.list("invoicesList").selectItem(Pattern.compile(invoiceClientToDeleted.toString()));
 		clientRepository.delete(clientToDeleted.getId());
-		window.button(JButtonMatcher.withText("Rimuovi fattura")).click();
-		window.label("labelClientErrorMessage").requireText("Cliente non più presente nel database: "
+		window.button(JButtonMatcher.withText(".*Rimuovi.*fattura.*")).click();
+		window.textBox("paneClientErrorMessage").requireText("Cliente non più presente nel database: "
 				+clientToDeleted.toString());
 		assertThat(window.list("clientsList").contents())
 			.noneMatch( e -> e.contains(clientToDeleted.toString()));
