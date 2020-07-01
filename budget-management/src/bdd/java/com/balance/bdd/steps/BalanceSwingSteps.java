@@ -201,7 +201,7 @@ public class BalanceSwingSteps {
 		window.textBox("textField_dayOfDateInvoice").enterText("4");
 		window.textBox("textField_monthOfDateInvoice").enterText("5");
 		window.textBox("textField_yearOfDateInvoice").enterText(""+YEAR_FIXTURE);
-		window.textBox("textField_revenueInvoice").enterText("100.25");
+		window.textBox("textField_revenueInvoice").enterText("100,25");
 	}
 
 	@Then("The invoice list contains the new invoice")
@@ -226,14 +226,14 @@ public class BalanceSwingSteps {
 		window.textBox("textField_dayOfDateInvoice").enterText("4");
 		window.textBox("textField_monthOfDateInvoice").enterText("5");
 		window.textBox("textField_yearOfDateInvoice").enterText(""+(YEAR_FIXTURE-1));
-		window.textBox("textField_revenueInvoice").enterText("100.25");
+		window.textBox("textField_revenueInvoice").enterText("100,25");
 	}
 
 	@Then("The invoice list not contains the new invoice")
 	public void the_invoice_list_not_contains_the_new_invoice() {
 		String[][] tableContents = window.table("invoicesTable").contents(); 
 		assertThat(tableContents).doesNotContain(new String[] {CLIENT_FIXTURE_2_IDENTIFIER,
-				getShortFormatDate(DateTestsUtil.getDate(4, 5, YEAR_FIXTURE-1)),"100.25"});
+				getShortFormatDate(DateTestsUtil.getDate(4, 5, YEAR_FIXTURE-1)),getRevenueString(100.25)});
 	}
 
 	@Given("The user selects an invoice of the selected year from the invoice list")
