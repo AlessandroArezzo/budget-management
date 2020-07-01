@@ -52,7 +52,8 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 
 	private static final long serialVersionUID = 1L;
 	private static final int CURRENT_YEAR=Calendar.getInstance().get(Calendar.YEAR);
-
+	private static final String fontText="Lucida Grande";
+	
 	private transient BalanceController balanceController;
 	
 	private JPanel contentPane;
@@ -117,7 +118,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		panel_clientTitle.setLayout(null);
 		
 		JLabel lblClientsTitle = new JLabel("CLIENTI");
-		lblClientsTitle.setFont(new Font("Lucida Grande", Font.BOLD, 17));
+		lblClientsTitle.setFont(new Font(fontText, Font.BOLD, 17));
 		lblClientsTitle.setHorizontalAlignment(SwingConstants.CENTER);
 		lblClientsTitle.setBounds(0, 0, 304, 58);
 		lblClientsTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -130,7 +131,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		panel_clientManagement.add(scrollPaneClientsList);
 		clientListModel=new DefaultListModel<>();
 		listClients = new JList<>(clientListModel);
-		listClients.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
+		listClients.setFont(new Font(fontText, Font.PLAIN, 14));
 		listClients.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		listClients.setBorder(null);
 		listClients.setName("clientsList");
@@ -144,6 +145,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
             @Override
             public Component getListCellRendererComponent(JList list, Object value, int index,
                       boolean isSelected, boolean cellHasFocus) {
+            	super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                  setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
                  if (index % 2 == 0) setBackground(new Color(203, 214, 231));
                  if(isSelected) {
@@ -174,7 +176,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		btnRemoveClient.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btnRemoveClient.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		btnRemoveClient.setEnabled(false);
-		btnRemoveClient.setFont(new Font("Arial", Font.BOLD, 14));
+		btnRemoveClient.setFont(new Font(fontText, Font.BOLD, 14));
 		btnRemoveClient.setForeground(Color.WHITE);
 		btnRemoveClient.setBounds(10, 369, 288, 29);
 		panel_clientManagement.add(btnRemoveClient);
@@ -199,7 +201,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		lblNewClient = new JLabel("NUOVO CLIENTE");
 		lblNewClient.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewClient.setBounds(6, 18, 292, 17);
-		lblNewClient.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
+		lblNewClient.setFont(new Font(fontText, Font.PLAIN, 14));
 		lblNewClient.setForeground(Color.WHITE);
 		panel_newClient.add(lblNewClient);
 		
@@ -209,7 +211,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		panel_newClient.add(separator);
 		
 		textFieldNewClient = new JTextField();
-		textFieldNewClient.setFont(new Font("Lucida Grande", Font.BOLD, 13));
+		textFieldNewClient.setFont(new Font(fontText, Font.BOLD, 13));
 		textFieldNewClient.setHorizontalAlignment(SwingConstants.CENTER);
 		textFieldNewClient.setForeground(Color.WHITE);
 		textFieldNewClient.setName("textField_clientName");
@@ -222,7 +224,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		
 		lblClientName = new JLabel("Identificativo");
 		lblClientName.setHorizontalAlignment(SwingConstants.CENTER);
-		lblClientName.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
+		lblClientName.setFont(new Font(fontText, Font.PLAIN, 14));
 		lblClientName.setForeground(Color.WHITE);
 		lblClientName.setBounds(6, 58, 115, 22);
 		panel_newClient.add(lblClientName);
@@ -232,7 +234,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		btnNewClient.setEnabled(false);
 		btnNewClient.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		btnNewClient.setForeground(Color.WHITE);
-		btnNewClient.setFont(new Font("Arial", Font.BOLD, 14));
+		btnNewClient.setFont(new Font(fontText, Font.BOLD, 14));
 		btnNewClient.setBounds(12, 98, 286, 29);
 		btnNewClient.setName("btnAddClient");
 		panel_newClient.add(btnNewClient);
@@ -260,7 +262,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		panel_revenueLabel.setLayout(null);
 		
 		lblRevenue = new JLabel("");
-		lblRevenue.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
+		lblRevenue.setFont(new Font(fontText, Font.PLAIN, 14));
 		lblRevenue.setForeground(new Color(89, 89, 89));
 		lblRevenue.setHorizontalAlignment(SwingConstants.CENTER);
 		lblRevenue.setBounds(2, 0, 549, 88);
@@ -277,13 +279,13 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 	    comboboxYears = new JComboBox<>(comboboxYearsModel);
 		comboboxYears.setBounds(302, 0, 101, 27);
 		panel_invoiceViewAndAdd.add(comboboxYears);
-		comboboxYears.setFont(new Font("Lucida Grande", Font.BOLD, 16));
+		comboboxYears.setFont(new Font(fontText, Font.BOLD, 16));
 		comboboxYears.setName("yearsCombobox");
 		comboboxYears.setBorder(null);
 		comboboxYears.setBackground(new Color(245,245,245));
 		
 		JScrollPane scrollPaneInvoicesList = new JScrollPane();
-		scrollPaneInvoicesList.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
+		scrollPaneInvoicesList.setFont(new Font(fontText, Font.PLAIN, 14));
 		scrollPaneInvoicesList.setBackground(new Color(255, 255, 255));
 		scrollPaneInvoicesList.setBorder(new EmptyBorder(0, 0, 0, 0));
 		scrollPaneInvoicesList.setBounds(0, 31, 403, 234);
@@ -319,7 +321,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		btnRemoveInvoice.setBounds(401, 146, 114, 121);
 		panel_invoiceViewAndAdd.add(btnRemoveInvoice);
 		btnRemoveInvoice.setEnabled(false);
-		btnRemoveInvoice.setFont(new Font("Lucida Grande", Font.BOLD, 14));
+		btnRemoveInvoice.setFont(new Font(fontText, Font.BOLD, 14));
 		btnRemoveInvoice.addActionListener(
 				e -> balanceController.deleteInvoice(invoiceTableModel.getInvoiceAt(tableInvoices.getSelectedRow()))
 			);
@@ -330,7 +332,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		btnShowAllInvoices.setHorizontalTextPosition(SwingConstants.CENTER);
 		btnShowAllInvoices.setBounds(401, 23, 114, 121);
 		panel_invoiceViewAndAdd.add(btnShowAllInvoices);
-		btnShowAllInvoices.setFont(new Font("Lucida Grande", Font.BOLD, 14));
+		btnShowAllInvoices.setFont(new Font(fontText, Font.BOLD, 14));
 		
 		JPanel panel_newInvoice = new JPanel();
 		panel_newInvoice.setBounds(0, 264, 515, 154);
@@ -341,12 +343,12 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		
 		JLabel lblNewInvoice = new JLabel("NUOVA FATTURA");
 		lblNewInvoice.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewInvoice.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
+		lblNewInvoice.setFont(new Font(fontText, Font.PLAIN, 14));
 		lblNewInvoice.setBounds(6, 6, 503, 22);
 		panel_newInvoice.add(lblNewInvoice);
 		
 		JLabel lblClientNewInvoice = new JLabel("Cliente");
-		lblClientNewInvoice.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
+		lblClientNewInvoice.setFont(new Font(fontText, Font.PLAIN, 14));
 		lblClientNewInvoice.setBounds(33, 47, 84, 16);
 		panel_newInvoice.add(lblClientNewInvoice);
 		
@@ -357,7 +359,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		panel_newInvoice.add(comboBoxClients);
 		
 		JLabel lblDateNewInvoice = new JLabel("Data");
-		lblDateNewInvoice.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
+		lblDateNewInvoice.setFont(new Font(fontText, Font.PLAIN, 14));
 		lblDateNewInvoice.setBounds(33, 91, 84, 16);
 		panel_newInvoice.add(lblDateNewInvoice);
 		
@@ -367,7 +369,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		panel_newInvoice.add(separator_1);
 		
 		JLabel lblSlashDate1NewInvoice = new JLabel("/");
-		lblSlashDate1NewInvoice.setFont(new Font("Lucida Grande", Font.PLAIN, 16));
+		lblSlashDate1NewInvoice.setFont(new Font(fontText, Font.PLAIN, 16));
 		lblSlashDate1NewInvoice.setBounds(159, 93, 8, 16);
 		panel_newInvoice.add(lblSlashDate1NewInvoice);
 		
@@ -377,7 +379,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		panel_newInvoice.add(separator_1_1);
 		
 		JLabel lblSlashDate2NewInvoice = new JLabel("/");
-		lblSlashDate2NewInvoice.setFont(new Font("Lucida Grande", Font.PLAIN, 16));
+		lblSlashDate2NewInvoice.setFont(new Font(fontText, Font.PLAIN, 16));
 		lblSlashDate2NewInvoice.setBounds(201, 93, 8, 16);
 		panel_newInvoice.add(lblSlashDate2NewInvoice);
 		
@@ -414,7 +416,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		panel_newInvoice.add(textFieldYearNewInvoice);
 		
 		JLabel lblRevenueNewInvoice = new JLabel("Importo");
-		lblRevenueNewInvoice.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
+		lblRevenueNewInvoice.setFont(new Font(fontText, Font.PLAIN, 14));
 		lblRevenueNewInvoice.setBounds(33, 129, 84, 16);
 		panel_newInvoice.add(lblRevenueNewInvoice);
 		
@@ -427,7 +429,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		btnNewInvoice.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btnNewInvoice.setEnabled(false);
 		btnNewInvoice.setBorder(new LineBorder(new Color(23, 35, 51), 1, true));
-		btnNewInvoice.setFont(new Font("Lucida Grande", Font.BOLD, 14));
+		btnNewInvoice.setFont(new Font(fontText, Font.BOLD, 14));
 		btnNewInvoice.setBounds(335, 53, 180, 101);
 		panel_newInvoice.add(btnNewInvoice);
 		
@@ -441,7 +443,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		panel_newInvoice.add(textFieldRevenueNewInvoice);
 		
 		JLabel lblRevenueNewInvoice_1 = new JLabel("€");
-		lblRevenueNewInvoice_1.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
+		lblRevenueNewInvoice_1.setFont(new Font(fontText, Font.PLAIN, 14));
 		lblRevenueNewInvoice_1.setBounds(270, 129, 15, 16);
 		panel_newInvoice.add(lblRevenueNewInvoice_1);
 		

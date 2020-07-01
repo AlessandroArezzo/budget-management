@@ -144,9 +144,9 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		);
 		String[][] tableContents = window.table("invoicesTable").contents(); 
 		assertThat(tableContents[0]).containsExactly(INVOICE_FIXTURE_1.getClient().getIdentifier(),
-				INVOICE_FIXTURE_1.getDateInString(),""+INVOICE_FIXTURE_1.getRevenue());
+				INVOICE_FIXTURE_1.getDateInString(),INVOICE_FIXTURE_1.getRevenueInString());
 		assertThat(tableContents[1]).containsExactly(INVOICE_FIXTURE_2.getClient().getIdentifier(),
-				INVOICE_FIXTURE_2.getDateInString(),""+INVOICE_FIXTURE_2.getRevenue());
+				INVOICE_FIXTURE_2.getDateInString(),INVOICE_FIXTURE_2.getRevenueInString());
 	}
 	
 	@Test @GUITest
@@ -161,7 +161,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		);
 		String[][] tableContents = window.table("invoicesTable").contents(); 
 		assertThat(tableContents[0]).containsExactly(INVOICE_FIXTURE_2.getClient().getIdentifier(),
-				INVOICE_FIXTURE_2.getDateInString(),""+INVOICE_FIXTURE_2.getRevenue());
+				INVOICE_FIXTURE_2.getDateInString(),INVOICE_FIXTURE_2.getRevenueInString());
 	}
 	
 	@Test @GUITest
@@ -179,9 +179,9 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		);
 		String[][] tableContents = window.table("invoicesTable").contents(); 
 		assertThat(tableContents[0]).containsExactly(invoicePrevious.getClient().getIdentifier(),
-				invoicePrevious.getDateInString(),""+invoicePrevious.getRevenue());
+				invoicePrevious.getDateInString(),invoicePrevious.getRevenueInString());
 		assertThat(tableContents[1]).containsExactly(invoiceNext.getClient().getIdentifier(),
-				invoiceNext.getDateInString(),""+invoiceNext.getRevenue());
+				invoiceNext.getDateInString(),invoiceNext.getRevenueInString());
 	}
 	
 	
@@ -424,7 +424,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		);
 		String[][] tableContents = window.table("invoicesTable").contents(); 
 		assertThat(tableContents[0]).containsExactly(invoiceToAdd.getClient().getIdentifier(),
-				invoiceToAdd.getDateInString(),""+invoiceToAdd.getRevenue());
+				invoiceToAdd.getDateInString(),invoiceToAdd.getRevenueInString());
 		window.textBox("paneInvoiceErrorMessage").requireText("");
 	}
 	
@@ -451,11 +451,11 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		GuiActionRunner.execute(() -> balanceSwingView.invoiceAdded(invoiceToAdd));
 		String[][] tableContents = window.table("invoicesTable").contents();
 		assertThat(tableContents[0]).containsExactly(invoiceExistingPrevious.getClient().getIdentifier(),
-				invoiceExistingPrevious.getDateInString(),""+invoiceExistingPrevious.getRevenue());
+				invoiceExistingPrevious.getDateInString(),invoiceExistingPrevious.getRevenueInString());
 		assertThat(tableContents[1]).containsExactly(invoiceToAdd.getClient().getIdentifier(),
-				invoiceToAdd.getDateInString(),""+invoiceToAdd.getRevenue());
+				invoiceToAdd.getDateInString(),invoiceToAdd.getRevenueInString());
 		assertThat(tableContents[2]).containsExactly(invoiceExistingNext.getClient().getIdentifier(),
-				invoiceExistingNext.getDateInString(),""+invoiceExistingNext.getRevenue());
+				invoiceExistingNext.getDateInString(),invoiceExistingNext.getRevenueInString());
 		window.table("invoicesTable").requireSelectedRows(2);
 		window.textBox("paneInvoiceErrorMessage").requireText("");
 	}
@@ -476,7 +476,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		);
 		assertThat(window.table("invoicesTable").contents())
 			.doesNotContain(new String[] {invoiceToAdd.getClient().getIdentifier(),
-					invoiceToAdd.getDateInString(),""+invoiceToAdd.getRevenue()});
+					invoiceToAdd.getDateInString(),invoiceToAdd.getRevenueInString()});
 		assertThat(window.comboBox("yearsCombobox").contents())
 			.containsExactly(""+CURRENT_YEAR,""+YEAR_FIXTURE,""+(YEAR_FIXTURE-1),""+(YEAR_FIXTURE-2));
 		window.comboBox("yearsCombobox").requireSelection(Pattern.compile(""+CURRENT_YEAR));
@@ -891,7 +891,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		);
 		assertThat(window.table("invoicesTable").contents())
 			.containsOnly(new String[] {INVOICE_FIXTURE_2.getClient().getIdentifier(),INVOICE_FIXTURE_2.getDateInString(),
-					""+INVOICE_FIXTURE_2.getRevenue()});
+					INVOICE_FIXTURE_2.getRevenueInString()});
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale del "+CURRENT_YEAR+" è di "
 						+String.format("%.2f", INVOICE_FIXTURE_2.getRevenue())+"€");
@@ -978,7 +978,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		);
 		assertThat(window.table("invoicesTable").contents())
 			.containsOnly(new String[] {INVOICE_FIXTURE_2.getClient().getIdentifier(),
-					INVOICE_FIXTURE_2.getDateInString(),""+INVOICE_FIXTURE_2.getRevenue()});
+					INVOICE_FIXTURE_2.getDateInString(),INVOICE_FIXTURE_2.getRevenueInString()});
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale del "+CURRENT_YEAR+" è di "
 						+String.format("%.2f", INVOICE_FIXTURE_2.getRevenue())+"€");

@@ -23,10 +23,7 @@ public class InvoiceTableModel extends AbstractTableModel {
     
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-        if (getRowCount() > 0 && getValueAt(0, columnIndex) != null) {
-            return getValueAt(0, columnIndex).getClass();
-        }
-        return super.getColumnClass(columnIndex);
+        return getValueAt(0, columnIndex).getClass();
     }
 
     @Override
@@ -59,7 +56,7 @@ public class InvoiceTableModel extends AbstractTableModel {
                 value = invoice.getDateInString();
                 break;
             case 2:
-                value = ""+invoice.getRevenue();
+                value = invoice.getRevenueInString();
                 break;
         }
 
@@ -86,11 +83,6 @@ public class InvoiceTableModel extends AbstractTableModel {
     
     public int getRowInvoice(Invoice invoice) {
     	return invoices.indexOf(invoice);
-    }
-    
-    public void remove(int row) {
-    	invoices.remove(row);
-    	fireTableDataChanged();
     }
     
     public void removeElement(Invoice invoiceToRemove) {
