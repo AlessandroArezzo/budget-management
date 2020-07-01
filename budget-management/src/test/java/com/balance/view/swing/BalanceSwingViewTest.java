@@ -64,7 +64,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		GuiActionRunner.execute(() -> {
 			balanceSwingView = new BalanceSwingView();
 			balanceSwingView.setBalanceController(balanceController);
-			return balanceSwingView; 
+			return balanceSwingView;
 		});
 		window = new FrameFixture(robot(), balanceSwingView);
 		window.show();
@@ -547,6 +547,18 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.textBox("textField_monthOfDateInvoice").enterText("5");
 		window.textBox("textField_yearOfDateInvoice").enterText("2020");
 		window.textBox("textField_revenueInvoice").enterText("10,20");
+		window.button(JButtonMatcher.withText("Aggiungi fattura")).requireEnabled();
+		
+		window.comboBox("clientsCombobox").clearSelection();
+		window.textBox("textField_dayOfDateInvoice").enterText("");
+		window.textBox("textField_monthOfDateInvoice").enterText("");
+		window.textBox("textField_yearOfDateInvoice").enterText("");
+		window.textBox("textField_revenueInvoice").enterText("");
+		window.textBox("textField_dayOfDateInvoice").enterText("1");
+		window.textBox("textField_monthOfDateInvoice").enterText("5");
+		window.textBox("textField_yearOfDateInvoice").enterText("2020");
+		window.textBox("textField_revenueInvoice").enterText("10,20");
+		window.comboBox("clientsCombobox").selectItem(0);
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).requireEnabled();
 	}
 	

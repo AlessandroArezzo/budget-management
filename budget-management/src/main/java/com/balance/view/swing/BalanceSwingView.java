@@ -26,6 +26,9 @@ import com.balance.model.Invoice;
 import com.balance.view.BalanceView;
 
 import javax.swing.JLabel;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.time.DateTimeException;
@@ -478,8 +481,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 			e -> {
 				int yearOfDate=Integer.parseInt(textFieldYearNewInvoice.getText());
 				int monthOfYear=Integer.parseInt(textFieldMonthNewInvoice.getText());
-				int dayOfMonth=Integer.parseInt(textFieldDayNewInvoice.getText());
-				
+				int dayOfMonth=Integer.parseInt(textFieldDayNewInvoice.getText());	
 				double revenueOfInvoice=Double.parseDouble(textFieldRevenueNewInvoice.getText().replace(",", "."));
 				try {
 					if(yearOfDate<CURRENT_YEAR-100 || yearOfDate>CURRENT_YEAR) {
@@ -519,13 +521,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		KeyAdapter btnAddInvoiceEnabler= new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				btnNewInvoice.setEnabled(
-						!textFieldDayNewInvoice.getText().trim().isEmpty() &&
-						!textFieldMonthNewInvoice.getText().trim().isEmpty() &&
-						!textFieldYearNewInvoice.getText().trim().isEmpty() &&
-						!textFieldRevenueNewInvoice.getText().trim().isEmpty() &&
-						comboBoxClients.getSelectedIndex()!=-1
-				); 
+				enableNewInvoiceButton();
 			}
 		};
 		
@@ -534,7 +530,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		textFieldMonthNewInvoice.addKeyListener(btnAddInvoiceEnabler);
 		textFieldYearNewInvoice.addKeyListener(btnAddInvoiceEnabler);
 		textFieldRevenueNewInvoice.addKeyListener(btnAddInvoiceEnabler);
-		comboBoxClients.addKeyListener(btnAddInvoiceEnabler);
+		comboBoxClients.addActionListener (e-> enableNewInvoiceButton() );
 		textFieldDayNewInvoice.addKeyListener(  new KeyAdapter() {
 				@Override
 		        public void keyTyped(KeyEvent e) {
@@ -592,6 +588,15 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		return partsOfText[1].length();
 	}
 	
+	private void enableNewInvoiceButton() {
+		btnNewInvoice.setEnabled(
+				!textFieldDayNewInvoice.getText().trim().isEmpty() &&
+				!textFieldMonthNewInvoice.getText().trim().isEmpty() &&
+				!textFieldYearNewInvoice.getText().trim().isEmpty() &&
+				!textFieldRevenueNewInvoice.getText().trim().isEmpty() &&
+				comboBoxClients.getSelectedIndex()!=-1
+		); 
+	}
 	@Override
 	public void showClients(List<Client> clients) {
 		clientListModel.removeAllElements();
