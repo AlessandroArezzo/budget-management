@@ -11,12 +11,16 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.SoftBevelBorder;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 
 import com.balance.controller.BalanceController;
 import com.balance.model.Client;
@@ -60,8 +64,8 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 	private JPanel contentPane;
 	private JList<Client> listClients;
 	private DefaultListModel<Client> clientListModel;
-	private JList<Invoice> listInvoices;
-	private DefaultListModel<Invoice> invoiceListModel;
+	private JTable tableInvoices;
+	private InvoiceTableModel invoiceTableModel;
 	private JComboBox<Integer> comboboxYears;
 	private DefaultComboBoxModel<Integer> comboboxYearsModel;
 	private JLabel lblRevenue;
@@ -286,38 +290,35 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		comboboxYears.setBackground(new Color(245,245,245));
 		
 		JScrollPane scrollPaneInvoicesList = new JScrollPane();
+		scrollPaneInvoicesList.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
 		scrollPaneInvoicesList.setBackground(new Color(255, 255, 255));
-		scrollPaneInvoicesList.setBorder(null);
-		scrollPaneInvoicesList.setBounds(0, 23, 403, 242);
+		scrollPaneInvoicesList.setBorder(new EmptyBorder(0, 0, 0, 0));
+		scrollPaneInvoicesList.setBounds(0, 31, 403, 234);
 		panel_invoiceViewAndAdd.add(scrollPaneInvoicesList);
 		
-		invoiceListModel=new DefaultListModel<Invoice>();
-		listInvoices = new JList<>(invoiceListModel);
-		listInvoices.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
-		listInvoices.setName("invoicesList");
-		listInvoices.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		listInvoices.setFixedCellHeight(20);
-		scrollPaneInvoicesList.setViewportView(listInvoices);
-		listInvoices.addListSelectionListener(e -> 
-			btnRemoveInvoice.setEnabled(listInvoices.getSelectedIndex() != -1));
-		
-		listInvoices.setCellRenderer(new DefaultListCellRenderer() {
-
-            @Override
-            public Component getListCellRendererComponent(JList list, Object value, int index,
-                      boolean isSelected, boolean cellHasFocus) {
-                 Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                 setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-                 if (index % 2 == 0) setBackground(new Color(247, 247, 247));
-                 if(isSelected) {
-                	 setForeground(Color.white);
-                	 setBackground(Color.BLACK);
-                 }
-                 return this;
+		invoiceTableModel=new InvoiceTableModel();
+		tableInvoices = new JTable(invoiceTableModel) {
+			private static final long serialVersionUID = 1L;
+			@Override
+            public Component prepareRenderer(
+                    TableCellRenderer renderer, int row, int column) {
+                Component c = super.prepareRenderer(renderer, row, column);
+                if (isRowSelected(row)) {
+                    c.setBackground(Color.black);
+                } else {
+                	c.setBackground(row%2==0 ? Color.white : new Color(247, 247, 247));
+                }
+                return c;
             }
+		};
+		tableInvoices.setBorder(new EmptyBorder(0, 0, 0, 0));
+		tableInvoices.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tableInvoices.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
+		tableInvoices.setName("invoicesTable");
+		scrollPaneInvoicesList.setViewportView(tableInvoices);
+		tableInvoices.getSelectionModel().addListSelectionListener(e -> 
+			btnRemoveInvoice.setEnabled(tableInvoices.getSelectedRow() != -1));
 
-       });
-		
 		btnRemoveInvoice = new JButton();
 		btnRemoveInvoice.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btnRemoveInvoice.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -327,7 +328,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		btnRemoveInvoice.setEnabled(false);
 		btnRemoveInvoice.setFont(new Font("Lucida Grande", Font.BOLD, 14));
 		btnRemoveInvoice.addActionListener(
-				e -> balanceController.deleteInvoice(listInvoices.getSelectedValue())
+				e -> balanceController.deleteInvoice(invoiceTableModel.getInvoiceAt(tableInvoices.getSelectedRow()))
 			);
 		
 		btnShowAllInvoices = new JButton("<html><center>Vedi tutte<br>le fatture</center></html>");
@@ -599,9 +600,8 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 			balanceController.yearsOfTheInvoices();
 		}
 		else {
-			invoiceListModel.removeAllElements();
-			Collections.sort(invoices);
-			invoices.stream().forEach(invoiceListModel::addElement);
+			invoiceTableModel.removeAllElements();
+			invoiceTableModel.addElements(invoices);
 			this.setLabelTotalRevenue();
 		}
 	}
@@ -624,8 +624,8 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		return comboboxYearsModel;
 	}
 	
-	public DefaultListModel<Invoice> getInvoiceListModel() {
-		return invoiceListModel;
+	public InvoiceTableModel getInvoiceTableModel() {
+		return invoiceTableModel;
 	}
 	
 	public DefaultListModel<Client> getClientListModel() {
@@ -639,7 +639,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 	private void setLabelTotalRevenue() {
 		int yearSelected=(int) comboboxYears.getSelectedItem();
 		Client clientSelected=listClients.getSelectedValue();
-		int numberOfInvoices=invoiceListModel.getSize();
+		int numberOfInvoices=invoiceTableModel.getRowCount();
 		if(numberOfInvoices==0 && clientSelected==null) {
 			lblRevenue.setText("Non sono presenti fatture per il "+yearSelected);
 		}
@@ -649,7 +649,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		else {
 			double totalRevenue=0;
 			for(int i=0;i<numberOfInvoices;i++) {
-				totalRevenue+=invoiceListModel.getElementAt(i).getRevenue();
+				totalRevenue+=invoiceTableModel.getInvoiceAt(i).getRevenue();
 			}
 			if (clientSelected==null) {
 				lblRevenue.setText("Il ricavo totale del "+yearSelected+" è di "+String.format("%.2f", totalRevenue)+"€");
@@ -727,14 +727,11 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		calendar.setTime(invoiceToAdd.getDate());
 		int yearOfInvoice=calendar.get(Calendar.YEAR);
 		if(yearOfInvoice==yearSelected) {			
-			Invoice invoiceSelectedList=listInvoices.getSelectedValue();
-			List<Invoice> invoices=new ArrayList<>();
-			for(int index=0;index<invoiceListModel.getSize();index++)
-				invoices.add(invoiceListModel.getElementAt(index));
-			invoices.add(invoiceToAdd);
-			showInvoices(invoices);
-			if(invoiceSelectedList!=null) {
-				listInvoices.setSelectedValue(invoiceSelectedList, true);
+			Invoice invoiceSelectedInTable=invoiceTableModel.getInvoiceAt(tableInvoices.getSelectedRow());
+			invoiceTableModel.addElement(invoiceToAdd);
+			if(invoiceSelectedInTable!=null) {
+				int indexToSelected=invoiceTableModel.getRowInvoice(invoiceSelectedInTable);
+				tableInvoices.setRowSelectionInterval(indexToSelected,indexToSelected);
 			}
 			setLabelTotalRevenue();
 		}
@@ -759,14 +756,8 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 
 	@Override
 	public void removeInvoicesOfClient(Client client) {
-		int counter=0;
-		while(counter<invoiceListModel.getSize()) {
-			if(invoiceListModel.getElementAt(counter).getClient().equals(client)) 
-				invoiceListModel.remove(counter);
-			else 
-				counter++;
-		}
-		if(invoiceListModel.getSize()==0 && listClients.getSelectedValue()==null) {
+		invoiceTableModel.removeInvoicesOfAClient(client);
+		if(invoiceTableModel.getRowCount()==0 && listClients.getSelectedValue()==null) {
 			balanceController.yearsOfTheInvoices();
 		}
 		else if (listClients.getSelectedValue()==null){
@@ -776,8 +767,8 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 
 	@Override
 	public void invoiceRemoved(Invoice invoiceToRemove) {
-		invoiceListModel.removeElement(invoiceToRemove);
-		if(invoiceListModel.getSize()==0) {
+		invoiceTableModel.removeElement(invoiceToRemove);
+		if(invoiceTableModel.getRowCount()==0) {
 			balanceController.yearsOfTheInvoices();
 		}
 		else{

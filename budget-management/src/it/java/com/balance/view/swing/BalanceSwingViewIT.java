@@ -118,8 +118,11 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 				balanceController.allInvoicesByYear(YEAR_FIXTURE);
 			}	
 		);
-		assertThat(window.list("invoicesList").contents())
-			.containsExactly(invoice1.toString(),invoice2.toString());
+		String[][] tableContents = window.table("invoicesTable").contents(); 
+		assertThat(tableContents[0]).containsExactly(invoice1.getClient().getIdentifier(),
+				invoice1.getDateInString(),""+invoice1.getRevenue());
+		assertThat(tableContents[1]).containsExactly(invoice2.getClient().getIdentifier(),
+				invoice2.getDateInString(),""+invoice2.getRevenue());
 	}
 	
 	@Test @GUITest
@@ -140,9 +143,11 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		);	
 		window.comboBox("yearsCombobox")
 			.selectItem(Pattern.compile(""+YEAR_FIXTURE)); 
-
-		assertThat(window.list("invoicesList").contents())
-			.containsExactly(invoice1.toString(),invoice2.toString());
+		String[][] tableContents = window.table("invoicesTable").contents(); 
+		assertThat(tableContents[0]).containsExactly(invoice1.getClient().getIdentifier(),
+				invoice1.getDateInString(),""+invoice1.getRevenue());
+		assertThat(tableContents[1]).containsExactly(invoice2.getClient().getIdentifier(),
+				invoice2.getDateInString(),""+invoice2.getRevenue());
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
 						INVOICE_REVENUE_1+INVOICE_REVENUE_2)+"€");
@@ -168,8 +173,9 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		window.comboBox("yearsCombobox")
 			.selectItem(Pattern.compile(""+YEAR_FIXTURE)); 
 		window.list("clientsList").selectItem(Pattern.compile(CLIENT_IDENTIFIER_1));
-		assertThat(window.list("invoicesList").contents())
-			.containsOnly(invoice1.toString());
+		String[][] tableContents = window.table("invoicesTable").contents(); 
+		assertThat(tableContents[0]).containsExactly(invoice1.getClient().getIdentifier(),
+				invoice1.getDateInString(),""+invoice1.getRevenue());
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale delle fatture del cliente " + CLIENT_IDENTIFIER_1 +
 				" nel "+ YEAR_FIXTURE+ " è di "+String.format("%.2f", 
@@ -196,8 +202,9 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 				+ "Cliente non più presente nel database: " + 
 				client1.getIdentifier());
 		assertThat(window.list("clientsList").contents()).doesNotContain(client1.toString());
-		assertThat(window.list("invoicesList").contents())
-			.containsOnly(invoice2.toString());
+		String[][] tableContents = window.table("invoicesTable").contents(); 
+		assertThat(tableContents[0]).containsExactly(invoice2.getClient().getIdentifier(),
+				invoice2.getDateInString(),""+invoice2.getRevenue());
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
 						INVOICE_REVENUE_2)+"€");
@@ -219,8 +226,11 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 			.selectItem(Pattern.compile(""+YEAR_FIXTURE));
 		window.list("clientsList").selectItem(Pattern.compile(CLIENT_IDENTIFIER_1));
 		window.button(JButtonMatcher.withText(".*Vedi tutte.*le fatture.*")).click();
-		assertThat(window.list("invoicesList").contents())
-			.containsExactly(invoice1.toString(),invoice2.toString());
+		String[][] tableContents = window.table("invoicesTable").contents(); 
+		assertThat(tableContents[0]).containsExactly(invoice1.getClient().getIdentifier(),
+				invoice1.getDateInString(),""+invoice1.getRevenue());	
+		assertThat(tableContents[1]).containsExactly(invoice2.getClient().getIdentifier(),
+				invoice2.getDateInString(),""+invoice2.getRevenue());
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
 						INVOICE_REVENUE_1+INVOICE_REVENUE_2)+"€");
@@ -256,8 +266,9 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 			.noneMatch(e -> e.contains(CLIENT_IDENTIFIER_1));
 		assertThat(window.comboBox("clientsCombobox").contents())
 			.noneMatch(e -> e.contains(CLIENT_IDENTIFIER_1));
-		assertThat(window.list("invoicesList").contents())
-			.containsOnly(invoice2.toString());
+		String[][] tableContents = window.table("invoicesTable").contents(); 
+		assertThat(tableContents).containsOnly(new String[] {invoice2.getClient().getIdentifier(),
+				invoice2.getDateInString(),""+invoice2.getRevenue()});
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
 					INVOICE_REVENUE_2)+"€");
@@ -279,8 +290,9 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 			.noneMatch(e -> e.contains(CLIENT_IDENTIFIER_1));
 		assertThat(window.comboBox("clientsCombobox").contents())
 			.noneMatch(e -> e.contains(CLIENT_IDENTIFIER_1));
-		assertThat(window.list("invoicesList").contents())
-			.containsOnly(invoiceOfClient2.toString());
+		String[][] tableContents = window.table("invoicesTable").contents(); 
+		assertThat(tableContents).containsOnly(new String[] {invoiceOfClient2.getClient().getIdentifier(),
+				invoiceOfClient2.getDateInString(),""+invoiceOfClient2.getRevenue()});
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
 					INVOICE_REVENUE_2)+"€");
@@ -309,9 +321,14 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		window.textBox("textField_yearOfDateInvoice").enterText(""+YEAR_FIXTURE);
 		window.textBox("textField_revenueInvoice").enterText("10.20");
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
-		assertThat(window.list("invoicesList").contents())
-			.contains(invoice1.toString(),invoice2.toString(),
-					new Invoice(client1,DateTestsUtil.getDate(1, 5, YEAR_FIXTURE),10.20).toString());
+		Invoice invoiceAdded=new Invoice(client1,DateTestsUtil.getDate(1, 5, YEAR_FIXTURE),10.20);
+		String[][] tableContents = window.table("invoicesTable").contents(); 
+		assertThat(tableContents).contains(new String[] {invoice1.getClient().getIdentifier(),
+				invoice1.getDateInString(),""+invoice1.getRevenue()});
+		assertThat(tableContents).contains(new String[] {invoice2.getClient().getIdentifier(),
+				invoice2.getDateInString(),""+invoice2.getRevenue()});
+		assertThat(tableContents).contains(new String[] {invoiceAdded.getClient().getIdentifier(),
+				invoiceAdded.getDateInString(),""+invoiceAdded.getRevenue()});
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
 						INVOICE_REVENUE_1+INVOICE_REVENUE_2+10.20)+"€");
@@ -337,10 +354,10 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		window.textBox("textField_yearOfDateInvoice").enterText(""+YEAR_FIXTURE);
 		window.textBox("textField_revenueInvoice").enterText("10.20");
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
-		assertThat(window.list("invoicesList").contents())
-			.noneMatch( 
-				e-> e.contains(
-					new Invoice(client1,DateTestsUtil.getDate(1, 5, YEAR_FIXTURE),10.20).toString()));
+		Invoice invoiceAdded=new Invoice(client1,DateTestsUtil.getDate(1, 5, YEAR_FIXTURE),10.20);
+		String[][] tableContents = window.table("invoicesTable").contents(); 
+		assertThat(tableContents).doesNotContain(new String[] {invoiceAdded.getClient().getIdentifier(),
+						invoiceAdded.getDateInString(),""+invoiceAdded.getRevenue()}); 
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale del "+(YEAR_FIXTURE-1)+" è di "+String.format("%.2f", 
 						INVOICE_REVENUE_3)+"€");
@@ -359,8 +376,10 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		window.textBox("textField_yearOfDateInvoice").enterText(""+YEAR_FIXTURE);
 		window.textBox("textField_revenueInvoice").enterText("10.20");
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
-		assertThat(window.list("invoicesList").contents())
-			.contains(new Invoice(client1,DateTestsUtil.getDate(1, 1, YEAR_FIXTURE),10.20).toString());
+		Invoice invoiceAdded=new Invoice(client1,DateTestsUtil.getDate(1, 1, YEAR_FIXTURE),10.20);
+		String[][] tableContents = window.table("invoicesTable").contents(); 
+		assertThat(tableContents).contains(new String[] {invoiceAdded.getClient().getIdentifier(),
+				invoiceAdded.getDateInString(),""+invoiceAdded.getRevenue()});
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
 						INVOICE_REVENUE_1+10.20)+"€");
@@ -382,8 +401,11 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		window.textBox("textField_yearOfDateInvoice").enterText(""+YEAR_FIXTURE);
 		window.textBox("textField_revenueInvoice").enterText("10.20");
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
-		assertThat(window.list("invoicesList").contents())
-			.contains(new Invoice(client1,DateTestsUtil.getDate(31, 12, YEAR_FIXTURE),10.20).toString());
+		
+		Invoice invoiceAdded=new Invoice(client1,DateTestsUtil.getDate(31, 12, YEAR_FIXTURE),10.20);
+		String[][] tableContents = window.table("invoicesTable").contents(); 
+		assertThat(tableContents).contains(new String[] {invoiceAdded.getClient().getIdentifier(),
+				invoiceAdded.getDateInString(),""+invoiceAdded.getRevenue()});
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
 						INVOICE_REVENUE_1+10.20)+"€");
@@ -416,8 +438,9 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		window.textBox("paneClientErrorMessage").requireText(""
 				+ "Cliente non più presente nel database: " + 
 				client1.getIdentifier());
-		assertThat(window.list("invoicesList").contents())
-			.containsOnly(invoice2.toString());
+		String[][] tableContents = window.table("invoicesTable").contents(); 
+		assertThat(tableContents).containsOnly(new String[] {invoice2.getClient().getIdentifier(),
+				invoice2.getDateInString(),""+invoice2.getRevenue()});
 		assertThat(window.list("clientsList").contents())
 			.noneMatch( e -> e.contains(client1.toString()));
 		assertThat(window.comboBox("clientsCombobox").contents())
@@ -438,10 +461,12 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		GuiActionRunner.execute( () -> balanceController.initializeView() );
 		window.comboBox("yearsCombobox")
 			.selectItem(Pattern.compile(""+YEAR_FIXTURE));
-		window.list("invoicesList").selectItem(Pattern.compile(invoice1.toString()));
+		int rowInvoiceToDeleted=balanceSwingView.getInvoiceTableModel().getRowInvoice(invoice1);
+		window.table("invoicesTable").selectRows(rowInvoiceToDeleted);
 		window.button(JButtonMatcher.withText(".*Rimuovi.*fattura.*")).click();
-		assertThat(window.list("invoicesList").contents())
-			.noneMatch(e -> e.contains(invoice1.toString()));
+		String[][] tableContents = window.table("invoicesTable").contents(); 
+		assertThat(tableContents).doesNotContain(new String[] {invoice1.getClient().getIdentifier(),
+				invoice1.getDateInString(),""+invoice1.getRevenue()}); 
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
 					INVOICE_REVENUE_2)+"€");
@@ -458,13 +483,15 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		GuiActionRunner.execute( () -> balanceController.initializeView() );
 		window.comboBox("yearsCombobox")
 			.selectItem(Pattern.compile(""+YEAR_FIXTURE));
-		window.list("invoicesList").selectItem(Pattern.compile(invoiceToDeleted.toString()));
+		int rowInvoiceToDeleted=balanceSwingView.getInvoiceTableModel().getRowInvoice(invoiceToDeleted);
+		window.table("invoicesTable").selectRows(rowInvoiceToDeleted);
 		invoiceRepository.delete(invoiceToDeleted.getId());
 		window.button(JButtonMatcher.withText(".*Rimuovi.*fattura.*")).click();
 		window.textBox("paneInvoiceErrorMessage").requireText("Fattura non più presente nel database: "
 				+invoiceToDeleted.toString());
-		assertThat(window.list("invoicesList").contents())
-			.noneMatch(e -> e.contains(invoiceToDeleted.toString()));
+		String[][] tableContents = window.table("invoicesTable").contents(); 
+		assertThat(tableContents).doesNotContain(new String[] {invoiceToDeleted.getClient().getIdentifier(),
+				invoiceToDeleted.getDateInString(),""+invoiceToDeleted.getRevenue()}); 
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
 						invoiceRemaining.getRevenue())+"€");
@@ -481,7 +508,8 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		GuiActionRunner.execute( () -> balanceController.initializeView() );
 		window.comboBox("yearsCombobox")
 			.selectItem(Pattern.compile(""+YEAR_FIXTURE));
-		window.list("invoicesList").selectItem(Pattern.compile(invoiceClientToDeleted.toString()));
+		int rowInvoiceToDeleted=balanceSwingView.getInvoiceTableModel().getRowInvoice(invoiceClientToDeleted);
+		window.table("invoicesTable").selectRows(rowInvoiceToDeleted);
 		clientRepository.delete(clientToDeleted.getId());
 		window.button(JButtonMatcher.withText(".*Rimuovi.*fattura.*")).click();
 		window.textBox("paneClientErrorMessage").requireText("Cliente non più presente nel database: "
@@ -490,8 +518,9 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 			.noneMatch( e -> e.contains(clientToDeleted.toString()));
 		assertThat(window.comboBox("clientsCombobox").contents())
 			.noneMatch( e -> e.contains(clientToDeleted.toString()));
-		assertThat(window.list("invoicesList").contents())
-			.noneMatch(e -> e.contains(invoiceClientToDeleted.toString()));
+		String[][] tableContents = window.table("invoicesTable").contents(); 
+		assertThat(tableContents).doesNotContain(new String[] {invoiceClientToDeleted.getClient().getIdentifier(),
+				invoiceClientToDeleted.getDateInString(),""+invoiceClientToDeleted.getRevenue()}); 
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
 						invoiceClientRemaining.getRevenue())+"€");

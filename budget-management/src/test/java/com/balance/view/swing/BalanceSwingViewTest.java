@@ -74,7 +74,10 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 	public void testControlInitialStates() {
 		window.label(JLabelMatcher.withText("CLIENTI")); 
 		window.list("clientsList");
-		window.list("invoicesList");
+		window.table("invoicesTable").requireColumnCount(3);
+		window.table("invoicesTable").requireColumnNamed("Cliente");
+		window.table("invoicesTable").requireColumnNamed("Data");
+		window.table("invoicesTable").requireColumnNamed("Importo (€)");
 		window.label("revenueLabel");
 		window.comboBox("yearsCombobox");
 		window.textBox("paneClientErrorMessage").requireText("");
@@ -131,7 +134,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 	
 	
 	@Test @GUITest
-	public void testShowAllInvoicesShouldAddInvoicesToTheInvoicesList(){ 
+	public void testShowAllInvoicesShouldAddInvoicesToTheInvoicesTable(){ 
 		GuiActionRunner.execute(() -> {
 				DefaultComboBoxModel<Integer> yearsCombobox=balanceSwingView.getComboboxYearsModel();
 				yearsCombobox.addElement(CURRENT_YEAR);
@@ -139,26 +142,30 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 				balanceSwingView.showInvoices(Arrays.asList(INVOICE_FIXTURE_1, INVOICE_FIXTURE_2));
 			}
 		);
-		String[] listContents = window.list("invoicesList").contents(); 
-		assertThat(listContents).containsExactly(INVOICE_FIXTURE_1.toString(), INVOICE_FIXTURE_2.toString());
+		String[][] tableContents = window.table("invoicesTable").contents(); 
+		assertThat(tableContents[0]).containsExactly(INVOICE_FIXTURE_1.getClient().getIdentifier(),
+				INVOICE_FIXTURE_1.getDateInString(),""+INVOICE_FIXTURE_1.getRevenue());
+		assertThat(tableContents[1]).containsExactly(INVOICE_FIXTURE_2.getClient().getIdentifier(),
+				INVOICE_FIXTURE_2.getDateInString(),""+INVOICE_FIXTURE_2.getRevenue());
 	}
 	
 	@Test @GUITest
-	public void testShowAllInvoicesShouldAddInvoicesToTheInvoicesListAndResetPrevious(){ 
+	public void testShowAllInvoicesShouldAddInvoicesToTheInvoicesTableAndResetPrevious(){ 
 		GuiActionRunner.execute(() -> {
 				DefaultComboBoxModel<Integer> yearsCombobox=balanceSwingView.getComboboxYearsModel();
 				yearsCombobox.addElement(CURRENT_YEAR);
 				yearsCombobox.setSelectedItem(CURRENT_YEAR);
-				balanceSwingView.getInvoiceListModel().add(0,INVOICE_FIXTURE_1);
+				balanceSwingView.getInvoiceTableModel().addElement(INVOICE_FIXTURE_1);
 				balanceSwingView.showInvoices(Arrays.asList(INVOICE_FIXTURE_2));
 			}
 		);
-		String[] listContents = window.list("invoicesList").contents(); 
-		assertThat(listContents).containsExactly(INVOICE_FIXTURE_2.toString());
+		String[][] tableContents = window.table("invoicesTable").contents(); 
+		assertThat(tableContents[0]).containsExactly(INVOICE_FIXTURE_2.getClient().getIdentifier(),
+				INVOICE_FIXTURE_2.getDateInString(),""+INVOICE_FIXTURE_2.getRevenue());
 	}
 	
 	@Test @GUITest
-	public void testShowAllInvoicesShouldAddInvoicesInOrderToTheInvoicesListAndResetPrevious(){
+	public void testShowAllInvoicesShouldAddInvoicesInOrderToTheInvoicesTableAndResetPrevious(){
 		Invoice invoicePrevious=new Invoice(CLIENT_FIXTURE_1, DateTestsUtil.getDate(2, 10, CURRENT_YEAR)
 				,20);
 		Invoice invoiceNext=new Invoice(CLIENT_FIXTURE_1, DateTestsUtil.getDate(3, 10, CURRENT_YEAR),10);
@@ -166,12 +173,15 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 				DefaultComboBoxModel<Integer> yearsCombobox=balanceSwingView.getComboboxYearsModel();
 				yearsCombobox.addElement(CURRENT_YEAR);
 				yearsCombobox.setSelectedItem(CURRENT_YEAR);
-				balanceSwingView.getInvoiceListModel().add(0,INVOICE_FIXTURE_1);
+				balanceSwingView.getInvoiceTableModel().addElement(INVOICE_FIXTURE_1);
 				balanceSwingView.showInvoices(Arrays.asList(invoiceNext,invoicePrevious));
 			}
 		);
-		String[] listContents = window.list("invoicesList").contents(); 
-		assertThat(listContents).containsExactly(invoicePrevious.toString(),invoiceNext.toString());
+		String[][] tableContents = window.table("invoicesTable").contents(); 
+		assertThat(tableContents[0]).containsExactly(invoicePrevious.getClient().getIdentifier(),
+				invoicePrevious.getDateInString(),""+invoicePrevious.getRevenue());
+		assertThat(tableContents[1]).containsExactly(invoiceNext.getClient().getIdentifier(),
+				invoiceNext.getDateInString(),""+invoiceNext.getRevenue());
 	}
 	
 	
@@ -412,7 +422,9 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 			balanceSwingView.invoiceAdded(invoiceToAdd);
 			}
 		);
-		assertThat(window.list("invoicesList").contents()).contains(invoiceToAdd.toString());
+		String[][] tableContents = window.table("invoicesTable").contents(); 
+		assertThat(tableContents[0]).containsExactly(invoiceToAdd.getClient().getIdentifier(),
+				invoiceToAdd.getDateInString(),""+invoiceToAdd.getRevenue());
 		window.textBox("paneInvoiceErrorMessage").requireText("");
 	}
 	
@@ -430,18 +442,21 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 				comboboxYearsModel.addElement(YEAR_FIXTURE);
 				comboboxYearsModel.addElement(CURRENT_YEAR);
 				comboboxYearsModel.setSelectedItem(CURRENT_YEAR);
-				DefaultListModel<Invoice> listInvoiceModel=balanceSwingView.getInvoiceListModel();
-				listInvoiceModel.add(0,invoiceExistingPrevious);
-				listInvoiceModel.add(1,invoiceExistingNext);
+				InvoiceTableModel listInvoiceModel=balanceSwingView.getInvoiceTableModel();
+				listInvoiceModel.addElement(invoiceExistingPrevious);
+				listInvoiceModel.addElement(invoiceExistingNext);
 			}
 		);
-		window.list("invoicesList").selectItem(Pattern.compile(invoiceExistingNext.toString()));
+		window.table("invoicesTable").selectRows(1);
 		GuiActionRunner.execute(() -> balanceSwingView.invoiceAdded(invoiceToAdd));
-		assertThat(window.list("invoicesList").contents())
-			.containsExactly(invoiceExistingPrevious.toString(),
-					invoiceToAdd.toString(),
-					invoiceExistingNext.toString());
-		window.list("invoicesList").requireSelection(Pattern.compile(invoiceExistingNext.toString()));
+		String[][] tableContents = window.table("invoicesTable").contents();
+		assertThat(tableContents[0]).containsExactly(invoiceExistingPrevious.getClient().getIdentifier(),
+				invoiceExistingPrevious.getDateInString(),""+invoiceExistingPrevious.getRevenue());
+		assertThat(tableContents[1]).containsExactly(invoiceToAdd.getClient().getIdentifier(),
+				invoiceToAdd.getDateInString(),""+invoiceToAdd.getRevenue());
+		assertThat(tableContents[2]).containsExactly(invoiceExistingNext.getClient().getIdentifier(),
+				invoiceExistingNext.getDateInString(),""+invoiceExistingNext.getRevenue());
+		window.table("invoicesTable").requireSelectedRows(2);
 		window.textBox("paneInvoiceErrorMessage").requireText("");
 	}
 	
@@ -459,8 +474,9 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 			balanceSwingView.invoiceAdded(invoiceToAdd);
 			}
 		);
-		assertThat(window.list("invoicesList").contents()).noneMatch(
-				e -> e.contains(invoiceToAdd.toString()));
+		assertThat(window.table("invoicesTable").contents())
+			.doesNotContain(new String[] {invoiceToAdd.getClient().getIdentifier(),
+					invoiceToAdd.getDateInString(),""+invoiceToAdd.getRevenue()});
 		assertThat(window.comboBox("yearsCombobox").contents())
 			.containsExactly(""+CURRENT_YEAR,""+YEAR_FIXTURE,""+(YEAR_FIXTURE-1),""+(YEAR_FIXTURE-2));
 		window.comboBox("yearsCombobox").requireSelection(Pattern.compile(""+CURRENT_YEAR));
@@ -616,7 +632,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.textBox("textField_monthOfDateInvoice").enterText("5");
 		window.textBox("textField_yearOfDateInvoice").enterText(""+(CURRENT_YEAR-101));
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
-		window.label("paneInvoiceErrorMessage").requireText(
+		window.textBox("paneInvoiceErrorMessage").requireText(
 				"La data 1/5/"+(CURRENT_YEAR-101)+" non è corretta");
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).requireDisabled();
 		verifyNoMoreInteractions(balanceController);
@@ -867,13 +883,15 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 			DefaultComboBoxModel<Integer> comboboxYearModel=balanceSwingView.getComboboxYearsModel();
 			comboboxYearModel.addElement(CURRENT_YEAR);
 			comboboxYearModel.setSelectedItem(CURRENT_YEAR);
-			DefaultListModel<Invoice> listInvoiceModel=balanceSwingView.getInvoiceListModel();
+			InvoiceTableModel listInvoiceModel=balanceSwingView.getInvoiceTableModel();
 			listInvoiceModel.addElement(INVOICE_FIXTURE_1);
 			listInvoiceModel.addElement(INVOICE_FIXTURE_2);
 			balanceSwingView.removeInvoicesOfClient(new Client(CLIENT_FIXTURE_1.getIdentifier()));
 			}
 		);
-		assertThat(window.list("invoicesList").contents()).containsOnly(INVOICE_FIXTURE_2.toString());
+		assertThat(window.table("invoicesTable").contents())
+			.containsOnly(new String[] {INVOICE_FIXTURE_2.getClient().getIdentifier(),INVOICE_FIXTURE_2.getDateInString(),
+					""+INVOICE_FIXTURE_2.getRevenue()});
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale del "+CURRENT_YEAR+" è di "
 						+String.format("%.2f", INVOICE_FIXTURE_2.getRevenue())+"€");
@@ -886,14 +904,14 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 			comboboxYearModel.addElement(YEAR_FIXTURE);
 			comboboxYearModel.addElement(CURRENT_YEAR);
 			comboboxYearModel.setSelectedItem(YEAR_FIXTURE);
-			DefaultListModel<Invoice> listInvoiceModel=balanceSwingView.getInvoiceListModel();
+			InvoiceTableModel listInvoiceModel=balanceSwingView.getInvoiceTableModel();
 			listInvoiceModel.addElement(INVOICE_FIXTURE_1);
 			listInvoiceModel.addElement(new Invoice(CLIENT_FIXTURE_1,
 					DateTestsUtil.getDateFromYear(YEAR_FIXTURE),10.20));
 			balanceSwingView.removeInvoicesOfClient(new Client(CLIENT_FIXTURE_1.getIdentifier()));
 			}
 		);
-		assertThat(window.list("invoicesList").contents()).isEmpty();
+		assertThat(window.table("invoicesTable").contents()).isEmpty();
 		verify(balanceController).yearsOfTheInvoices();
 	}
 	
@@ -907,7 +925,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 			comboboxYearModel.addElement(YEAR_FIXTURE);
 			comboboxYearModel.addElement(CURRENT_YEAR);
 			comboboxYearModel.setSelectedItem(YEAR_FIXTURE);
-			DefaultListModel<Invoice> listInvoiceModel=balanceSwingView.getInvoiceListModel();
+			InvoiceTableModel listInvoiceModel=balanceSwingView.getInvoiceTableModel();
 			listInvoiceModel.addElement(INVOICE_FIXTURE_1);
 			listInvoiceModel.addElement(new Invoice(CLIENT_FIXTURE_1,
 					DateTestsUtil.getDateFromYear(YEAR_FIXTURE),10.20));
@@ -917,48 +935,50 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		GuiActionRunner.execute(() ->
 			balanceSwingView.removeInvoicesOfClient(new Client(CLIENT_FIXTURE_1.getIdentifier()))
 			);
-		assertThat(window.list("invoicesList").contents()).isEmpty();
+		assertThat(window.table("invoicesTable").contents()).isEmpty();
 		verify(balanceController,never()).yearsOfTheInvoices();
 	}
 	
 	@Test @GUITest
 	public void testDeleteInvoiceButtonShouldBeEnabledOnlyWhenAnInvoiceIsSelected() {
-		GuiActionRunner.execute(() -> balanceSwingView.getInvoiceListModel().addElement(INVOICE_FIXTURE_1)); 
-		window.list("invoicesList").selectItem(0); 
+		GuiActionRunner.execute(() -> balanceSwingView.getInvoiceTableModel().addElement(INVOICE_FIXTURE_1)); 
+		window.table("invoicesTable").selectRows(0); 
 		JButtonFixture deleteButton = window.button(JButtonMatcher.withText(Pattern.compile(".*Rimuovi.*fattura.*")));
 		deleteButton.requireEnabled();
-		window.list("invoicesList").clearSelection(); 
+		window.table("invoicesTable").unselectRows(0); 
 		deleteButton.requireDisabled(); 
 	}
 	
 	@Test @GUITest
 	public void testDeleteInvoiceButtonShouldDelegateToBalanceControllerDeleteInvoice() {
 		GuiActionRunner.execute(() -> {
-			DefaultListModel<Invoice> listInvoiceModel =balanceSwingView.getInvoiceListModel();
+			InvoiceTableModel listInvoiceModel=balanceSwingView.getInvoiceTableModel();
 			listInvoiceModel.addElement(INVOICE_FIXTURE_1);
 			listInvoiceModel.addElement(INVOICE_FIXTURE_2);
 			}
 		);
-		window.list("invoicesList").selectItem(0);
+		window.table("invoicesTable").selectRows(0); 
 		window.button(JButtonMatcher.withText(Pattern.compile(".*Rimuovi.*fattura.*"))).click();
 		verify(balanceController).deleteInvoice(new Invoice(INVOICE_FIXTURE_1.getClient(),
 				INVOICE_FIXTURE_1.getDate(), INVOICE_FIXTURE_1.getRevenue()));
 	}
 	
 	@Test @GUITest
-	public void testRemoveInvoiceWhenInvoicesRemanentInListIsNotEmptyAndUpdateTotalRevenue() {
+	public void testRemoveInvoiceWhenInvoicesRemanentInTabletIsNotEmptyAndUpdateTotalRevenue() {
 		GuiActionRunner.execute(() -> {
 			DefaultComboBoxModel<Integer> comboboxYearModel=balanceSwingView.getComboboxYearsModel();
 			comboboxYearModel.addElement(CURRENT_YEAR);
 			comboboxYearModel.setSelectedItem(CURRENT_YEAR);
-			DefaultListModel<Invoice> listInvoiceModel=balanceSwingView.getInvoiceListModel();
+			InvoiceTableModel listInvoiceModel=balanceSwingView.getInvoiceTableModel();
 			listInvoiceModel.addElement(INVOICE_FIXTURE_1);
 			listInvoiceModel.addElement(INVOICE_FIXTURE_2);
 			balanceSwingView.invoiceRemoved(new Invoice(INVOICE_FIXTURE_1.getClient(),
 					INVOICE_FIXTURE_1.getDate(), INVOICE_FIXTURE_1.getRevenue()));
 			}
 		);
-		assertThat(window.list("invoicesList").contents()).containsOnly(INVOICE_FIXTURE_2.toString());
+		assertThat(window.table("invoicesTable").contents())
+			.containsOnly(new String[] {INVOICE_FIXTURE_2.getClient().getIdentifier(),
+					INVOICE_FIXTURE_2.getDateInString(),""+INVOICE_FIXTURE_2.getRevenue()});
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale del "+CURRENT_YEAR+" è di "
 						+String.format("%.2f", INVOICE_FIXTURE_2.getRevenue())+"€");
@@ -971,12 +991,12 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 			comboboxYearModel.addElement(YEAR_FIXTURE);
 			comboboxYearModel.addElement(CURRENT_YEAR);
 			comboboxYearModel.setSelectedItem(YEAR_FIXTURE);
-			balanceSwingView.getInvoiceListModel().addElement(INVOICE_FIXTURE_1);
+			balanceSwingView.getInvoiceTableModel().addElement(INVOICE_FIXTURE_1);
 			balanceSwingView.invoiceRemoved(new Invoice(INVOICE_FIXTURE_1.getClient(),
 					INVOICE_FIXTURE_1.getDate(), INVOICE_FIXTURE_1.getRevenue()));
 			}
 		);
-		assertThat(window.list("invoicesList").contents()).isEmpty();
+		assertThat(window.table("invoicesTable").contents()).isEmpty();
 		verify(balanceController).yearsOfTheInvoices();
 	}
 	
