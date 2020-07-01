@@ -6,6 +6,7 @@ jdk: openjdk8
 
 services:
    - xvbf
+   - docker
    
 env:
    global:
