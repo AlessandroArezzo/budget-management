@@ -546,7 +546,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.textBox("textField_dayOfDateInvoice").enterText("1");
 		window.textBox("textField_monthOfDateInvoice").enterText("5");
 		window.textBox("textField_yearOfDateInvoice").enterText("2020");
-		window.textBox("textField_revenueInvoice").enterText("10.20");
+		window.textBox("textField_revenueInvoice").enterText("10,20");
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).requireEnabled();
 	}
 	
@@ -567,7 +567,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.textBox("textField_yearOfDateInvoice").setText("");
 		window.textBox("textField_revenueInvoice").setText("");
 		window.textBox("textField_yearOfDateInvoice").enterText(" ");
-		window.textBox("textField_revenueInvoice").enterText("10.20");
+		window.textBox("textField_revenueInvoice").enterText("10,20");
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).requireDisabled();
 		
 		window.textBox("textField_monthOfDateInvoice").setText("");
@@ -600,7 +600,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.textBox("textField_dayOfDateInvoice").enterText("1");
 		window.textBox("textField_monthOfDateInvoice").enterText("5");
 		window.textBox("textField_yearOfDateInvoice").enterText(""+YEAR_FIXTURE);
-		window.textBox("textField_revenueInvoice").enterText("10.20");
+		window.textBox("textField_revenueInvoice").enterText("10,20");
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
 		verify(balanceController).newInvoice(new Invoice(
 				CLIENT_FIXTURE_1, DateTestsUtil.getDate(1, 5, YEAR_FIXTURE), 10.20));
@@ -624,7 +624,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.textBox("textField_dayOfDateInvoice").enterText("1");
 		window.textBox("textField_monthOfDateInvoice").enterText("5");
 		window.textBox("textField_yearOfDateInvoice").enterText(""+(CURRENT_YEAR+1));
-		window.textBox("textField_revenueInvoice").enterText("10.20");
+		window.textBox("textField_revenueInvoice").enterText("10,20");
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
 		
 		window.textBox("textField_dayOfDateInvoice").requireEmpty();
@@ -656,7 +656,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.textBox("textField_dayOfDateInvoice").enterText("1");
 		window.textBox("textField_monthOfDateInvoice").enterText("13");
 		window.textBox("textField_yearOfDateInvoice").enterText("2020");
-		window.textBox("textField_revenueInvoice").enterText("10.20");
+		window.textBox("textField_revenueInvoice").enterText("10,20");
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
 		
 		window.textBox("textField_dayOfDateInvoice").requireEmpty();
@@ -678,7 +678,7 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		window.textBox("textField_dayOfDateInvoice").enterText("31");
 		window.textBox("textField_monthOfDateInvoice").enterText("2");
 		window.textBox("textField_yearOfDateInvoice").enterText("2020");
-		window.textBox("textField_revenueInvoice").enterText("10.20");
+		window.textBox("textField_revenueInvoice").enterText("10,20");
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
 		window.textBox("textField_dayOfDateInvoice").requireEmpty();
 		window.textBox("textField_monthOfDateInvoice").requireEmpty();

@@ -319,7 +319,7 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		window.textBox("textField_dayOfDateInvoice").enterText("1");
 		window.textBox("textField_monthOfDateInvoice").enterText("5");
 		window.textBox("textField_yearOfDateInvoice").enterText(""+YEAR_FIXTURE);
-		window.textBox("textField_revenueInvoice").enterText("10.20");
+		window.textBox("textField_revenueInvoice").enterText("10,20");
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
 		Invoice invoiceAdded=new Invoice(client1,DateTestsUtil.getDate(1, 5, YEAR_FIXTURE),10.20);
 		String[][] tableContents = window.table("invoicesTable").contents(); 
@@ -352,7 +352,7 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		window.textBox("textField_dayOfDateInvoice").enterText("1");
 		window.textBox("textField_monthOfDateInvoice").enterText("5");
 		window.textBox("textField_yearOfDateInvoice").enterText(""+YEAR_FIXTURE);
-		window.textBox("textField_revenueInvoice").enterText("10.20");
+		window.textBox("textField_revenueInvoice").enterText("10,20");
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
 		Invoice invoiceAdded=new Invoice(client1,DateTestsUtil.getDate(1, 5, YEAR_FIXTURE),10.20);
 		String[][] tableContents = window.table("invoicesTable").contents(); 
@@ -374,7 +374,7 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		window.textBox("textField_dayOfDateInvoice").enterText("1");
 		window.textBox("textField_monthOfDateInvoice").enterText("1");
 		window.textBox("textField_yearOfDateInvoice").enterText(""+YEAR_FIXTURE);
-		window.textBox("textField_revenueInvoice").enterText("10.20");
+		window.textBox("textField_revenueInvoice").enterText("10,20");
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
 		Invoice invoiceAdded=new Invoice(client1,DateTestsUtil.getDate(1, 1, YEAR_FIXTURE),10.20);
 		String[][] tableContents = window.table("invoicesTable").contents(); 
@@ -399,7 +399,7 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		window.textBox("textField_dayOfDateInvoice").enterText("31");
 		window.textBox("textField_monthOfDateInvoice").enterText("12");
 		window.textBox("textField_yearOfDateInvoice").enterText(""+YEAR_FIXTURE);
-		window.textBox("textField_revenueInvoice").enterText("10.20");
+		window.textBox("textField_revenueInvoice").enterText("10,20");
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
 		
 		Invoice invoiceAdded=new Invoice(client1,DateTestsUtil.getDate(31, 12, YEAR_FIXTURE),10.20);
@@ -432,7 +432,7 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		window.textBox("textField_dayOfDateInvoice").enterText("1");
 		window.textBox("textField_monthOfDateInvoice").enterText("5");
 		window.textBox("textField_yearOfDateInvoice").enterText(""+YEAR_FIXTURE);
-		window.textBox("textField_revenueInvoice").enterText("10.20");
+		window.textBox("textField_revenueInvoice").enterText("10,20");
 		clientRepository.delete(client1.getId());
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
 		window.textBox("paneClientErrorMessage").requireText(""

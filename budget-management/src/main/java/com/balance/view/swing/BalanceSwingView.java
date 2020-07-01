@@ -474,12 +474,13 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		});
 	
 	
-	btnNewInvoice.addActionListener(
+		btnNewInvoice.addActionListener(
 			e -> {
 				int yearOfDate=Integer.parseInt(textFieldYearNewInvoice.getText());
 				int monthOfYear=Integer.parseInt(textFieldMonthNewInvoice.getText());
 				int dayOfMonth=Integer.parseInt(textFieldDayNewInvoice.getText());
-				double revenueOfInvoice=Double.parseDouble(textFieldRevenueNewInvoice.getText());
+				
+				double revenueOfInvoice=Double.parseDouble(textFieldRevenueNewInvoice.getText().replace(",", "."));
 				try {
 					if(yearOfDate<CURRENT_YEAR-100 || yearOfDate>CURRENT_YEAR) {
 						throw new DateTimeException("Wrong year");
