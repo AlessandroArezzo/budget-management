@@ -47,6 +47,10 @@ public class Invoice extends BaseEntity implements Comparable<Invoice>{
 		return revenue;
 	}
 	
+	public String getRevenueInString() {
+		return String.format("%.2f", revenue);
+	}
+	
 	public void setClient(Client client) {
 		this.client = client;
 	}
