@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Vector;
 
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
 
 import com.balance.model.Client;
 import com.balance.model.Invoice;
@@ -16,7 +14,7 @@ public class InvoiceTableModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = 1L;
 	private List<Invoice> invoices;
-    public static final String[] columnNames = {"Cliente", "Data", "Importo (€)"};
+    private static final String[] columnNames = {"Cliente", "Data", "Importo (€)"};
 
 
     public InvoiceTableModel() {

@@ -323,12 +323,12 @@ public class BalanceSwingViewIT extends AssertJSwingJUnitTestCase{
 		window.button(JButtonMatcher.withText("Aggiungi fattura")).click();
 		Invoice invoiceAdded=new Invoice(client1,DateTestsUtil.getDate(1, 5, YEAR_FIXTURE),10.20);
 		String[][] tableContents = window.table("invoicesTable").contents(); 
-		assertThat(tableContents).contains(new String[] {invoice1.getClient().getIdentifier(),
-				invoice1.getDateInString(),""+invoice1.getRevenue()});
-		assertThat(tableContents).contains(new String[] {invoice2.getClient().getIdentifier(),
-				invoice2.getDateInString(),""+invoice2.getRevenue()});
-		assertThat(tableContents).contains(new String[] {invoiceAdded.getClient().getIdentifier(),
-				invoiceAdded.getDateInString(),""+invoiceAdded.getRevenue()});
+		assertThat(tableContents[0]).containsExactly(invoice1.getClient().getIdentifier(),
+				invoice1.getDateInString(),""+invoice1.getRevenue());
+		assertThat(tableContents[1]).containsExactly(invoice2.getClient().getIdentifier(),
+				invoice2.getDateInString(),""+invoice2.getRevenue());
+		assertThat(tableContents[2]).containsExactly(invoiceAdded.getClient().getIdentifier(),
+				invoiceAdded.getDateInString(),""+invoiceAdded.getRevenue());
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale del "+(YEAR_FIXTURE)+" è di "+String.format("%.2f", 
 						INVOICE_REVENUE_1+INVOICE_REVENUE_2+10.20)+"€");

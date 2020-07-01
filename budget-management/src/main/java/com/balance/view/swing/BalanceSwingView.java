@@ -18,8 +18,6 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.SoftBevelBorder;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
 import com.balance.controller.BalanceController;
@@ -27,10 +25,7 @@ import com.balance.model.Client;
 import com.balance.model.Invoice;
 import com.balance.view.BalanceView;
 
-import java.awt.GridBagLayout;
 import javax.swing.JLabel;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.time.DateTimeException;
@@ -51,7 +46,6 @@ import javax.swing.JTextPane;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.Font;
 
 public class BalanceSwingView extends JFrame implements BalanceView {
@@ -134,7 +128,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		scrollPaneClientsList.setBorder(null);
 		scrollPaneClientsList.setBounds(0, 58, 304, 301);
 		panel_clientManagement.add(scrollPaneClientsList);
-		clientListModel=new DefaultListModel<Client>();
+		clientListModel=new DefaultListModel<>();
 		listClients = new JList<>(clientListModel);
 		listClients.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
 		listClients.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -150,7 +144,6 @@ public class BalanceSwingView extends JFrame implements BalanceView {
             @Override
             public Component getListCellRendererComponent(JList list, Object value, int index,
                       boolean isSelected, boolean cellHasFocus) {
-                 Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                  setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
                  if (index % 2 == 0) setBackground(new Color(203, 214, 231));
                  if(isSelected) {
