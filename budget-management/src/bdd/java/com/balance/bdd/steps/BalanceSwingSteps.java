@@ -208,7 +208,7 @@ public class BalanceSwingSteps {
 	public void the_invoice_list_contains_the_new_invoice() {
 		String[][] tableContents = window.table("invoicesTable").contents(); 
 		assertThat(tableContents).contains(new String[] {CLIENT_FIXTURE_2_IDENTIFIER,
-				getShortFormatDate(DateTestsUtil.getDate(4, 5, YEAR_FIXTURE)),"100,25"});
+				getShortFormatDate(DateTestsUtil.getDate(4, 5, YEAR_FIXTURE)),getRevenueString(100.25)});
 	}
 
 	@Then("The total annual revenue of the selected year is updated also considering the new invoice added")
