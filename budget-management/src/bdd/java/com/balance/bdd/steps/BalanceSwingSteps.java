@@ -68,15 +68,15 @@ public class BalanceSwingSteps {
 	public void the_invoice_list_contains_all_invoices_of_the_current_year_contained_in_the_database() {
 		String[][] tableContents = window.table("invoicesTable").contents(); 
 		assertThat(tableContents[0]).containsExactly(INVOICE_OF_THE_CURRENT_YEAR_1_CLIENT.getIdentifier(),
-				getShortFormatDate(INVOICE_OF_THE_CURRENT_YEAR_1_DATE),""+INVOICE_OF_THE_CURRENT_YEAR_1_REVENUE);
+				getShortFormatDate(INVOICE_OF_THE_CURRENT_YEAR_1_DATE),getRevenueString(INVOICE_OF_THE_CURRENT_YEAR_1_REVENUE));
 		assertThat(tableContents[1]).containsExactly(INVOICE_OF_THE_CURRENT_YEAR_2_CLIENT.getIdentifier(),
-				getShortFormatDate(INVOICE_OF_THE_CURRENT_YEAR_2_DATE),""+INVOICE_OF_THE_CURRENT_YEAR_2_REVENUE);
+				getShortFormatDate(INVOICE_OF_THE_CURRENT_YEAR_2_DATE),getRevenueString(INVOICE_OF_THE_CURRENT_YEAR_2_REVENUE));
 	}
 	
 	@Then("The initial total annual revenue of the current year is shown")
 	public void the_initial_total_annual_revenue_of_the_current_year_is_shown() {
 		window.label("revenueLabel").requireText(
-				"Il ricavo totale del "+CURRENT_YEAR+" è di "+String.format("%.2f", 
+				"Il ricavo totale del "+CURRENT_YEAR+" è di "+getRevenueString(
 					INVOICE_OF_THE_CURRENT_YEAR_1_REVENUE+INVOICE_OF_THE_CURRENT_YEAR_2_REVENUE)+"€");
 	}
 	
@@ -91,17 +91,17 @@ public class BalanceSwingSteps {
 	public void the_invoice_list_contains_all_invoices_of_the_selected_year() {
 		String[][] tableContents = window.table("invoicesTable").contents(); 
 		assertThat(tableContents[0]).containsExactly(INVOICE_OF_THE_YEAR_FIXTURE_1_CLIENT.getIdentifier(),
-				getShortFormatDate(INVOICE_OF_THE_YEAR_FIXTURE_1_DATE),""+INVOICE_OF_THE_YEAR_FIXTURE_1_REVENUE);
+				getShortFormatDate(INVOICE_OF_THE_YEAR_FIXTURE_1_DATE),getRevenueString(INVOICE_OF_THE_YEAR_FIXTURE_1_REVENUE));
 		assertThat(tableContents[1]).containsExactly(INVOICE_OF_THE_YEAR_FIXTURE_2_CLIENT.getIdentifier(),
-				getShortFormatDate(INVOICE_OF_THE_YEAR_FIXTURE_2_DATE),""+INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE);
+				getShortFormatDate(INVOICE_OF_THE_YEAR_FIXTURE_2_DATE),getRevenueString(INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE));
 		assertThat(tableContents[2]).containsExactly(INVOICE_OF_THE_YEAR_FIXTURE_3_CLIENT.getIdentifier(),
-				getShortFormatDate(INVOICE_OF_THE_YEAR_FIXTURE_3_DATE),""+INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE);
+				getShortFormatDate(INVOICE_OF_THE_YEAR_FIXTURE_3_DATE),getRevenueString(INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE));
 	}
 
 	@Then("The initial total annual revenue of the selected year is shown")
 	public void the_initial_total_annual_revenue_of_the_selected_year_is_shown() {
 		window.label("revenueLabel").requireText(
-				"Il ricavo totale del "+YEAR_FIXTURE+" è di "+String.format("%.2f", 
+				"Il ricavo totale del "+YEAR_FIXTURE+" è di "+getRevenueString( 
 						INVOICE_OF_THE_YEAR_FIXTURE_1_REVENUE+INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE+
 						INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE)+"€");
 	}
@@ -116,16 +116,16 @@ public class BalanceSwingSteps {
 	public void the_invoice_list_contains_the_invoices_of_the_selected_year_for_the_client_selected() {
 		String[][] tableContents = window.table("invoicesTable").contents(); 
 		assertThat(tableContents[0]).containsExactly(INVOICE_OF_THE_YEAR_FIXTURE_2_CLIENT.getIdentifier(),
-				getShortFormatDate(INVOICE_OF_THE_YEAR_FIXTURE_2_DATE),""+INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE);
+				getShortFormatDate(INVOICE_OF_THE_YEAR_FIXTURE_2_DATE),getRevenueString(INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE));
 		assertThat(tableContents[1]).containsExactly(INVOICE_OF_THE_YEAR_FIXTURE_3_CLIENT.getIdentifier(),
-				getShortFormatDate(INVOICE_OF_THE_YEAR_FIXTURE_3_DATE),""+INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE);
+				getShortFormatDate(INVOICE_OF_THE_YEAR_FIXTURE_3_DATE),getRevenueString(INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE));
 	}
 
 	@Then("The initial total annual revenue of the client selected of the selected year is shown")
 	public void the_initial_total_annual_revenue_of_the_client_selected_of_the_selected_year_is_shown() {
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale delle fatture del cliente "+CLIENT_FIXTURE_2_IDENTIFIER
-				+" nel "+YEAR_FIXTURE+" è di "+String.format("%.2f", 
+				+" nel "+YEAR_FIXTURE+" è di "+getRevenueString( 
 						INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE+
 						INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE)+"€");
 	}
@@ -160,13 +160,13 @@ public class BalanceSwingSteps {
 	public void the_invoice_list_contains_all_invoices_of_the_selected_year_without_invoices_of_the_client_removed() {
 		String[][] tableContents = window.table("invoicesTable").contents(); 
 		assertThat(tableContents).containsOnly(new String[] {INVOICE_OF_THE_YEAR_FIXTURE_1_CLIENT.getIdentifier(),
-				getShortFormatDate(INVOICE_OF_THE_YEAR_FIXTURE_1_DATE),""+INVOICE_OF_THE_YEAR_FIXTURE_1_REVENUE});
+				getShortFormatDate(INVOICE_OF_THE_YEAR_FIXTURE_1_DATE),getRevenueString(INVOICE_OF_THE_YEAR_FIXTURE_1_REVENUE)});
 	}
 
 	@Then("The total annual revenue of the selected year is shown considering invoices of the client removed")
 	public void the_total_annual_revenue_of_the_selected_year_is_shown_considering_invoices_of_the_client_removed() {
 		window.label("revenueLabel").requireText(
-				"Il ricavo totale del "+YEAR_FIXTURE+" è di "+String.format("%.2f", 
+				"Il ricavo totale del "+YEAR_FIXTURE+" è di "+getRevenueString(
 						INVOICE_OF_THE_YEAR_FIXTURE_1_REVENUE)+"€");
 	}
 
@@ -208,13 +208,13 @@ public class BalanceSwingSteps {
 	public void the_invoice_list_contains_the_new_invoice() {
 		String[][] tableContents = window.table("invoicesTable").contents(); 
 		assertThat(tableContents).contains(new String[] {CLIENT_FIXTURE_2_IDENTIFIER,
-				getShortFormatDate(DateTestsUtil.getDate(4, 5, YEAR_FIXTURE)),"100.25"});
+				getShortFormatDate(DateTestsUtil.getDate(4, 5, YEAR_FIXTURE)),"100,25"});
 	}
 
 	@Then("The total annual revenue of the selected year is updated also considering the new invoice added")
 	public void the_total_annual_revenue_of_the_selected_year_is_updated_also_considering_the_new_invoice_added() {
 		window.label("revenueLabel").requireText(
-				"Il ricavo totale del "+YEAR_FIXTURE+" è di "+String.format("%.2f", 
+				"Il ricavo totale del "+YEAR_FIXTURE+" è di "+getRevenueString( 
 						INVOICE_OF_THE_YEAR_FIXTURE_1_REVENUE+INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE+
 						INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE+
 						100.25)+"€");
@@ -245,13 +245,13 @@ public class BalanceSwingSteps {
 	public void the_invoice_is_removed_from_the_invoice_list() {
 		String[][] tableContents = window.table("invoicesTable").contents(); 
 		assertThat(tableContents).doesNotContain(new String[] {INVOICE_OF_THE_YEAR_FIXTURE_2_CLIENT.getIdentifier(),
-				getShortFormatDate(INVOICE_OF_THE_YEAR_FIXTURE_2_DATE),""+INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE});
+				getShortFormatDate(INVOICE_OF_THE_YEAR_FIXTURE_2_DATE),getRevenueString(INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE)});
 	}
 
 	@Then("The total annual revenue of the selected year is shown considering the invoice removed")
 	public void the_total_annual_revenue_of_the_selected_year_is_shown_considering_the_invoice_removed() {
 		window.label("revenueLabel").requireText(
-				"Il ricavo totale del "+YEAR_FIXTURE+" è di "+String.format("%.2f", 
+				"Il ricavo totale del "+YEAR_FIXTURE+" è di "+getRevenueString(
 						INVOICE_OF_THE_YEAR_FIXTURE_1_REVENUE+
 						INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE)+"€");
 	}
@@ -265,6 +265,9 @@ public class BalanceSwingSteps {
 						INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE).toString());
 	}
 
+	private String getRevenueString(double revenue) {
+		return String.format("%.2f",revenue);
+	}
 	private String getShortFormatDate(Date date) {
 		final DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 		return formatter.format(date);
