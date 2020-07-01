@@ -8,12 +8,14 @@ import com.balance.model.Client;
 import com.balance.model.Invoice;
 import com.balance.repository.ClientRepository;
 import com.balance.repository.InvoiceRepository;
-import com.balance.repository.TypeRepository;
 import com.balance.transaction.TransactionManager;
 
 public class InvoiceServiceTransactional implements InvoiceService{
 
 	private TransactionManager transactionManager;
+	
+	private static final String ERROR_MESSAGE_CLIENT_NOT_FOUND="Il cliente con id %s non è presente nel database";
+	private static final String ERROR_MESSAGE_INVOICE_NOT_FOUND="La fattura con id %s non è presente nel database";
 	
 	public InvoiceServiceTransactional(TransactionManager transactionManager) {
 		this.transactionManager=transactionManager;
@@ -23,7 +25,7 @@ public class InvoiceServiceTransactional implements InvoiceService{
 	public List<Invoice> findAllInvoicesByYear(int year) {
 		return transactionManager.doInTransaction(
 				factory -> { 
-					InvoiceRepository invoiceRepository=(InvoiceRepository) factory.createRepository(TypeRepository.INVOICE);
+					InvoiceRepository invoiceRepository=factory.createInvoiceRepository();
 				    return invoiceRepository.findInvoicesByYear(year);
 		});
 	}
@@ -32,7 +34,7 @@ public class InvoiceServiceTransactional implements InvoiceService{
 	public List<Integer> findYearsOfTheInvoices() {
 		return transactionManager.doInTransaction(
 				factory -> { 
-					InvoiceRepository invoiceRepository=(InvoiceRepository) factory.createRepository(TypeRepository.INVOICE);
+					InvoiceRepository invoiceRepository=factory.createInvoiceRepository();
 				    return invoiceRepository.getYearsOfInvoicesInDatabase();
 		});
 	}
@@ -41,12 +43,12 @@ public class InvoiceServiceTransactional implements InvoiceService{
 	public List<Invoice> findInvoicesByClientAndYear(Client client, int year){
 		return transactionManager.doInTransaction(
 			factory -> {
-				ClientRepository clientRepository=(ClientRepository) factory.createRepository(TypeRepository.CLIENT);
+				ClientRepository clientRepository=factory.createClientRepository();
 				if(clientRepository.findById(client.getId())==null) {
-					throw new ClientNotFoundException("Il cliente con id "+
-							client.getId()+" non è presente nel database");
+					throw new ClientNotFoundException(String.format(ERROR_MESSAGE_CLIENT_NOT_FOUND,
+							client.getId()));
 				}
-				InvoiceRepository invoiceRepository=(InvoiceRepository) factory.createRepository(TypeRepository.INVOICE);
+				InvoiceRepository invoiceRepository=factory.createInvoiceRepository();
 			    return invoiceRepository.findInvoicesByClientAndYear(client, year);
 			});
 		
@@ -55,14 +57,12 @@ public class InvoiceServiceTransactional implements InvoiceService{
 	public Invoice addInvoice(Invoice invoice) {
 		return transactionManager.doInTransaction(
 				factory -> { 
-					ClientRepository clientRepository=(ClientRepository) factory.createRepository(TypeRepository.CLIENT);
+					ClientRepository clientRepository=factory.createClientRepository();
 					if(clientRepository.findById(invoice.getClient().getId())==null) {
-						throw new ClientNotFoundException("Il cliente con id "+
-								invoice.getClient().getId()+" non è presente nel database");
+						throw new ClientNotFoundException(String.format(ERROR_MESSAGE_CLIENT_NOT_FOUND,
+								invoice.getClient().getId()));
 					}
-					 ((InvoiceRepository) factory.createRepository(TypeRepository.INVOICE))
-						.save(invoice);
-					 return invoice;
+					return factory.createInvoiceRepository().save(invoice);
 				});
 	}
 
@@ -70,16 +70,14 @@ public class InvoiceServiceTransactional implements InvoiceService{
 		transactionManager.doInTransaction(
 				factory -> {
 					String clientId=invoice.getClient().getId();
-					if (((ClientRepository) factory.createRepository(TypeRepository.CLIENT))
-							.findById(clientId)==null) {
-						throw new ClientNotFoundException("Il cliente con id "+
-								clientId+" non è presente nel database");
+					if (factory.createClientRepository().findById(clientId)==null) {
+						throw new ClientNotFoundException(String.format(ERROR_MESSAGE_CLIENT_NOT_FOUND,clientId));
 					}
 					String invoiceId=invoice.getId();
-					InvoiceRepository invoiceRepository=(InvoiceRepository) factory.createRepository(TypeRepository.INVOICE);
+					InvoiceRepository invoiceRepository=factory.createInvoiceRepository();
 					if(invoiceRepository.findById(invoiceId)==null) {
-						throw new InvoiceNotFoundException("La fattura con id "+
-								invoiceId+" non è presente nel database");
+						throw new InvoiceNotFoundException(String.format(ERROR_MESSAGE_INVOICE_NOT_FOUND,
+								invoiceId));
 					}
 					return invoiceRepository.delete(invoiceId);
 				});

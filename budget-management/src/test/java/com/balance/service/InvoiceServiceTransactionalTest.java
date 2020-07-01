@@ -25,7 +25,6 @@ import com.balance.model.Invoice;
 import com.balance.repository.ClientRepository;
 import com.balance.repository.InvoiceRepository;
 import com.balance.repository.RepositoryFactory;
-import com.balance.repository.TypeRepository;
 import com.balance.transaction.TransactionCode;
 import com.balance.transaction.TransactionManager;
 
@@ -54,9 +53,8 @@ public class InvoiceServiceTransactionalTest {
 		MockitoAnnotations.initMocks(this); 
 		when(transactionManager.doInTransaction(
 				any())).thenAnswer(answer((TransactionCode<?> code) -> code.apply(repositoryFactory)));
-		doReturn(invoiceRepository).when(repositoryFactory).createRepository(TypeRepository.INVOICE);
-		doReturn(clientRepository).when(repositoryFactory).createRepository(TypeRepository.CLIENT);
-
+		doReturn(clientRepository).when(repositoryFactory).createClientRepository();
+		doReturn(invoiceRepository).when(repositoryFactory).createInvoiceRepository();
 	}
 	
 	@Test

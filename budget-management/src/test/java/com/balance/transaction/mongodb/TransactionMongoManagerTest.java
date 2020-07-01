@@ -37,7 +37,6 @@ import org.testcontainers.containers.GenericContainer;
 import com.balance.model.Client;
 import com.balance.model.Invoice;
 import com.balance.repository.ClientRepository;
-import com.balance.repository.TypeRepository;
 import com.balance.repository.mongodb.RepositoryMongoFactory;
 import com.mongodb.DBRef;
 import com.mongodb.MongoClient;

@@ -14,9 +14,8 @@ import com.balance.exception.ClientNotFoundException;
 import com.balance.exception.InvoiceNotFoundException;
 import com.balance.model.Client;
 import com.balance.model.Invoice;
-import com.balance.repository.TypeRepository;
-import com.balance.repository.mongodb.ClientMongoRepository;
-import com.balance.repository.mongodb.InvoiceMongoRepository;
+import com.balance.repository.ClientRepository;
+import com.balance.repository.InvoiceRepository;
 import com.balance.repository.mongodb.RepositoryMongoFactory;
 import com.balance.transaction.TransactionManager;
 import com.balance.transaction.mongodb.TransactionMongoManager;
@@ -27,10 +26,10 @@ import com.mongodb.MongoClient;
 
 public class InvoiceMongoRepositoryServiceIT {
 	private InvoiceService invoiceService;
-	private InvoiceMongoRepository invoiceRepository;
+	private InvoiceRepository invoiceRepository;
 		
 	private MongoClient mongoClient;
-	private ClientMongoRepository clientRepository;
+	private ClientRepository clientRepository;
 	
 	private static final String DB_NAME="balance";
 	private static final String COLLECTION_CLIENTS_NAME="client";
@@ -51,10 +50,8 @@ public class InvoiceMongoRepositoryServiceIT {
 		RepositoryMongoFactory mongoFactory=new RepositoryMongoFactory(
 				mongoClient,mongoClient.startSession(),
 				DB_NAME, COLLECTION_CLIENTS_NAME,COLLECTION_INVOICES_NAME);
-		clientRepository=(ClientMongoRepository) mongoFactory.createRepository(
-				TypeRepository.CLIENT);
-		invoiceRepository=(InvoiceMongoRepository) mongoFactory.createRepository(
-				TypeRepository.INVOICE);
+		clientRepository=mongoFactory.createClientRepository();
+		invoiceRepository=mongoFactory.createInvoiceRepository();
 		for (Client client : clientRepository.findAll()) {
 			clientRepository.delete(client.getId()); 
 		}

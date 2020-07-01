@@ -6,13 +6,13 @@ import com.balance.exception.ClientNotFoundException;
 import com.balance.model.Client;
 import com.balance.repository.ClientRepository;
 import com.balance.repository.InvoiceRepository;
-import com.balance.repository.TypeRepository;
 import com.balance.transaction.TransactionManager;
 
 public class ClientServiceTransactional implements ClientService {
 	
 	private TransactionManager transactionManager;
-	
+	private static final String ERROR_MESSAGE_CLIENT_NOT_FOUND="Il cliente con id %s non è presente nel database";
+
 	public ClientServiceTransactional(TransactionManager transactionManager) {
 		this.transactionManager=transactionManager;
 	}
@@ -21,7 +21,7 @@ public class ClientServiceTransactional implements ClientService {
 	public List<Client> findAllClients() {
 		return transactionManager.doInTransaction(
 			factory -> { 
-				ClientRepository clientRepository=(ClientRepository) factory.createRepository(TypeRepository.CLIENT);
+				ClientRepository clientRepository=factory.createClientRepository();
 			    return clientRepository.findAll();
 			});
 	}
@@ -29,9 +29,7 @@ public class ClientServiceTransactional implements ClientService {
 	public Client addClient(Client client) {
 		return transactionManager.doInTransaction(
 			factory -> { 
-				 ((ClientRepository) factory.createRepository(TypeRepository.CLIENT))
-					.save(client);
-				 return client;
+				 return factory.createClientRepository().save(client);
 			});
 	}
 
@@ -39,12 +37,12 @@ public class ClientServiceTransactional implements ClientService {
 	public void removeClient(String clientId) {
 		transactionManager.doInTransaction(
 			factory -> { 
-				ClientRepository clientRepository=(ClientRepository) factory.createRepository(TypeRepository.CLIENT);
+				ClientRepository clientRepository=factory.createClientRepository();
 				if(clientRepository.findById(clientId)==null) {
-					throw new ClientNotFoundException("Il cliente con id "+
-							clientId+" non è presente nel database");
+					throw new ClientNotFoundException(String.format(ERROR_MESSAGE_CLIENT_NOT_FOUND,clientId));
+
 				}
-				InvoiceRepository invoiceRepository=(InvoiceRepository) factory.createRepository(TypeRepository.INVOICE);
+				InvoiceRepository invoiceRepository=factory.createInvoiceRepository();
 				invoiceRepository.deleteAllInvoicesByClient(clientId);
 				return clientRepository.delete(clientId);
 			});
