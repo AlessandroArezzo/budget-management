@@ -520,13 +520,20 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		
 		window.textBox("textField_revenueInvoice").enterText("text");
 		window.textBox("textField_revenueInvoice").requireEmpty();
-		window.textBox("textField_revenueInvoice").enterText("5 00. 20");
-		window.textBox("textField_revenueInvoice").requireText("500.20");
+		window.textBox("textField_revenueInvoice").enterText("5 00, 20");
+		window.textBox("textField_revenueInvoice").requireText("500,20");
 		window.textBox("textField_revenueInvoice").setText("");
-		window.textBox("textField_revenueInvoice").enterText("500.20");
-		window.textBox("textField_revenueInvoice").requireText("500.20");
+		window.textBox("textField_revenueInvoice").enterText("500,2012");
+		window.textBox("textField_revenueInvoice").requireText("500,20");
+		window.textBox("textField_revenueInvoice").setText("");
+		window.textBox("textField_revenueInvoice").enterText("500,2,0");
+		window.textBox("textField_revenueInvoice").requireText("500,20");
+		window.textBox("textField_revenueInvoice").setText("");
+		window.textBox("textField_revenueInvoice").enterText("500,20");
+		window.textBox("textField_revenueInvoice").requireText("500,20");
+		
+		
 	}
-	
 	
 	@Test @GUITest
 	public void testWhenAClientIsSelectedAndTextFieldsIsNotEmptyThenAddInvoiceButtonShouldBeEnabled() {

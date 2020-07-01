@@ -562,8 +562,9 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		textFieldRevenueNewInvoice.addKeyListener(  new KeyAdapter() {
 			@Override
 	        public void keyTyped(KeyEvent e) {
+				String textRevenueField=textFieldRevenueNewInvoice.getText();
 				char ch = e.getKeyChar();
-	            if (!isNumber(ch) && !isDot(ch))
+	            if ((!isNumber(ch) && !isComma(ch)) || numberSignificantFigures(textRevenueField)>=2 || (isComma(ch) && containsComma(textRevenueField)))
 	                e.consume();
 	        }
 		});
@@ -574,8 +575,20 @@ public class BalanceSwingView extends JFrame implements BalanceView {
         return ch >= '0' && ch <= '9';
     }
 	
-	private boolean isDot(char ch) {
-		return ch == '.';
+	private boolean isComma(char ch) {
+		return ch == ',';
+	}
+	
+	private boolean containsComma(String text) {
+		return text.contains(",");
+	}
+	
+	private int numberSignificantFigures(String text) {
+		String[] partsOfText=text.split(",");
+		if(partsOfText.length==1) {
+			return 0;
+		}
+		return partsOfText[1].length();
 	}
 	
 	@Override
