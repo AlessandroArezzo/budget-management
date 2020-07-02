@@ -3,6 +3,8 @@ package com.balance.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
+import java.util.List;
+
 import org.bson.types.ObjectId;
 import org.junit.After;
 import org.junit.Before;
@@ -36,8 +38,7 @@ public class ClientMongoRepositoryServiceIT {
 		mongoClient=new MongoClient("localhost");
 		TransactionManager transactionManager=new TransactionMongoManager(mongoClient, 
 				DB_NAME, COLLECTION_CLIENTS_NAME, COLLECTION_INVOICES_NAME);
-		clientService= new ClientServiceTransactional(transactionManager);
-		 
+		clientService= new ClientServiceTransactional(transactionManager); 
 		clientRepository=new ClientMongoRepository(mongoClient, mongoClient.startSession(),
 				DB_NAME, COLLECTION_CLIENTS_NAME);
 		for (Client client : clientRepository.findAll()) {
@@ -54,34 +55,35 @@ public class ClientMongoRepositoryServiceIT {
 	public void testFindAllClients() {
 		clientRepository.save(CLIENT_FIXTURE_1);
 		clientRepository.save(CLIENT_FIXTURE_2);
-		assertThat(clientService.findAllClients()).containsExactly(CLIENT_FIXTURE_1,CLIENT_FIXTURE_2);
+		List<Client> clientsInDatabase=clientService.findAllClients();
+		assertThat(clientsInDatabase).containsExactly(CLIENT_FIXTURE_1,CLIENT_FIXTURE_2);
 	}
 	
 	@Test
 	public void testAddClient() {
 		Client clientAdded=clientService.addClient(CLIENT_FIXTURE_1);
-		assertThat(clientRepository.findById(clientAdded.getId())).isEqualTo(CLIENT_FIXTURE_1);
+		Client clientFound=clientRepository.findById(clientAdded.getId());
+		assertThat(clientFound).isEqualTo(CLIENT_FIXTURE_1);
 	}
 	
 	@Test
-	public void testRemoveClientWhenClientIsPresentInDatabase() {
-		clientRepository.save(CLIENT_FIXTURE_1);
+	public void testRemoveClientWhenClientNotExistingInDatabase() {
+		Client clientToRemove=clientRepository.save(CLIENT_FIXTURE_1);
 		clientRepository.save(CLIENT_FIXTURE_2);
-		String idClientToRemove=clientRepository.findAll().get(0).getId();
-		clientService.removeClient(idClientToRemove);
-		assertThat(clientRepository.findById(idClientToRemove)).isNull();
+		clientService.removeClient(clientToRemove.getId());
+		Client clientFound=clientRepository.findById(clientToRemove.getId());
+		assertThat(clientFound).isNull();
 	}
 	
 	@Test
-	public void testRemoveClientWhenClientIsNotPresentInDatabase() {
-		clientRepository.save(CLIENT_FIXTURE_2);
-		String idClientNotPresent=new ObjectId().toString();
+	public void testRemoveClientWhenClienNotExistingInDatabase() {
+		String idClientNotExistInDatabase=new ObjectId().toString();
 		try {
-			clientService.removeClient(idClientNotPresent);
+			clientService.removeClient(idClientNotExistInDatabase);
 			fail("Excpected a ClientNotFoundException to be thrown");
 		}
 		catch(ClientNotFoundException e) {
-			assertThat("Il cliente con id "+idClientNotPresent+" non è presente nel database")
+			assertThat("Il cliente con id "+idClientNotExistInDatabase+" non è presente nel database")
 					.isEqualTo(e.getMessage());
 		}	
 	}
