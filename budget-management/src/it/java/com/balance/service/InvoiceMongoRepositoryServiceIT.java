@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.Date;
+import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.junit.After;
@@ -58,10 +59,8 @@ public class InvoiceMongoRepositoryServiceIT {
 		for (Invoice invoice : invoiceRepository.findAll()) {
 			invoiceRepository.delete(invoice.getId()); 
 		}
-		clientRepository.save(new Client("test identifier 1"));
-		clientRepository.save(new Client("test identifier 2"));
-		CLIENT_FIXTURE_1=clientRepository.findAll().get(0);
-		CLIENT_FIXTURE_2=clientRepository.findAll().get(1);
+		CLIENT_FIXTURE_1=clientRepository.save(new Client("test identifier 1"));
+		CLIENT_FIXTURE_2=clientRepository.save(new Client("test identifier 2"));
 		INVOICE_OF_YEAR_FIXTURE_1= new Invoice(CLIENT_FIXTURE_1,
 				DateTestsUtil.getDateFromYear(YEAR_FIXTURE), 10);
 		INVOICE_OF_YEAR_FIXTURE_2= new Invoice(CLIENT_FIXTURE_2,
@@ -83,9 +82,10 @@ public class InvoiceMongoRepositoryServiceIT {
 		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_1);
 		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_2);
 		invoiceRepository.save(INVOICE_OF_PREVIOUS_YEAR_FIXTURE);
-		assertThat(invoiceService.findAllInvoicesByYear(YEAR_FIXTURE)).containsExactly(
-				INVOICE_OF_YEAR_FIXTURE_1,
-				INVOICE_OF_YEAR_FIXTURE_2);
+		List<Invoice> invoicesOfYearFixtureFound=invoiceService.findAllInvoicesByYear(YEAR_FIXTURE);
+		assertThat(invoicesOfYearFixtureFound).containsExactly(
+					INVOICE_OF_YEAR_FIXTURE_1,
+					INVOICE_OF_YEAR_FIXTURE_2);
 	}
 	
 	@Test
@@ -93,8 +93,8 @@ public class InvoiceMongoRepositoryServiceIT {
 		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_1);
 		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_2);
 		invoiceRepository.save(INVOICE_OF_PREVIOUS_YEAR_FIXTURE);
-		assertThat(invoiceService.findYearsOfTheInvoices())
-			.containsExactly(YEAR_FIXTURE-1,YEAR_FIXTURE);
+		List<Integer> yearsOfTheInvoicesFound=invoiceService.findYearsOfTheInvoices();
+		assertThat(yearsOfTheInvoicesFound).containsExactly(YEAR_FIXTURE-1,YEAR_FIXTURE);
 	}
 	
 	@Test
@@ -102,8 +102,9 @@ public class InvoiceMongoRepositoryServiceIT {
 		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_1);
 		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_2);
 		invoiceRepository.save(INVOICE_OF_PREVIOUS_YEAR_FIXTURE);
-		assertThat(invoiceService.findInvoicesByClientAndYear(CLIENT_FIXTURE_1, YEAR_FIXTURE))
-			.containsExactly(INVOICE_OF_YEAR_FIXTURE_1);
+		List<Invoice> invoicesOfYearFixtureClient1Found=invoiceService
+									.findInvoicesByClientAndYear(CLIENT_FIXTURE_1, YEAR_FIXTURE);
+		assertThat(invoicesOfYearFixtureClient1Found).containsExactly(INVOICE_OF_YEAR_FIXTURE_1);
 	}
 	
 	@Test
@@ -118,14 +119,15 @@ public class InvoiceMongoRepositoryServiceIT {
 		}
 		catch(ClientNotFoundException e) {
 			assertThat("Il cliente con id "+CLIENT_FIXTURE_1.getId()+" non è presente nel database")
-				.isEqualTo(e.getMessage());
+					.isEqualTo(e.getMessage());
 		}	
 	}
 	
 	@Test
 	public void testAddNewInvoiceWhenClientExistingInDatabase() {
 		Invoice invoiceAdded=invoiceService.addInvoice(INVOICE_OF_YEAR_FIXTURE_1);
-		assertThat(invoiceRepository.findById(invoiceAdded.getId())).isEqualTo(invoiceAdded);
+		Invoice invoiceFound=invoiceRepository.findById(invoiceAdded.getId());
+		assertThat(invoiceFound).isEqualTo(invoiceAdded);
 	}
 	
 	@Test
@@ -138,7 +140,7 @@ public class InvoiceMongoRepositoryServiceIT {
 		}
 		catch(ClientNotFoundException e) {
 			assertThat("Il cliente con id "+clientOfInvoiceToAdd.getId()+" non è presente nel database")
-				.isEqualTo(e.getMessage());
+					.isEqualTo(e.getMessage());
 		}	
 	}
 	
@@ -147,7 +149,8 @@ public class InvoiceMongoRepositoryServiceIT {
 		Invoice invoiceToRemove=invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_1);
 		invoiceRepository.save(INVOICE_OF_YEAR_FIXTURE_2);
 		invoiceService.removeInvoice(invoiceToRemove);
-		assertThat(invoiceRepository.findById(invoiceToRemove.getId())).isNull();
+		Invoice invoiceFound=invoiceRepository.findById(invoiceToRemove.getId());
+		assertThat(invoiceFound).isNull();
 	}
 	
 	@Test

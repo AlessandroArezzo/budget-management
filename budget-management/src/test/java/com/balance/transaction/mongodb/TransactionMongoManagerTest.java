@@ -14,6 +14,7 @@ import java.util.stream.StreamSupport;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -43,7 +44,9 @@ public class TransactionMongoManagerTest {
 
 	@SuppressWarnings("rawtypes")
 	@ClassRule
-	public static final GenericContainer mongo = new GenericContainer("mongo:4.2.3") .withExposedPorts(27017) .withCommand("--replSet rs0");
+	public static final GenericContainer mongo = new GenericContainer("mongo:4.2.3")
+														.withExposedPorts(27017) 
+														.withCommand("--replSet rs0");
 	
 	private MongoClient mongoClient;
 	
@@ -67,13 +70,16 @@ public class TransactionMongoManagerTest {
 	public static void init() throws UnsupportedOperationException, IOException, InterruptedException {
 		mongo.start();
 		mongo.execInContainer("/bin/bash", "-c", "mongo --eval 'rs.initiate()' --quiet");
-        mongo.execInContainer("/bin/bash", "-c",
-	            "until mongo --eval 'rs.isMaster()' | grep ismaster | grep true > /dev/null 2>&1;do sleep 1;done"); 
+        mongo.execInContainer("/bin/bash", "-c", "until mongo --eval 'rs.isMaster()' "
+											  + "| grep ismaster | grep true > /dev/null 2>&1;"
+											  + "do sleep 1;done"); 
 	}
 	
 	@Before
 	public void setup() { 
-		mongoClient = spy(new MongoClient(new ServerAddress(mongo.getContainerIpAddress(), mongo.getMappedPort(27017))));		
+		mongoClient = spy(new MongoClient(new ServerAddress(
+											  mongo.getContainerIpAddress(),
+											  mongo.getMappedPort(27017))));		
 		MongoDatabase database = mongoClient.getDatabase(DB_NAME);
 		database.drop();
 		database.createCollection(COLLECTION_CLIENTS_NAME);
@@ -87,32 +93,45 @@ public class TransactionMongoManagerTest {
 		
 	}
 	
+	@After
+	public void tearDown() { 
+		mongoClient.close();
+	}
+	
 	@Test
 	public void testOnCommitDoInTransaction() {
 		List<String> idElementsAdded=transactionManager.doInTransaction( 
 				factory -> {
-					String idClientAdded=addTestClientToDatabase(CLIENT_IDENTIFIER_FIXTURE,this.clientSession);
-					String idInvoiceAdded=addTestInvoiceToDatabase(idClientAdded,
-							INVOICE_DATE_FIXTURE,INVOICE_REVENUE_FIXTURE,this.clientSession);
-					return new ArrayList<String>(
-							Arrays.asList(idClientAdded,idInvoiceAdded));
+					String idClientAdded=addTestClientToDatabaseInTransaction(
+							CLIENT_IDENTIFIER_FIXTURE);
+					String idInvoiceAdded=addTestInvoiceToDatabaseInTransaction(idClientAdded,
+							INVOICE_DATE_FIXTURE,INVOICE_REVENUE_FIXTURE);
+					return new ArrayList<String>(Arrays.asList(idClientAdded,idInvoiceAdded));
 				});
-		assertThat(readAllClientsFromDatabase())
-			.containsExactly(new Client(idElementsAdded.get(0), CLIENT_IDENTIFIER_FIXTURE));
-		assertThat(readAllInvoicesFromDatabase()).containsExactly(new Invoice (idElementsAdded.get(1),
-				new Client(idElementsAdded.get(0), CLIENT_IDENTIFIER_FIXTURE),INVOICE_DATE_FIXTURE,
-				INVOICE_REVENUE_FIXTURE));
+		List<Client> clientsInDatabase=readAllClientsFromDatabase();
+		assertThat(clientsInDatabase).containsOnly(
+				new Client(idElementsAdded.get(0), CLIENT_IDENTIFIER_FIXTURE));
+		List<Invoice> invoicesInDatabase=readAllInvoicesFromDatabase();
+		assertThat(invoicesInDatabase).containsOnly(
+				new Invoice (idElementsAdded.get(1), 
+							new Client(idElementsAdded.get(0), CLIENT_IDENTIFIER_FIXTURE),
+							INVOICE_DATE_FIXTURE, INVOICE_REVENUE_FIXTURE));
 	}
 	
 	@Test
 	public void testOnRollBackDoInTransaction() {
 		transactionManager.doInTransaction( 
 				factory -> {
-						addTestClientToDatabase(CLIENT_IDENTIFIER_FIXTURE,this.clientSession);
-						throw new MongoException("Error: abort transaction.");
-				});	
-		assertThat(readAllClientsFromDatabase())
-			.isEmpty();
+					String idClientAdded=addTestClientToDatabaseInTransaction(
+							CLIENT_IDENTIFIER_FIXTURE);
+					addTestInvoiceToDatabaseInTransaction(idClientAdded,
+								INVOICE_DATE_FIXTURE,INVOICE_REVENUE_FIXTURE);
+					throw new MongoException("Error: abort transaction.");
+				});
+		List<Client> clientsInDatabase=readAllClientsFromDatabase();
+		assertThat(clientsInDatabase).isEmpty();
+		List<Invoice> invoicesInDatabase=readAllInvoicesFromDatabase();
+		assertThat(invoicesInDatabase).isEmpty();
 	}
 	
 
@@ -139,7 +158,7 @@ public class TransactionMongoManagerTest {
 		return null;
 	}
 	
-	private String addTestInvoiceToDatabase(String clientId, Date data, double revenue, ClientSession clientSession) {
+	private String addTestInvoiceToDatabaseInTransaction(String clientId, Date data, double revenue) {
 		Document invoiceToAdd=new Document().append(FIELD_INVOICE_CLIENT,
 				 new DBRef(COLLECTION_CLIENTS_NAME,
 					 		new ObjectId(clientId)))
@@ -149,7 +168,7 @@ public class TransactionMongoManagerTest {
 		return invoiceToAdd.get( FIELD_PK_COLLECTIONS ).toString();
 	}
 	
-	private String addTestClientToDatabase(String identifier,ClientSession clientSession) {
+	private String addTestClientToDatabaseInTransaction(String identifier) {
 		Document clientToAdd=new Document().append(FIELD_CLIENT_IDENTIFIER, identifier);
 		clientsCollection.insertOne(clientSession, clientToAdd);
 		return clientToAdd.get( FIELD_PK_COLLECTIONS ).toString();

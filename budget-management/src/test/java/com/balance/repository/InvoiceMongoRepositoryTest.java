@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,12 +54,13 @@ public class InvoiceMongoRepositoryTest {
 	private static final Date LAST_DAY_OF_THE_YEAR_FIXTURE=DateTestsUtil.getLastDayOfYear(YEAR_FIXTURE);
 	private static final Date LAST_DAY_OF_THE_PREVIOUS_YEAR_FIXTURE=DateTestsUtil.getLastDayOfYear(YEAR_FIXTURE-1);
 	private static final Date FIRST_DAY_OF_THE_NEXT_YEAR_FIXTURE=DateTestsUtil.getFirstDayOfYear(YEAR_FIXTURE+1);
-	private static final Date DATE_NOT_OF_THE_YEAR_FIXTURE=DateTestsUtil.getDateFromYear(YEAR_FIXTURE-1);
+	private static final Date DATE_OF_THE_PREVIOUS_YEAR_FIXTURE=DateTestsUtil.getDateFromYear(YEAR_FIXTURE-1);
 	
 	@SuppressWarnings("rawtypes")
 	@ClassRule
-	public static final GenericContainer mongo = new GenericContainer("mongo:4.2.3") .withExposedPorts(27017) .withCommand("--replSet rs0");
-	
+	public static final GenericContainer mongo = new GenericContainer("mongo:4.2.3")
+														.withExposedPorts(27017) 
+														.withCommand("--replSet rs0");
 	private MongoClient mongoClient;
 	private MongoCollection<Document> invoiceCollection;
 
@@ -74,23 +74,23 @@ public class InvoiceMongoRepositoryTest {
 	public static void init() throws UnsupportedOperationException, IOException, InterruptedException {
 		mongo.start();
 		mongo.execInContainer("/bin/bash", "-c", "mongo --eval 'rs.initiate()' --quiet");
-        mongo.execInContainer("/bin/bash", "-c",
-	            "until mongo --eval 'rs.isMaster()' | grep ismaster | grep true > /dev/null 2>&1;do sleep 1;done"); 
+        mongo.execInContainer("/bin/bash", "-c", "until mongo --eval 'rs.isMaster()' "
+											  + "| grep ismaster | grep true > /dev/null 2>&1;"
+											  + "do sleep 1;done"); 
 	}
 	
 	@Before
 	public void setup() { 
 		mongoClient = new MongoClient(new ServerAddress(mongo.getContainerIpAddress(), mongo.getMappedPort(27017)));	
 		MongoDatabase database = mongoClient.getDatabase(BUDGET_DB_NAME);
-		if(!database.listCollectionNames().into(new ArrayList<String>())
-				.contains(INVOICE_COLLECTION_NAME)) {
-			database.createCollection(INVOICE_COLLECTION_NAME);
-		}
+		database.drop();
+		database.createCollection(INVOICE_COLLECTION_NAME);
 		invoiceRepository = new InvoiceMongoRepository(mongoClient, mongoClient.startSession(),
 				BUDGET_DB_NAME, INVOICE_COLLECTION_NAME, clientRepository);
 		MockitoAnnotations.initMocks(this);
-		database.drop();
 		invoiceCollection = database.getCollection(INVOICE_COLLECTION_NAME);
+		when(clientRepository.findById(CLIENT_FIXTURE_1.getId())).thenReturn(CLIENT_FIXTURE_1);
+		when(clientRepository.findById(CLIENT_FIXTURE_2.getId())).thenReturn(CLIENT_FIXTURE_2);
 	}
 	
 	@After
@@ -99,7 +99,7 @@ public class InvoiceMongoRepositoryTest {
 	}
 	
 	@Test
-	public void testCreateInvoiceCollectionInConstructorWhenCollectionNotExistInDatabase() {
+	public void testCreateInvoiceCollectionInConstructorWhenCollectionNotExistingInDatabase() {
 		String invoiceCollectionNotExisting="invoice_collection_not_existing_in_db";
 		invoiceRepository = new InvoiceMongoRepository(mongoClient, mongoClient.startSession(),
 				BUDGET_DB_NAME, invoiceCollectionNotExisting, clientRepository);
@@ -109,86 +109,91 @@ public class InvoiceMongoRepositoryTest {
 	
 	@Test
 	public void testFindAllInvoicesWhenDatabaseIsEmpty() {
-		assertThat(invoiceRepository.findAll()).isEmpty();
+		List<Invoice> invoicesInDatabase=invoiceRepository.findAll();
+		assertThat(invoicesInDatabase).isEmpty();
 	}
 	
 	@Test
 	public void testFindAllWhenDatabaseIsNotEmpty() {
 		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_YEAR_FIXTURE , 10);
 		addTestInvoiceToDatabase(CLIENT_FIXTURE_2.getId(), DATE_OF_THE_YEAR_FIXTURE, 20);
-		when(clientRepository.findById(CLIENT_FIXTURE_1.getId())).thenReturn(CLIENT_FIXTURE_1);
-		when(clientRepository.findById(CLIENT_FIXTURE_2.getId())).thenReturn(CLIENT_FIXTURE_2);
-		assertThat(invoiceRepository.findAll())
-			.containsExactly(new Invoice(CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 10 ),
-			new Invoice(CLIENT_FIXTURE_2, DATE_OF_THE_YEAR_FIXTURE, 20));
+		List<Invoice> invoicesInDatabase=invoiceRepository.findAll();
+		assertThat(invoicesInDatabase) .containsExactly(
+				new Invoice(CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 10 ),
+				new Invoice(CLIENT_FIXTURE_2, DATE_OF_THE_YEAR_FIXTURE, 20));
 	}
 	
 	@Test
 	public void testFindByIdNotFound() {
-		assertThat(invoiceRepository.findById(new ObjectId().toString())).isNull();
+		Invoice invoiceFound=invoiceRepository.findById(new ObjectId().toString());
+		assertThat(invoiceFound).isNull();
 	}
 	
 	@Test
 	public void testFindByIdFound() {
-		String idInvoiceTest1=addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_YEAR_FIXTURE, 10);
-		addTestInvoiceToDatabase(CLIENT_FIXTURE_2.getId(), DATE_OF_THE_YEAR_FIXTURE, 20);
-		when(clientRepository.findById(CLIENT_FIXTURE_1.getId())).thenReturn(CLIENT_FIXTURE_1);
-		assertThat(invoiceRepository.findById(idInvoiceTest1)).isEqualTo(
+		String idInvoiceToFind=addTestInvoiceToDatabase(
+				CLIENT_FIXTURE_1.getId(), DATE_OF_THE_YEAR_FIXTURE, 10);
+		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_YEAR_FIXTURE, 20);
+		Invoice invoiceFound=invoiceRepository.findById(idInvoiceToFind);
+		assertThat(invoiceFound).isEqualTo(
 				new Invoice(CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 10 ));
 	}
 	
 	@Test
 	public void testSave() {
-		Invoice invoice = new Invoice(CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 10 );
-		when(clientRepository.findById(CLIENT_FIXTURE_1.getId())).thenReturn(CLIENT_FIXTURE_1);
+		Invoice invoiceToAdd = new Invoice(CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 10 );
 		when(clientRepository.getClientCollection())
 			.thenReturn(mongoClient.getDatabase(BUDGET_DB_NAME).getCollection(CLIENT_COLLECTION_NAME));
-		Invoice invoiceResult=invoiceRepository.save(invoice);
-		assertThat(invoiceResult).isEqualTo(
+		Invoice invoiceAdded=invoiceRepository.save(invoiceToAdd);
+		assertThat(invoiceAdded).isEqualTo(
 				new Invoice(CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 10 ));
-		assertThat(invoiceResult.getId()).isNotNull();
-		assertThat(readAllInvoicesFromDatabase()).containsExactly(new Invoice(
-				CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 10 ));
+		assertThat(invoiceAdded.getId()).isNotNull();
+		List<Invoice> invoicesInDatabase=readAllInvoicesFromDatabase();
+		assertThat(invoicesInDatabase).containsOnly(
+				new Invoice(CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 10 ));
 	}
 	
 	@Test
-	public void testDeleteWhenInvoiceIsPresentInDatabase() {
-		String idInvoiceTest=addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_YEAR_FIXTURE , 10);
-		when(clientRepository.findById(CLIENT_FIXTURE_1.getId())).thenReturn(CLIENT_FIXTURE_1);
-		Invoice invoiceRemoved=invoiceRepository.delete(idInvoiceTest); 
-		assertThat(invoiceRemoved).isEqualTo(new Invoice(CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE , 10));
-		assertThat(readAllInvoicesFromDatabase()).isEmpty();
+	public void testDeleteWhenInvoiceExistingInDatabase() {
+		String idInvoiceToRemove=addTestInvoiceToDatabase(
+				CLIENT_FIXTURE_1.getId(), DATE_OF_THE_YEAR_FIXTURE , 10);
+		Invoice invoiceRemoved=invoiceRepository.delete(idInvoiceToRemove); 
+		assertThat(invoiceRemoved).isEqualTo(
+				new Invoice(CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE , 10));
+		List<Invoice> invoicesInDatabase=readAllInvoicesFromDatabase();
+		assertThat(invoicesInDatabase).isEmpty();
 	}
 	
 	@Test
-	public void testDeleteWhenInvoiceIsNotPresentInDatabase() {
-		assertThat(invoiceRepository.delete(new ObjectId().toString())).isNull();
+	public void testDeleteWhenInvoiceNotExistingInDatabase() {
+		Invoice invoiceRemoved=invoiceRepository.delete(new ObjectId().toString());
+		assertThat(invoiceRemoved).isNull();
 	}
 	
 	@Test
 	public void testFindInvoicesByYearWhenDatabaseIsEmpty() {
-		assertThat(invoiceRepository.findInvoicesByYear(YEAR_FIXTURE)).isEmpty();
+		List<Invoice> invoicesOfYearFixture=invoiceRepository.findInvoicesByYear(YEAR_FIXTURE);
+		assertThat(invoicesOfYearFixture).isEmpty();
 	}
 	
 	@Test
 	public void testFindInvoicesByYearWhenThereAreInvoicesAllSameYearInDatabase() {
 		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_YEAR_FIXTURE, 10);
-		addTestInvoiceToDatabase(CLIENT_FIXTURE_2.getId(), DATE_OF_THE_YEAR_FIXTURE, 20);
-		when(clientRepository.findById(CLIENT_FIXTURE_1.getId())).thenReturn(CLIENT_FIXTURE_1);
-		when(clientRepository.findById(CLIENT_FIXTURE_2.getId())).thenReturn(CLIENT_FIXTURE_2);
-		assertThat(invoiceRepository.findInvoicesByYear(YEAR_FIXTURE))
-			.containsExactly(new Invoice(CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 10 ),
-			new Invoice(CLIENT_FIXTURE_2, DATE_OF_THE_YEAR_FIXTURE, 20));
+		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_YEAR_FIXTURE, 20);
+		List<Invoice> invoicesOfYear=invoiceRepository.findInvoicesByYear(YEAR_FIXTURE);
+		assertThat(invoicesOfYear) .containsExactly(
+					new Invoice(CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 10 ),
+					new Invoice(CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 20));
 	}
 	
 	@Test
-	public void testFindAllInvoicesByYearWhenThereAreInvoicesAllDifferentYearInDatabase() {
+	public void testFindAllInvoicesByYearWhenThereAreInvoicesAllDifferentYearsInDatabase() {
 		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_YEAR_FIXTURE, 10);
-		addTestInvoiceToDatabase(CLIENT_FIXTURE_2.getId(), DATE_NOT_OF_THE_YEAR_FIXTURE, 20);
+		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_PREVIOUS_YEAR_FIXTURE, 20);
 		when(clientRepository.findById(CLIENT_FIXTURE_1.getId())).thenReturn(CLIENT_FIXTURE_1);
-		when(clientRepository.findById(CLIENT_FIXTURE_2.getId())).thenReturn(CLIENT_FIXTURE_2);
-		assertThat(invoiceRepository.findInvoicesByYear(YEAR_FIXTURE))
-			.containsOnly(new Invoice(CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 10));
+		List<Invoice> invoicesOfYear=invoiceRepository.findInvoicesByYear(YEAR_FIXTURE);
+		assertThat(invoicesOfYear).containsOnly(
+					new Invoice(CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 10));
 	}
 	
 	@Test
@@ -197,87 +202,77 @@ public class InvoiceMongoRepositoryTest {
 		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), LAST_DAY_OF_THE_YEAR_FIXTURE, 20);
 		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), LAST_DAY_OF_THE_PREVIOUS_YEAR_FIXTURE, 30);
 		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), FIRST_DAY_OF_THE_NEXT_YEAR_FIXTURE, 40);
-		when(clientRepository.findById(CLIENT_FIXTURE_1.getId())).thenReturn(CLIENT_FIXTURE_1);
-		assertThat(invoiceRepository.findInvoicesByYear(YEAR_FIXTURE))
-		.containsExactly(new Invoice(CLIENT_FIXTURE_1, FIRST_DAY_OF_THE_YEAR_FIXTURE, 10),
-				new Invoice(CLIENT_FIXTURE_1, LAST_DAY_OF_THE_YEAR_FIXTURE, 20));
+		List<Invoice> invoicesOfYear=invoiceRepository.findInvoicesByYear(YEAR_FIXTURE);
+		assertThat(invoicesOfYear) .containsExactly(
+					new Invoice(CLIENT_FIXTURE_1, FIRST_DAY_OF_THE_YEAR_FIXTURE, 10),
+					new Invoice(CLIENT_FIXTURE_1, LAST_DAY_OF_THE_YEAR_FIXTURE, 20));
 	}
 	
 	@Test
 	public void testGetYearsOfInvoicesInDatabaseWhenDatabaseIsEmpty() {
-		assertThat(invoiceRepository.getYearsOfInvoicesInDatabase()).isEmpty();
+		List<Integer> yearsOfTheInvoices=invoiceRepository.getYearsOfInvoicesInDatabase();
+		assertThat(yearsOfTheInvoices).isEmpty();
 	}
 	
 	@Test
 	public void testGetYearsOfInvoicesInDatabaseWhenDatabaseIsNotEmpty() {
-		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DateTestsUtil.getDateFromYear(YEAR_FIXTURE), 10);
-		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DateTestsUtil.getDateFromYear(YEAR_FIXTURE-1), 20);
-		addTestInvoiceToDatabase(CLIENT_FIXTURE_2.getId(), DateTestsUtil.getDateFromYear(YEAR_FIXTURE), 30);
-		when(clientRepository.findById(CLIENT_FIXTURE_1.getId())).thenReturn(CLIENT_FIXTURE_1);
-		when(clientRepository.findById(CLIENT_FIXTURE_2.getId())).thenReturn(CLIENT_FIXTURE_2);
-		assertThat(invoiceRepository.getYearsOfInvoicesInDatabase()).contains(
-				YEAR_FIXTURE-1,YEAR_FIXTURE);
+		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_YEAR_FIXTURE, 10);
+		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_YEAR_FIXTURE, 30);
+		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_PREVIOUS_YEAR_FIXTURE, 20);
+		List<Integer> yearsOfTheInvoices=invoiceRepository.getYearsOfInvoicesInDatabase();
+		assertThat(yearsOfTheInvoices).contains(YEAR_FIXTURE-1,YEAR_FIXTURE);
 	}
 	
 	@Test
-	public void testGetInvoicesOfClientAndYearWhenNotPresentInvoicesOfTheClientInDatabase() {
-		addTestInvoiceToDatabase(CLIENT_FIXTURE_2.getId(), 
-				DATE_OF_THE_YEAR_FIXTURE, 10);
-		addTestInvoiceToDatabase(CLIENT_FIXTURE_2.getId(), 
-				DATE_NOT_OF_THE_YEAR_FIXTURE, 20);
-		assertThat(invoiceRepository.findInvoicesByClientAndYear(CLIENT_FIXTURE_1, YEAR_FIXTURE))
-			.isEmpty();
+	public void testGetInvoicesOfClientAndYearWhenNotExistingInvoicesOfTheClientInDatabase() {
+		addTestInvoiceToDatabase(CLIENT_FIXTURE_2.getId(), DATE_OF_THE_YEAR_FIXTURE, 10);
+		addTestInvoiceToDatabase(CLIENT_FIXTURE_2.getId(), DATE_OF_THE_PREVIOUS_YEAR_FIXTURE, 20);
+		List<Invoice> invoicesOfYearAndClient=invoiceRepository
+					.findInvoicesByClientAndYear(CLIENT_FIXTURE_1, YEAR_FIXTURE);
+		assertThat(invoicesOfYearAndClient).isEmpty();
 	}
 	
 	@Test
 	public void testGetInvoicesOfClientAndYearWhenThereAreOnlyInvoicesOfTheClientAndYearInDatabase() {
-		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), 
-				DATE_OF_THE_YEAR_FIXTURE, 10);
-		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), 
-				DATE_OF_THE_YEAR_FIXTURE, 20);
-		when(clientRepository.findById(CLIENT_FIXTURE_1.getId())).thenReturn(CLIENT_FIXTURE_1);
-		assertThat(invoiceRepository.findInvoicesByClientAndYear(CLIENT_FIXTURE_1, YEAR_FIXTURE))
-			.containsExactly(new Invoice(CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 10),
+		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_YEAR_FIXTURE, 10);
+		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_YEAR_FIXTURE, 20);
+		List<Invoice> invoicesOfYearAndClient=invoiceRepository
+				.findInvoicesByClientAndYear(CLIENT_FIXTURE_1, YEAR_FIXTURE);
+		assertThat(invoicesOfYearAndClient).containsExactly(
+					new Invoice(CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 10),
 					new Invoice(CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 20));
 	}
 	
 	@Test
 	public void testGetInvoicesOfClientAndYearWhenThereAreOnlyInvoicesOfTheClientInDatabase() {
-		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), 
-				DATE_OF_THE_YEAR_FIXTURE, 10);
-		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), 
-				DATE_NOT_OF_THE_YEAR_FIXTURE, 20);
-		when(clientRepository.findById(CLIENT_FIXTURE_1.getId())).thenReturn(CLIENT_FIXTURE_1);
-		assertThat(invoiceRepository.findInvoicesByClientAndYear(CLIENT_FIXTURE_1, YEAR_FIXTURE))
-			.containsExactly(new Invoice(CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 10));
+		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_YEAR_FIXTURE, 10);
+		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_PREVIOUS_YEAR_FIXTURE, 20);
+		List<Invoice> invoicesOfYearAndClient=invoiceRepository
+				.findInvoicesByClientAndYear(CLIENT_FIXTURE_1, YEAR_FIXTURE);
+		assertThat(invoicesOfYearAndClient).containsOnly(
+				new Invoice(CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 10));
 	}
 	
 	@Test
 	public void testGetInvoicesOfClientAndYearWhenThereAreInvoicesOfTheDifferentClientsInDatabase() {
-		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), 
-				DATE_OF_THE_YEAR_FIXTURE, 10);
-		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), 
-				DATE_NOT_OF_THE_YEAR_FIXTURE, 20);
-		addTestInvoiceToDatabase(CLIENT_FIXTURE_2.getId(), 
-				DATE_OF_THE_YEAR_FIXTURE, 30);
-		when(clientRepository.findById(CLIENT_FIXTURE_1.getId())).thenReturn(CLIENT_FIXTURE_1);
-		when(clientRepository.findById(CLIENT_FIXTURE_2.getId())).thenReturn(CLIENT_FIXTURE_2);
-		assertThat(invoiceRepository.findInvoicesByClientAndYear(CLIENT_FIXTURE_1, YEAR_FIXTURE))
-			.containsExactly(new Invoice(CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 10));
+		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_YEAR_FIXTURE, 10);
+		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_PREVIOUS_YEAR_FIXTURE, 20);
+		addTestInvoiceToDatabase(CLIENT_FIXTURE_2.getId(), DATE_OF_THE_YEAR_FIXTURE, 30);
+		List<Invoice> invoicesOfYearAndClient=invoiceRepository
+				.findInvoicesByClientAndYear(CLIENT_FIXTURE_1, YEAR_FIXTURE);
+		assertThat(invoicesOfYearAndClient).containsOnly(
+				new Invoice(CLIENT_FIXTURE_1, DATE_OF_THE_YEAR_FIXTURE, 10));
 	}
 	
 	@Test
 	public void testDeleteAllInvoicesOfAClient() {
-		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), 
-				DATE_OF_THE_YEAR_FIXTURE, 10);
-		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), 
-				DATE_NOT_OF_THE_YEAR_FIXTURE, 20);
-		addTestInvoiceToDatabase(CLIENT_FIXTURE_2.getId(), 
-				DATE_OF_THE_YEAR_FIXTURE, 30);
-		when(clientRepository.findById(CLIENT_FIXTURE_2.getId())).thenReturn(CLIENT_FIXTURE_2);
+		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_YEAR_FIXTURE, 10);
+		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_PREVIOUS_YEAR_FIXTURE, 20);
+		addTestInvoiceToDatabase(CLIENT_FIXTURE_2.getId(), DATE_OF_THE_YEAR_FIXTURE, 30);
 		invoiceRepository.deleteAllInvoicesByClient(CLIENT_FIXTURE_1.getId());
-		assertThat(readAllInvoicesFromDatabase()).containsOnly(
-				new Invoice(CLIENT_FIXTURE_2, DATE_OF_THE_YEAR_FIXTURE,30));
+		List<Invoice> invoicesRemainingInDatabase=readAllInvoicesFromDatabase();
+		assertThat(invoicesRemainingInDatabase).containsOnly(
+					new Invoice(CLIENT_FIXTURE_2, DATE_OF_THE_YEAR_FIXTURE,30));
 	}
 	
 	private List<Invoice> readAllInvoicesFromDatabase() {
