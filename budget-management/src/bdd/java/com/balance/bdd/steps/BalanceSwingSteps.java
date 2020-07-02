@@ -55,8 +55,9 @@ public class BalanceSwingSteps {
 	
 	@Then("The client list contains all clients contained in the database")
 	public void the_client_list_contains_all_clients_contained_in_the_database() {
-		assertThat(window.list("clientsList").contents())
-			.containsExactly(CLIENT_FIXTURE_1_IDENTIFIER,
+		String[] clientListContents=window.list("clientsList").contents();
+		assertThat(clientListContents).containsExactly(
+							CLIENT_FIXTURE_1_IDENTIFIER,
 							CLIENT_FIXTURE_2_IDENTIFIER,
 							CLIENT_FIXTURE_3_IDENTIFIER
 			);
@@ -82,8 +83,7 @@ public class BalanceSwingSteps {
 
 	@When("The user selects a year from the year selection combobox")
 	public void the_user_selects_a_year_from_the_year_selection_combobox() {
-		window.comboBox("yearsCombobox")
-			.selectItem(Pattern.compile(""+YEAR_FIXTURE));
+		window.comboBox("yearsCombobox").selectItem(Pattern.compile(""+YEAR_FIXTURE));
 	}
 
 	@Then("The invoice list contains all invoices of the selected year")
@@ -115,8 +115,7 @@ public class BalanceSwingSteps {
 	
 	@Given("The user selects a client from the client list")
 	public void the_user_selects_a_client_from_the_client_list() {
-	    window.list("clientsList")
-	    	.selectItem(Pattern.compile(CLIENT_FIXTURE_2_IDENTIFIER));
+	    window.list("clientsList").selectItem(Pattern.compile(CLIENT_FIXTURE_2_IDENTIFIER));
 	}
 
 	@Then("The invoice list contains the invoices of the selected year for the client selected")
@@ -155,15 +154,15 @@ public class BalanceSwingSteps {
 
 	@Then("The client is removed from the client list")
 	public void the_client_is_removed_from_the_client_list() {
-		assertThat(window.list("clientsList").contents())
-			.noneMatch(
+		String[] clientListContents=window.list("clientsList").contents();
+		assertThat(clientListContents).noneMatch(
 				e -> e.contains(CLIENT_FIXTURE_2_IDENTIFIER));
 	}
 
 	@Then("The client is removed from client selection combobox in the invoice addition data")
 	public void the_client_is_removed_from_client_selection_combobox_in_the_invoice_addition_data() {
-		assertThat(window.comboBox("clientsCombobox").contents())
-			.noneMatch(
+		String[] clientComboboxContents=window.comboBox("clientsCombobox").contents();
+		assertThat(clientComboboxContents).noneMatch(
 				e -> e.contains(CLIENT_FIXTURE_2_IDENTIFIER));
 	}
 
@@ -196,14 +195,14 @@ public class BalanceSwingSteps {
 
 	@Then("The client list contains the new client")
 	public void the_client_list_contains_the_new_client() {
-		assertThat(window.list("clientsList").contents())
-			.contains(NEW_CLIENT_IDENTIFIER);
+		String[] clientListContents=window.list("clientsList").contents();
+		assertThat(clientListContents).contains(NEW_CLIENT_IDENTIFIER);
 	}
 
 	@Then("The client selection combobox in the invoice addition data contains the new client")
 	public void the_client_selection_combobox_in_the_invoice_addition_data_contains_the_new_client() {
-		assertThat(window.comboBox("clientsCombobox").contents())
-			.contains(NEW_CLIENT_IDENTIFIER);
+		String[] clientComboboxContents=window.comboBox("clientsCombobox").contents();
+		assertThat(clientComboboxContents).contains(NEW_CLIENT_IDENTIFIER);
 	}
 
 	@Given("The user provides invoice data in the text fields with the same year as the one selected")
