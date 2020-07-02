@@ -33,7 +33,7 @@
    		**/repository/mongodb/RepositoryMongoFactory.java
    	</sonar.coverage.exclusions>
    	
-	<sonar.issue.ignore.multicriteria>e1,e2,e3,e4,e5,e6</sonar.issue.ignore.multicriteria>
+	<sonar.issue.ignore.multicriteria>e1,e2,e3,e4,e5,e6,e7</sonar.issue.ignore.multicriteria>
 	<!--Disable rule for "Tests should include assertions" in swing view tests-->
 	<sonar.issue.ignore.multicriteria.e1.ruleKey>
 		java:S2699
@@ -52,7 +52,7 @@
 	</sonar.issue.ignore.multicriteria.e2.resourceKey>
 	
 	<!--Disable rule for "Inheritance tree of classes should not be too deep"
-	 in BalanceSwingView-->
+	 in BalanceSwingView and in ClientListCellRenderer-->
 	<sonar.issue.ignore.multicriteria.e3.ruleKey>
 		java:S110
 	</sonar.issue.ignore.multicriteria.e3.ruleKey>
@@ -60,6 +60,12 @@
 		**/BalanceSwingView.java
 	</sonar.issue.ignore.multicriteria.e3.resourceKey>
 	
+	<sonar.issue.ignore.multicriteria.e7.ruleKey>
+		java:S110
+	</sonar.issue.ignore.multicriteria.e7.ruleKey>
+	<sonar.issue.ignore.multicriteria.e7.resourceKey>
+		**/ClientListCellRenderer.java
+	</sonar.issue.ignore.multicriteria.e7.resourceKey>
 	<!--Disable rule for "Local variable and method parameter names should comply with a naming convention""
 	 in BalanceSwingView-->
 	<sonar.issue.ignore.multicriteria.e4.ruleKey>
