@@ -57,14 +57,15 @@ public class BalanceSwingSteps {
 	public void the_client_list_contains_all_clients_contained_in_the_database() {
 		assertThat(window.list("clientsList").contents())
 			.containsExactly(CLIENT_FIXTURE_1_IDENTIFIER,
-					CLIENT_FIXTURE_2_IDENTIFIER,
-					CLIENT_FIXTURE_3_IDENTIFIER
+							CLIENT_FIXTURE_2_IDENTIFIER,
+							CLIENT_FIXTURE_3_IDENTIFIER
 			);
 	}
 	
 	@Then("The invoice list contains all invoices of the current year contained in the database")
 	public void the_invoice_list_contains_all_invoices_of_the_current_year_contained_in_the_database() {
-		String[][] tableContents = window.table("invoicesTable").contents(); 
+		window.table("invoicesTable").requireRowCount(2);
+		String[][] tableContents = window.table("invoicesTable").contents();
 		assertThat(tableContents[0]).containsExactly(INVOICE_OF_THE_CURRENT_YEAR_1_CLIENT.getIdentifier(),
 				getShortFormatDate(INVOICE_OF_THE_CURRENT_YEAR_1_DATE),getRevenueString(INVOICE_OF_THE_CURRENT_YEAR_1_REVENUE));
 		assertThat(tableContents[1]).containsExactly(INVOICE_OF_THE_CURRENT_YEAR_2_CLIENT.getIdentifier(),
@@ -87,20 +88,28 @@ public class BalanceSwingSteps {
 
 	@Then("The invoice list contains all invoices of the selected year")
 	public void the_invoice_list_contains_all_invoices_of_the_selected_year() {
+		window.table("invoicesTable").requireRowCount(3);
 		String[][] tableContents = window.table("invoicesTable").contents(); 
-		assertThat(tableContents[0]).containsExactly(INVOICE_OF_THE_YEAR_FIXTURE_1_CLIENT.getIdentifier(),
-				getShortFormatDate(INVOICE_OF_THE_YEAR_FIXTURE_1_DATE),getRevenueString(INVOICE_OF_THE_YEAR_FIXTURE_1_REVENUE));
-		assertThat(tableContents[1]).containsExactly(INVOICE_OF_THE_YEAR_FIXTURE_2_CLIENT.getIdentifier(),
-				getShortFormatDate(INVOICE_OF_THE_YEAR_FIXTURE_2_DATE),getRevenueString(INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE));
-		assertThat(tableContents[2]).containsExactly(INVOICE_OF_THE_YEAR_FIXTURE_3_CLIENT.getIdentifier(),
-				getShortFormatDate(INVOICE_OF_THE_YEAR_FIXTURE_3_DATE),getRevenueString(INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE));
+		assertThat(tableContents[0]).containsExactly(
+				INVOICE_OF_THE_YEAR_FIXTURE_1_CLIENT.getIdentifier(),
+				getShortFormatDate(INVOICE_OF_THE_YEAR_FIXTURE_1_DATE),
+				getRevenueString(INVOICE_OF_THE_YEAR_FIXTURE_1_REVENUE));
+		assertThat(tableContents[1]).containsExactly(
+				INVOICE_OF_THE_YEAR_FIXTURE_2_CLIENT.getIdentifier(),
+				getShortFormatDate(INVOICE_OF_THE_YEAR_FIXTURE_2_DATE),
+				getRevenueString(INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE));
+		assertThat(tableContents[2]).containsExactly(
+				INVOICE_OF_THE_YEAR_FIXTURE_3_CLIENT.getIdentifier(),
+				getShortFormatDate(INVOICE_OF_THE_YEAR_FIXTURE_3_DATE),
+				getRevenueString(INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE));
 	}
 
 	@Then("The initial total annual revenue of the selected year is shown")
 	public void the_initial_total_annual_revenue_of_the_selected_year_is_shown() {
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale del "+YEAR_FIXTURE+" è di "+getRevenueString( 
-						INVOICE_OF_THE_YEAR_FIXTURE_1_REVENUE+INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE+
+						INVOICE_OF_THE_YEAR_FIXTURE_1_REVENUE+
+						INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE+
 						INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE)+"€");
 	}
 	
@@ -112,11 +121,16 @@ public class BalanceSwingSteps {
 
 	@Then("The invoice list contains the invoices of the selected year for the client selected")
 	public void the_invoice_list_contains_the_invoices_of_the_selected_year_for_the_client_selected() {
+		window.table("invoicesTable").requireRowCount(2);
 		String[][] tableContents = window.table("invoicesTable").contents(); 
-		assertThat(tableContents[0]).containsExactly(INVOICE_OF_THE_YEAR_FIXTURE_2_CLIENT.getIdentifier(),
-				getShortFormatDate(INVOICE_OF_THE_YEAR_FIXTURE_2_DATE),getRevenueString(INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE));
-		assertThat(tableContents[1]).containsExactly(INVOICE_OF_THE_YEAR_FIXTURE_3_CLIENT.getIdentifier(),
-				getShortFormatDate(INVOICE_OF_THE_YEAR_FIXTURE_3_DATE),getRevenueString(INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE));
+		assertThat(tableContents[0]).containsExactly(
+				INVOICE_OF_THE_YEAR_FIXTURE_2_CLIENT.getIdentifier(),
+				getShortFormatDate(INVOICE_OF_THE_YEAR_FIXTURE_2_DATE),
+				getRevenueString(INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE));
+		assertThat(tableContents[1]).containsExactly(
+				INVOICE_OF_THE_YEAR_FIXTURE_3_CLIENT.getIdentifier(),
+				getShortFormatDate(INVOICE_OF_THE_YEAR_FIXTURE_3_DATE),
+				getRevenueString(INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE));
 	}
 
 	@Then("The initial total annual revenue of the client selected of the selected year is shown")
@@ -124,20 +138,19 @@ public class BalanceSwingSteps {
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale delle fatture del cliente "+CLIENT_FIXTURE_2_IDENTIFIER
 				+" nel "+YEAR_FIXTURE+" è di "+getRevenueString( 
-						INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE+
-						INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE)+"€");
+								INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE+
+								INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE)+"€");
 	}
 
 	@When("The user selects the client removed from the client list")
 	public void the_user_selects_the_client_removed_from_the_client_list() {
-		window.list("clientsList")
-    		.selectItem(Pattern.compile(CLIENT_FIXTURE_2_IDENTIFIER));
+		window.list("clientsList").selectItem(Pattern.compile(CLIENT_FIXTURE_2_IDENTIFIER));
 	}
 
 	@Then("An error is shown containing the name of the selected client")
 	public void an_error_is_shown_containing_the_name_of_the_selected_client() {
 		assertThat(window.textBox("paneClientErrorMessage").text())
-			.contains(CLIENT_FIXTURE_2_IDENTIFIER); 
+					.contains(CLIENT_FIXTURE_2_IDENTIFIER); 
 	}
 
 	@Then("The client is removed from the client list")
@@ -213,7 +226,8 @@ public class BalanceSwingSteps {
 	public void the_total_annual_revenue_of_the_selected_year_is_updated_also_considering_the_new_invoice_added() {
 		window.label("revenueLabel").requireText(
 				"Il ricavo totale del "+YEAR_FIXTURE+" è di "+getRevenueString( 
-						INVOICE_OF_THE_YEAR_FIXTURE_1_REVENUE+INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE+
+						INVOICE_OF_THE_YEAR_FIXTURE_1_REVENUE+
+						INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE+
 						INVOICE_OF_THE_YEAR_FIXTURE_3_REVENUE+
 						100.25)+"€");
 	}
@@ -231,7 +245,8 @@ public class BalanceSwingSteps {
 	public void the_invoice_list_not_contains_the_new_invoice() {
 		String[][] tableContents = window.table("invoicesTable").contents(); 
 		assertThat(tableContents).doesNotContain(new String[] {CLIENT_FIXTURE_2_IDENTIFIER,
-				getShortFormatDate(DateTestsUtil.getDate(4, 5, YEAR_FIXTURE-1)),getRevenueString(100.25)});
+				getShortFormatDate(DateTestsUtil.getDate(4, 5, YEAR_FIXTURE-1)),
+				getRevenueString(100.25)});
 	}
 
 	@Given("The user selects an invoice of the selected year from the invoice list")
@@ -242,8 +257,10 @@ public class BalanceSwingSteps {
 	@Then("The invoice is removed from the invoice list")
 	public void the_invoice_is_removed_from_the_invoice_list() {
 		String[][] tableContents = window.table("invoicesTable").contents(); 
-		assertThat(tableContents).doesNotContain(new String[] {INVOICE_OF_THE_YEAR_FIXTURE_2_CLIENT.getIdentifier(),
-				getShortFormatDate(INVOICE_OF_THE_YEAR_FIXTURE_2_DATE),getRevenueString(INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE)});
+		assertThat(tableContents).doesNotContain(new String[] {
+				INVOICE_OF_THE_YEAR_FIXTURE_2_CLIENT.getIdentifier(),
+				getShortFormatDate(INVOICE_OF_THE_YEAR_FIXTURE_2_DATE),
+				getRevenueString(INVOICE_OF_THE_YEAR_FIXTURE_2_REVENUE)});
 	}
 
 	@Then("The total annual revenue of the selected year is shown considering the invoice removed")
