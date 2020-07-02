@@ -3,7 +3,6 @@ package com.balance.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -33,8 +32,9 @@ public class ClientMongoRepositoryTest {
 	
 	@SuppressWarnings("rawtypes")
 	@ClassRule
-	public static final GenericContainer mongo = new GenericContainer("mongo:4.2.3") .withExposedPorts(27017) .withCommand("--replSet rs0");
-	
+	public static final GenericContainer mongo = new GenericContainer("mongo:4.2.3")
+														.withExposedPorts(27017) 
+														.withCommand("--replSet rs0");
 	private MongoClient mongoClient;
 	private MongoCollection<Document> clientCollection;
 	private ClientMongoRepository clientRepository; 
@@ -43,8 +43,9 @@ public class ClientMongoRepositoryTest {
 	public static void init() throws UnsupportedOperationException, IOException, InterruptedException {
 		mongo.start();
 		mongo.execInContainer("/bin/bash", "-c", "mongo --eval 'rs.initiate()' --quiet");
-        mongo.execInContainer("/bin/bash", "-c",
-	            "until mongo --eval 'rs.isMaster()' | grep ismaster | grep true > /dev/null 2>&1;do sleep 1;done"); 
+        mongo.execInContainer("/bin/bash", "-c", "until mongo --eval 'rs.isMaster()' "
+											  + "| grep ismaster | grep true > /dev/null 2>&1;"
+											  + "do sleep 1;done"); 
 	}
 	
 	@Before
@@ -52,13 +53,10 @@ public class ClientMongoRepositoryTest {
 		mongoClient = new MongoClient(new ServerAddress(
 				mongo.getContainerIpAddress(), mongo.getMappedPort(27017)));
 		MongoDatabase database = mongoClient.getDatabase(BUDGET_DB_NAME);
-		if(!database.listCollectionNames().into(new ArrayList<String>())
-				.contains(CLIENT_COLLECTION_NAME)) {
-			mongoClient.getDatabase(BUDGET_DB_NAME).createCollection(CLIENT_COLLECTION_NAME);
-		}
+		database.drop();
+		mongoClient.getDatabase(BUDGET_DB_NAME).createCollection(CLIENT_COLLECTION_NAME);
 		clientRepository = new ClientMongoRepository(mongoClient, mongoClient.startSession(), 
 				BUDGET_DB_NAME, CLIENT_COLLECTION_NAME);
-		database.drop();
 		clientCollection = database.getCollection(CLIENT_COLLECTION_NAME);
 	}
 	
@@ -68,7 +66,7 @@ public class ClientMongoRepositoryTest {
 	}
 	
 	@Test
-	public void testCreateClientCollectionInConstructorWhenCollectionNotExistInDatabase() {
+	public void testCreateClientCollectionInConstructorWhenCollectionNotExistingInDatabase() {
 		String clientCollectionNotExisting="client_collection_not_existing_in_db";
 		clientRepository = new ClientMongoRepository(mongoClient, mongoClient.startSession(), 
 				BUDGET_DB_NAME, clientCollectionNotExisting);
@@ -84,51 +82,58 @@ public class ClientMongoRepositoryTest {
 	
 	@Test
 	public void testFindAllClientsWhenDatabaseIsEmpty() {
-		assertThat(clientRepository.findAll()).isEmpty();
+		List<Client> clientsInDatabase=clientRepository.findAll();
+		assertThat(clientsInDatabase).isEmpty();
 	}
 	
 	@Test
 	public void testFindAllWhenDatabaseIsNotEmpty() {
 		addTestClientToDatabase("test identifier 1"); 
-		addTestClientToDatabase("test identifier 2"); 
-		assertThat(clientRepository.findAll())
-				.containsExactly(new Client("test identifier 1"),
-				new Client("test identifier 2"));
+		addTestClientToDatabase("test identifier 2");
+		List<Client> clientsInDatabase=clientRepository.findAll();
+		assertThat(clientsInDatabase).containsExactly(
+					new Client("test identifier 1"),
+				    new Client("test identifier 2"));
 	}
 	
 	@Test
 	public void testFindByIdNotFound() {
-		assertThat(clientRepository.findById(""+new ObjectId())).isNull();
+		Client clientFound=clientRepository.findById(""+new ObjectId());
+		assertThat(clientFound).isNull();
 	}
 	
 	@Test
 	public void testFindByIdFound() {
-		String idClientTest1=addTestClientToDatabase("test identifier 1"); 
-		addTestClientToDatabase("test identifier 2");  
-		assertThat(clientRepository.findById(idClientTest1)).isEqualTo(new Client("test identifier 1"));
+		String idClientToFind=addTestClientToDatabase("test identifier 1"); 
+		addTestClientToDatabase("test identifier 2");
+		Client clientFound=clientRepository.findById(idClientToFind);
+		assertThat(clientFound).isEqualTo(new Client("test identifier 1"));
 	}
 	
 	@Test
 	public void testSave() {
-		Client client = new Client("Client to add");
-		Client clientResult=clientRepository.save(client);
-		assertThat(clientResult).isEqualTo(
+		Client clientToAdd = new Client("Client to add");
+		Client clientSaved=clientRepository.save(clientToAdd);
+		assertThat(clientSaved).isEqualTo(
 				new Client("Client to add"));
-		assertThat(clientResult.getId()).isNotNull();
-		assertThat(readAllClientsFromDatabase()).containsExactly(new Client("Client to add"));
+		assertThat(clientSaved.getId()).isNotNull();
+		List<Client> clientsInDatabase=readAllClientsFromDatabase();
+		assertThat(clientsInDatabase).containsExactly(new Client("Client to add"));
 	}
 	
 	@Test
 	public void testDeleteWhenClientIsPresentInDatabase() {
-		String idClientTest=addTestClientToDatabase("Client to remove"); 
-		Client clientRemoved=clientRepository.delete(idClientTest); 
+		String idClientToRemove=addTestClientToDatabase("Client to remove"); 
+		Client clientRemoved=clientRepository.delete(idClientToRemove); 
 		assertThat(clientRemoved).isEqualTo(new Client("Client to remove"));
-		assertThat(readAllClientsFromDatabase()).isEmpty();
+		List<Client> clientsInDatabase=readAllClientsFromDatabase();
+		assertThat(clientsInDatabase).isEmpty();
 	}
 	
 	@Test
 	public void testDeleteWhenClientIsNotPresentInDatabase() {
-		assertThat(clientRepository.delete(new ObjectId().toString())).isNull();
+		Client clientRemoved=clientRepository.delete(new ObjectId().toString());
+		assertThat(clientRemoved).isNull();
 	}
 	
 	private List<Client> readAllClientsFromDatabase() {

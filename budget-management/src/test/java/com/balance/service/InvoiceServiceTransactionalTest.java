@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.AdditionalAnswers.answer;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -51,55 +50,54 @@ public class InvoiceServiceTransactionalTest {
 	@Before
 	public void init(){
 		MockitoAnnotations.initMocks(this); 
-		when(transactionManager.doInTransaction(
-				any())).thenAnswer(answer((TransactionCode<?> code) -> code.apply(repositoryFactory)));
-		doReturn(clientRepository).when(repositoryFactory).createClientRepository();
-		doReturn(invoiceRepository).when(repositoryFactory).createInvoiceRepository();
+		when(transactionManager.doInTransaction(any()))
+			.thenAnswer(answer((TransactionCode<?> code) -> code.apply(repositoryFactory)));
+		when(repositoryFactory.createClientRepository()).thenReturn(clientRepository);
+		when(repositoryFactory.createInvoiceRepository()).thenReturn(invoiceRepository);
 	}
 	
 	@Test
 	public void testFindAllInvoicesByYear() {
 		List<Invoice> invoices=Arrays.asList(new Invoice());
 		when(invoiceRepository.findInvoicesByYear(YEAR_FIXTURE)).thenReturn(invoices);
-		assertThat(invoiceService.findAllInvoicesByYear(YEAR_FIXTURE)).isEqualTo(
-				invoices);
+		List<Invoice> invoicesFound=invoiceService.findAllInvoicesByYear(YEAR_FIXTURE);
+		assertThat(invoicesFound).isEqualTo(invoices);
 	}
 	
 	@Test
 	public void testGetYearsOfTheInvoicesInDatabase() {
 		List<Integer> years=Arrays.asList(YEAR_FIXTURE);
 		when(invoiceRepository.getYearsOfInvoicesInDatabase()).thenReturn(years);
-		assertThat(invoiceService.findYearsOfTheInvoices()).isEqualTo(
-				years);
+		List<Integer> yearsOfInvoicesFound=invoiceService.findYearsOfTheInvoices();
+		assertThat(yearsOfInvoicesFound).isEqualTo(years);
 	}
 	
 	@Test
 	public void testFindInvoicesByClientAndYear() {
-		when(clientRepository.findById(CLIENT_FIXTURE.getId()))
-			.thenReturn(CLIENT_FIXTURE);
+		when(clientRepository.findById(CLIENT_FIXTURE.getId())).thenReturn(CLIENT_FIXTURE);
 		List<Invoice> invoices=Arrays.asList(new Invoice());
 		when(invoiceRepository.findInvoicesByClientAndYear(CLIENT_FIXTURE, YEAR_FIXTURE))
 			.thenReturn(invoices);
-		assertThat(invoiceService.findInvoicesByClientAndYear(CLIENT_FIXTURE, YEAR_FIXTURE))
-			.isEqualTo(invoices);
+		List<Invoice> invoicesOfYearAndClientFound=invoiceService.findInvoicesByClientAndYear(
+																CLIENT_FIXTURE, YEAR_FIXTURE);
+		assertThat(invoicesOfYearAndClientFound).isEqualTo(invoices);
 	}
 	
 	@Test
-	public void testFindInvoicesByClientAndYearWhenClientIsNotPresentInDatabase() {
-		when(clientRepository.findById(CLIENT_FIXTURE.getId()))
-			.thenReturn(null);
+	public void testFindInvoicesByClientAndYearWhenClientExistingInDatabase() {
+		when(clientRepository.findById(CLIENT_FIXTURE.getId())).thenReturn(null);
 		try {
 			invoiceService.findInvoicesByClientAndYear(CLIENT_FIXTURE, YEAR_FIXTURE);
 			fail("Expected a ClientNotFoundException to be thrown");
 		}
 		catch(ClientNotFoundException e) {
 			assertThat("Il cliente con id "+CLIENT_FIXTURE.getId()+" non è presente nel database")
-					.isEqualTo(e.getMessage());
+						.isEqualTo(e.getMessage());
 		}
 	}
 	
 	@Test
-	public void testAddInvoiceWhenClientIsPresentInDatabase() {
+	public void testAddInvoiceWhenClientExistingInDatabase() {
 		Invoice invoiceToAdd=new Invoice(CLIENT_FIXTURE, new Date(), 10);
 		when(clientRepository.findById(CLIENT_FIXTURE.getId())).thenReturn(CLIENT_FIXTURE);
 		when(invoiceRepository.save(invoiceToAdd)).thenReturn(invoiceToAdd);
@@ -109,7 +107,7 @@ public class InvoiceServiceTransactionalTest {
 	}
 	
 	@Test
-	public void testAddInvoiceWhenClientIsNotPresentInDatabase() {
+	public void testAddInvoiceWhenClientNotExistingInDatabase() {
 		Invoice invoiceToAdd=new Invoice(CLIENT_FIXTURE, new Date(), 10);
 		when(clientRepository.findById(CLIENT_FIXTURE.getId())).thenReturn(null);
 		try {
@@ -118,7 +116,7 @@ public class InvoiceServiceTransactionalTest {
 		}
 		catch(ClientNotFoundException e) {
 			assertThat("Il cliente con id "+CLIENT_FIXTURE.getId()+" non è presente nel database")
-					.isEqualTo(e.getMessage());
+						.isEqualTo(e.getMessage());
 		}
 	}
 	
@@ -132,8 +130,8 @@ public class InvoiceServiceTransactionalTest {
 	}
 	
 	@Test
-	public void testRemoveInvoiceWhenInvoiceNoExistingInDatabase() {
-		Invoice invoiceToRemove=new Invoice("2",CLIENT_FIXTURE, new Date(), 10);
+	public void testRemoveInvoiceWhenInvoiceNotExistingInDatabase() {
+		Invoice invoiceToRemove=new Invoice("1",CLIENT_FIXTURE, new Date(), 10);
 		when(clientRepository.findById(CLIENT_FIXTURE.getId())).thenReturn(CLIENT_FIXTURE);
 		when(invoiceRepository.findById(invoiceToRemove.getId())).thenReturn(null);
 		try {
@@ -142,13 +140,13 @@ public class InvoiceServiceTransactionalTest {
 		}
 		catch(InvoiceNotFoundException e) {
 			assertThat("La fattura con id "+invoiceToRemove.getId()+" non è presente nel database")
-					.isEqualTo(e.getMessage());
+						.isEqualTo(e.getMessage());
 		}
 	}
 	
 	@Test
-	public void testRemoveInvoiceWhenClientNoExistingInDatabase() {
-		Invoice invoiceToRemove=new Invoice("2",CLIENT_FIXTURE, new Date(), 10);
+	public void testRemoveInvoiceWhenClientNotExistingInDatabase() {
+		Invoice invoiceToRemove=new Invoice("1",CLIENT_FIXTURE, new Date(), 10);
 		when(clientRepository.findById(CLIENT_FIXTURE.getId())).thenReturn(null);
 		try {
 			invoiceService.removeInvoice(invoiceToRemove);
@@ -156,7 +154,7 @@ public class InvoiceServiceTransactionalTest {
 		}
 		catch(ClientNotFoundException e) {
 			assertThat("Il cliente con id "+CLIENT_FIXTURE.getId()+" non è presente nel database")
-					.isEqualTo(e.getMessage());
+						.isEqualTo(e.getMessage());
 		}
 	}
 }

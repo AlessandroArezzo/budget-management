@@ -5,7 +5,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -41,7 +40,6 @@ public class BalanceControllerTest {
 	@InjectMocks
 	private BalanceController balanceController;
 	
-	private static final int CURRENT_YEAR=Calendar.getInstance().get(Calendar.YEAR);
 	private static final int YEAR_FIXTURE=2019;
 	private static final Client CLIENT_FIXTURE=new Client("1", "test identifier");
 	private static final Invoice INVOICE_FIXTURE=new Invoice("1", CLIENT_FIXTURE, new Date(), 10);
@@ -55,7 +53,7 @@ public class BalanceControllerTest {
 	public void testInitializeView() {
 		List<Client> clients = Arrays.asList(new Client());
 		when(clientService.findAllClients()).thenReturn(clients);
-		List<Integer> yearsOfTheinvoices=Arrays.asList(CURRENT_YEAR);
+		List<Integer> yearsOfTheinvoices=Arrays.asList(YEAR_FIXTURE);
 		when(invoiceService.findYearsOfTheInvoices()).thenReturn(yearsOfTheinvoices);
 		balanceController.initializeView();
 		verify(balanceView).showClients(clients);
@@ -96,9 +94,7 @@ public class BalanceControllerTest {
 	}
 	
 	@Test
-	public void testInvoicesByClientAndYearWhenClientIsNotPresentInDatabase() {
-		List<Invoice> invoices = Arrays.asList(new Invoice());
-		when(invoiceService.findAllInvoicesByYear(YEAR_FIXTURE)).thenReturn(invoices);
+	public void testInvoicesByClientAndYearWhenClientNotExistingInDatabase() {
 		when(invoiceService.findInvoicesByClientAndYear(CLIENT_FIXTURE,YEAR_FIXTURE))
 			.thenThrow(new ClientNotFoundException("Client not found"));
 		balanceController.allInvoicesByClientAndYear(CLIENT_FIXTURE, YEAR_FIXTURE);
@@ -117,7 +113,7 @@ public class BalanceControllerTest {
 	}
 	
 	@Test 
-	public void testDeleteClientWhenClientIsPresentInDatabase() {
+	public void testDeleteClientWhenClientExistingInDatabase() {
 		balanceController.deleteClient(CLIENT_FIXTURE);
 		InOrder inOrder = Mockito.inOrder(clientService, balanceView);
 		inOrder.verify(clientService).removeClient(CLIENT_FIXTURE.getId());
@@ -125,7 +121,7 @@ public class BalanceControllerTest {
 	}
 	
 	@Test 
-	public void testDeleteClientWhenClientIsNotPresentInDatabase() {
+	public void testDeleteClientWhenClientNotExistingInDatabase() {
 		doThrow(new ClientNotFoundException("Client not found")).when(clientService)
 			.removeClient(CLIENT_FIXTURE.getId());
 		balanceController.deleteClient(CLIENT_FIXTURE);
@@ -139,7 +135,7 @@ public class BalanceControllerTest {
 	}
 	
 	@Test
-	public void testAddNewInvoiceWhenClientIsPresentInDatabase() {
+	public void testAddNewInvoiceWhenClientExistingInDatabase() {
 		when(invoiceService.addInvoice(INVOICE_FIXTURE)).thenReturn(INVOICE_FIXTURE);
 		balanceController.newInvoice(INVOICE_FIXTURE);
 		InOrder inOrder = Mockito.inOrder(invoiceService, balanceView);
@@ -148,7 +144,7 @@ public class BalanceControllerTest {
 	}
 	
 	@Test
-	public void testAddNewInvoiceWhenClientIsNotPresentInDatabase() {
+	public void testAddNewInvoiceWhenClientNotExistingInDatabase() {
 		doThrow(new ClientNotFoundException("Client not found"))
 			.when(invoiceService).addInvoice(INVOICE_FIXTURE);
 		balanceController.newInvoice(INVOICE_FIXTURE);

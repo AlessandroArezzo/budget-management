@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.AdditionalAnswers.answer;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -47,18 +46,18 @@ public class ClientServiceTransactionalTest {
 	@Before
 	public void init(){
 		MockitoAnnotations.initMocks(this); 
-		when(transactionManager.doInTransaction(
-				any())).thenAnswer(answer((TransactionCode<?> code) -> code.apply(repositoryFactory)));
-		doReturn(clientRepository).when(repositoryFactory).createClientRepository();
-		doReturn(invoiceRepository).when(repositoryFactory).createInvoiceRepository();
+		when(transactionManager.doInTransaction(any()))
+			.thenAnswer(answer((TransactionCode<?> code) -> code.apply(repositoryFactory)));
+		when(repositoryFactory.createClientRepository()).thenReturn(clientRepository);
+		when(repositoryFactory.createInvoiceRepository()).thenReturn(invoiceRepository);
 	}
 	
 	@Test
 	public void testFindAllClients() {
 		List<Client> clients = Arrays.asList(new Client());
 		when(clientRepository.findAll()).thenReturn(clients);
-		assertThat(clientService.findAllClients())
-			.isEqualTo(clients);
+		List<Client> clientsFound=clientService.findAllClients();
+		assertThat(clientsFound).isEqualTo(clients);
 	}
 	
 	@Test
@@ -71,9 +70,10 @@ public class ClientServiceTransactionalTest {
 	}
 	
 	@Test
-	public void testDeleteClientWhenClientIsPresentInDatabase() {
+	public void testDeleteClientWhenClientExistingInDatabase() {
 		String idClientToRemove="1";
-		when(clientRepository.findById(idClientToRemove)).thenReturn(new Client(idClientToRemove,"test identifier"));
+		when(clientRepository.findById(idClientToRemove))
+			.thenReturn(new Client(idClientToRemove,"test identifier"));
 		clientService.removeClient(idClientToRemove);
 		InOrder inOrder = Mockito.inOrder(clientRepository, invoiceRepository);
 		inOrder.verify(invoiceRepository).deleteAllInvoicesByClient(idClientToRemove);
@@ -81,17 +81,16 @@ public class ClientServiceTransactionalTest {
 	}
 	
 	@Test
-	public void testDeleteClientWhenClientIsNotPresentInDatabase() {
+	public void testDeleteClientWhenClientNotExistingInDatabase() {
 		String idClientToRemove="1";
-		when(clientRepository.findById(idClientToRemove))
-			.thenReturn(null);
+		when(clientRepository.findById(idClientToRemove)).thenReturn(null);
 		try {
 			clientService.removeClient(idClientToRemove);
-			fail("Excepted a ClientNotFoundException to be thrown");
+			fail("Excpected a ClientNotFoundException to be thrown");
 		}
 		catch(ClientNotFoundException e) {
 			assertThat("Il cliente con id "+idClientToRemove+" non è presente nel database")
-			.isEqualTo(e.getMessage());
+						.isEqualTo(e.getMessage());
 		}
 	}
 	
