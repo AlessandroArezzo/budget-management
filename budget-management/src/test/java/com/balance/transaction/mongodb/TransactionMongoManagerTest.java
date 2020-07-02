@@ -1,26 +1,14 @@
 package com.balance.transaction.mongodb;
 
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -30,14 +18,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.Spy;
 import org.testcontainers.containers.GenericContainer;
 
 import com.balance.model.Client;
 import com.balance.model.Invoice;
-import com.balance.repository.ClientRepository;
-import com.balance.repository.mongodb.RepositoryMongoFactory;
 import com.mongodb.DBRef;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
