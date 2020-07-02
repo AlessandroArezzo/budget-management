@@ -102,8 +102,9 @@ public class InvoiceServiceTransactionalTest {
 	public void testAddInvoiceWhenClientIsPresentInDatabase() {
 		Invoice invoiceToAdd=new Invoice(CLIENT_FIXTURE, new Date(), 10);
 		when(clientRepository.findById(CLIENT_FIXTURE.getId())).thenReturn(CLIENT_FIXTURE);
-		assertThat(invoiceService.addInvoice(invoiceToAdd))	
-			.isEqualTo(invoiceToAdd);
+		when(invoiceRepository.save(invoiceToAdd)).thenReturn(invoiceToAdd);
+		Invoice invoiceAdded=invoiceService.addInvoice(invoiceToAdd);
+		assertThat(invoiceAdded).isEqualTo(invoiceToAdd);
 		verify(invoiceRepository).save(invoiceToAdd);
 	}
 	

@@ -25,12 +25,11 @@ public class ClientServiceTransactional implements ClientService {
 			    return clientRepository.findAll();
 			});
 	}
-
+	
+	@Override
 	public Client addClient(Client client) {
 		return transactionManager.doInTransaction(
-			factory -> { 
-				 return factory.createClientRepository().save(client);
-			});
+			factory -> factory.createClientRepository().save(client) );
 	}
 
 	@Override

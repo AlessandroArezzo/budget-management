@@ -64,8 +64,9 @@ public class ClientServiceTransactionalTest {
 	@Test
 	public void testAddClient() {
 		Client clientToAdd=new Client("test identifier");
-		assertThat(clientService.addClient(clientToAdd)).isEqualTo(
-			new Client("test identifier"));
+		when(clientRepository.save(clientToAdd)).thenReturn(clientToAdd);
+		Client clientAdded=clientService.addClient(clientToAdd);
+		assertThat(clientAdded).isEqualTo(new Client("test identifier"));
 		verify(clientRepository).save(clientToAdd);
 	}
 	
