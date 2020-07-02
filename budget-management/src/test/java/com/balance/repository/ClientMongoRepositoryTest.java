@@ -3,6 +3,7 @@ package com.balance.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -49,10 +50,14 @@ public class ClientMongoRepositoryTest {
 	@Before
 	public void setup() { 
 		mongoClient = new MongoClient(new ServerAddress(
-				mongo.getContainerIpAddress(), mongo.getMappedPort(27017)));		
+				mongo.getContainerIpAddress(), mongo.getMappedPort(27017)));
+		MongoDatabase database = mongoClient.getDatabase(BUDGET_DB_NAME);
+		if(!database.listCollectionNames().into(new ArrayList<String>())
+				.contains(CLIENT_COLLECTION_NAME)) {
+			mongoClient.getDatabase(BUDGET_DB_NAME).createCollection(CLIENT_COLLECTION_NAME);
+		}
 		clientRepository = new ClientMongoRepository(mongoClient, mongoClient.startSession(), 
 				BUDGET_DB_NAME, CLIENT_COLLECTION_NAME);
-		MongoDatabase database = mongoClient.getDatabase(BUDGET_DB_NAME);
 		database.drop();
 		clientCollection = database.getCollection(CLIENT_COLLECTION_NAME);
 	}
@@ -60,6 +65,15 @@ public class ClientMongoRepositoryTest {
 	@After
 	public void tearDown() { 
 		mongoClient.close();
+	}
+	
+	@Test
+	public void testCreateClientCollectionInConstructorWhenCollectionNotExistInDatabase() {
+		String clientCollectionNotExisting="client_collection_not_existing_in_db";
+		clientRepository = new ClientMongoRepository(mongoClient, mongoClient.startSession(), 
+				BUDGET_DB_NAME, clientCollectionNotExisting);
+		assertThat(mongoClient.getDatabase(BUDGET_DB_NAME).listCollectionNames())
+			.contains(clientCollectionNotExisting);
 	}
 	
 	@Test
