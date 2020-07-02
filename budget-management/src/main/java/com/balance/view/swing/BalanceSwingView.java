@@ -490,11 +490,12 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		textFieldYearNewInvoice.addKeyListener(btnAddInvoiceEnabler);
 		textFieldRevenueNewInvoice.addKeyListener(btnAddInvoiceEnabler);
 		comboBoxClients.addActionListener (e-> enableNewInvoiceButton() );
+
 		textFieldDayNewInvoice.addKeyListener(  new KeyAdapter() {
 				@Override
 		        public void keyTyped(KeyEvent e) {
 					char ch = e.getKeyChar();
-		            if (!isNumber(ch) || textFieldDayNewInvoice.getText().length() >= 2 )
+					if(isNotCorrectDateNumberFormat(textFieldMonthNewInvoice,ch,2))
 		                e.consume();
 		        }
 			});
@@ -503,7 +504,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 			@Override
 			public void keyTyped(KeyEvent e) {
 				char ch = e.getKeyChar();
-	            if (!isNumber(ch) || textFieldMonthNewInvoice.getText().length() >= 2 )
+	            if(isNotCorrectDateNumberFormat(textFieldMonthNewInvoice,ch,2))
 	                e.consume();
 	        }
 		});
@@ -511,21 +512,34 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 			@Override
 	        public void keyTyped(KeyEvent e) {
 				char ch = e.getKeyChar();
-	            if (!isNumber(ch) || textFieldYearNewInvoice.getText().length() >= 4) 
+				if(isNotCorrectDateNumberFormat(textFieldMonthNewInvoice,ch,4))
 	                e.consume();
 	        }
 		});
 		textFieldRevenueNewInvoice.addKeyListener(  new KeyAdapter() {
 			@Override
 	        public void keyTyped(KeyEvent e) {
-				String textRevenueField=textFieldRevenueNewInvoice.getText();
 				char ch = e.getKeyChar();
-	            if ((!isNumber(ch) && !isComma(ch)) || numberSignificantFigures(textRevenueField)>=2 || (isComma(ch) && containsComma(textRevenueField)))
+	            if (isNotCorrectRevenueNumberFormat(textFieldRevenueNewInvoice,ch))
 	                e.consume();
 	        }
 		});
 	}
 	
+	private boolean isNotCorrectDateNumberFormat(JTextField textfield, char character, int maxLenght) {
+		if (!isNumber(character) || textFieldMonthNewInvoice.getText().length() >= 2 ) {
+			return true;
+		}
+		return false;
+	}
+	private boolean isNotCorrectRevenueNumberFormat(JTextField textfield, char character) {
+        if ((!isNumber(character) && !isComma(character)) || 
+        		numberSignificantFigures(textfield.getText())>=2 ||
+        		(isComma(character) && containsComma(textfield.getText()))) {
+    		return true;
+        }
+        return false;
+	}
 	private boolean isNumber(char ch){
         return ch >= '0' && ch <= '9';
     }
