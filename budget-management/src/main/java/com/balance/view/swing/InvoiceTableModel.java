@@ -28,10 +28,7 @@ public class InvoiceTableModel extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
-    	int result=0;
-    	if(invoices!=null)
-    		result=invoices.size();
-        return result;
+		return invoices.size();
     }
     
     @Override
