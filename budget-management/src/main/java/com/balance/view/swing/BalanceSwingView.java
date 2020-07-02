@@ -3,9 +3,7 @@ package com.balance.view.swing;
 
 import java.awt.Dimension;
 
-import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -18,7 +16,6 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.SoftBevelBorder;
-import javax.swing.table.TableCellRenderer;
 
 import com.balance.controller.BalanceController;
 import com.balance.model.Client;
