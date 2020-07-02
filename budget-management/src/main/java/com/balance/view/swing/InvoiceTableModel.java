@@ -49,7 +49,7 @@ public class InvoiceTableModel extends AbstractTableModel {
         	value = invoice.getClient().getIdentifier();
         else if (columnIndex==1)
         	value = invoice.getDateInString();
-        else if (columnIndex==2)
+        else
         	value = invoice.getRevenueInString();
         return value;
     }

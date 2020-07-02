@@ -162,14 +162,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 			btnRemoveClient.setEnabled(
 					listClients.getSelectedIndex() != -1); 
 			if (!e.getValueIsAdjusting() && comboboxYears.getSelectedItem()!=null) {
-				int yearSelected=(int) comboboxYears.getSelectedItem();
-				if(listClients.getSelectedValue()!=null ) {
-					balanceController.allInvoicesByClientAndYear(
-							listClients.getSelectedValue(), yearSelected);
-				}
-				else {
-					balanceController.allInvoicesByYear(yearSelected);
-				}
+				findInvoices();
 			}
 		});
 		
@@ -462,45 +455,13 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		
 		comboboxYears.addActionListener(
 				e -> {
-				if(comboboxYears.getSelectedIndex()!=-1) {
-					int yearSelected=(int) comboboxYears.getSelectedItem();
-					Client clientSelected=listClients.getSelectedValue();
-					if(clientSelected==null) {
-				    	balanceController.allInvoicesByYear(yearSelected);
-					}
-					else {
-						balanceController.allInvoicesByClientAndYear(clientSelected, yearSelected);
-					}					
-				}
-		});
+					if(comboboxYears.getSelectedIndex()!=-1) 
+						findInvoices();		
+				});
 	
 	
-		btnNewInvoice.addActionListener(
-			e -> {
-				int yearOfDate=Integer.parseInt(textFieldYearNewInvoice.getText());
-				int monthOfYear=Integer.parseInt(textFieldMonthNewInvoice.getText());
-				int dayOfMonth=Integer.parseInt(textFieldDayNewInvoice.getText());	
-				double revenueOfInvoice=Double.parseDouble(textFieldRevenueNewInvoice.getText().replace(",", "."));
-				try {
-					if(yearOfDate<CURRENT_YEAR-100 || yearOfDate>CURRENT_YEAR) {
-						throw new DateTimeException("Wrong year");
-					}
-					LocalDate localDate = LocalDate.of( yearOfDate, monthOfYear, dayOfMonth);
-					Date date = Date.from(localDate.atStartOfDay(ZoneId.of("Z")).toInstant());
-					Client clientOfInvoice=(Client) comboBoxClients.getSelectedItem();
-					resetInvoiceErrorLabel();
-					resetTextBoxAndComboBoxNewInvoice();
-					balanceController.newInvoice(new Invoice(clientOfInvoice,
-							date,revenueOfInvoice));
-				}
-				catch(DateTimeException ex) {
-					paneInvoiceError.setText("La data "+dayOfMonth+"/"+monthOfYear+"/"+yearOfDate+" non è corretta");
-					resetTextBoxDateNewInvoice();
-					btnNewInvoice.setEnabled(false);
-				}
-			}
-			);
-	
+		btnNewInvoice.addActionListener( e -> newInvoice());
+
 		btnShowAllInvoices.addActionListener(
 				e -> {
 					btnShowAllInvoices.setVisible(false);
@@ -563,7 +524,6 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 	                e.consume();
 	        }
 		});
-		
 	}
 	
 	private boolean isNumber(char ch){
@@ -645,6 +605,41 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 	
 	public DefaultComboBoxModel<Client> getComboboxClientsModel() {
 		return comboboxClientsModel;
+	}
+	
+	private void findInvoices() {
+		int yearSelected=(int) comboboxYears.getSelectedItem();
+		if(listClients.getSelectedValue()!=null ) {
+			balanceController.allInvoicesByClientAndYear(
+					listClients.getSelectedValue(), yearSelected);
+		}
+		else {
+			balanceController.allInvoicesByYear(yearSelected);
+		}
+	}
+	
+	private void newInvoice() {
+		int yearOfDate=Integer.parseInt(textFieldYearNewInvoice.getText());
+		int monthOfYear=Integer.parseInt(textFieldMonthNewInvoice.getText());
+		int dayOfMonth=Integer.parseInt(textFieldDayNewInvoice.getText());	
+		double revenueOfInvoice=Double.parseDouble(textFieldRevenueNewInvoice.getText().replace(",", "."));
+		try {
+			if(yearOfDate<CURRENT_YEAR-100 || yearOfDate>CURRENT_YEAR) {
+				throw new DateTimeException("Wrong year");
+			}
+			LocalDate localDate = LocalDate.of( yearOfDate, monthOfYear, dayOfMonth);
+			Date date = Date.from(localDate.atStartOfDay(ZoneId.of("Z")).toInstant());
+			Client clientOfInvoice=(Client) comboBoxClients.getSelectedItem();
+			resetInvoiceErrorLabel();
+			resetTextBoxAndComboBoxNewInvoice();
+			balanceController.newInvoice(new Invoice(clientOfInvoice,
+					date,revenueOfInvoice));
+		}
+		catch(DateTimeException ex) {
+			paneInvoiceError.setText("La data "+dayOfMonth+"/"+monthOfYear+"/"+yearOfDate+" non è corretta");
+			resetTextBoxDateNewInvoice();
+			btnNewInvoice.setEnabled(false);
+		}
 	}
 	
 	private void setLabelTotalRevenue() {
