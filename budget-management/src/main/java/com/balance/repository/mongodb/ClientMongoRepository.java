@@ -1,5 +1,6 @@
 package com.balance.repository.mongodb;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -12,6 +13,7 @@ import com.balance.repository.ClientRepository;
 import com.mongodb.MongoClient;
 import com.mongodb.client.ClientSession;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 
 public class ClientMongoRepository implements ClientRepository{
@@ -22,7 +24,10 @@ public class ClientMongoRepository implements ClientRepository{
 
 	public ClientMongoRepository(MongoClient client, ClientSession clientSession, String balanceDbName, 
 			String clientCollectionName) {
-		clientCollection = client.getDatabase(balanceDbName).getCollection(clientCollectionName);
+		MongoDatabase database=client.getDatabase(balanceDbName);
+		if(!database.listCollectionNames().into(new ArrayList<String>()).contains(clientCollectionName))
+			database.createCollection(clientCollectionName);
+		clientCollection = database.getCollection(clientCollectionName);
 		this.clientSession=clientSession;
 	}
 	

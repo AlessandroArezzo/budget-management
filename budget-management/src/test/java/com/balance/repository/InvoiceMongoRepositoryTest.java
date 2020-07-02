@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -80,10 +81,14 @@ public class InvoiceMongoRepositoryTest {
 	@Before
 	public void setup() { 
 		mongoClient = new MongoClient(new ServerAddress(mongo.getContainerIpAddress(), mongo.getMappedPort(27017)));	
+		MongoDatabase database = mongoClient.getDatabase(BUDGET_DB_NAME);
+		if(!database.listCollectionNames().into(new ArrayList<String>())
+				.contains(INVOICE_COLLECTION_NAME)) {
+			database.createCollection(INVOICE_COLLECTION_NAME);
+		}
 		invoiceRepository = new InvoiceMongoRepository(mongoClient, mongoClient.startSession(),
 				BUDGET_DB_NAME, INVOICE_COLLECTION_NAME, clientRepository);
 		MockitoAnnotations.initMocks(this);
-		MongoDatabase database = mongoClient.getDatabase(BUDGET_DB_NAME);
 		database.drop();
 		invoiceCollection = database.getCollection(INVOICE_COLLECTION_NAME);
 	}
@@ -91,6 +96,15 @@ public class InvoiceMongoRepositoryTest {
 	@After
 	public void tearDown() { 
 		mongoClient.close();
+	}
+	
+	@Test
+	public void testCreateInvoiceCollectionInConstructorWhenCollectionNotExistInDatabase() {
+		String invoiceCollectionNotExisting="invoice_collection_not_existing_in_db";
+		invoiceRepository = new InvoiceMongoRepository(mongoClient, mongoClient.startSession(),
+				BUDGET_DB_NAME, invoiceCollectionNotExisting, clientRepository);
+		assertThat(mongoClient.getDatabase(BUDGET_DB_NAME).listCollectionNames())
+			.contains(invoiceCollectionNotExisting);
 	}
 	
 	@Test
