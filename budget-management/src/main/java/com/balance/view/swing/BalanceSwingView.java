@@ -142,20 +142,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		listClients.setFixedCellHeight(35);
 		scrollPaneClientsList.setViewportView(listClients);
 		
-		listClients.setCellRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList list, Object value, int index,
-                      boolean isSelected, boolean cellHasFocus) {
-            	super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                 setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
-                 if (index % 2 == 0) setBackground(new Color(203, 214, 231));
-                 if(isSelected) {
-                	 setForeground(Color.white);
-                	 setBackground(new Color(23, 35, 51));
-                 }
-                 return this;
-            }
-        });
+		listClients.setCellRenderer(new ClientListCellRenderer());
 		listClients.addListSelectionListener(e -> {
 			btnShowAllInvoices.setVisible(
 					listClients.getSelectedIndex() != -1);
@@ -286,20 +273,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 		panel_invoiceViewAndAdd.add(scrollPaneInvoicesList);
 		
 		invoiceTableModel=new InvoiceTableModel();
-		tableInvoices = new JTable(invoiceTableModel) {
-			private static final long serialVersionUID = 1L;
-			@Override
-            public Component prepareRenderer(
-                    TableCellRenderer renderer, int row, int column) {
-                Component c = super.prepareRenderer(renderer, row, column);
-                if (isRowSelected(row)) {
-                    c.setBackground(Color.black);
-                } else {
-                	c.setBackground(row%2==0 ? Color.white : new Color(247, 247, 247));
-                }
-                return c;
-            }
-		};
+		tableInvoices = new InvoiceTable(invoiceTableModel);
 		tableInvoices.setBorder(new EmptyBorder(0, 0, 0, 0));
 		tableInvoices.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tableInvoices.setFont(new Font(FONT_TEXT , Font.PLAIN, 13));
@@ -495,7 +469,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 				@Override
 		        public void keyTyped(KeyEvent e) {
 					char ch = e.getKeyChar();
-					if(isNotCorrectDateNumberFormat(textFieldMonthNewInvoice,ch,2))
+					if(!isCorrectDateNumberFormat(textFieldDayNewInvoice,ch,2))
 		                e.consume();
 		        }
 			});
@@ -504,7 +478,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 			@Override
 			public void keyTyped(KeyEvent e) {
 				char ch = e.getKeyChar();
-	            if(isNotCorrectDateNumberFormat(textFieldMonthNewInvoice,ch,2))
+	            if(!isCorrectDateNumberFormat(textFieldMonthNewInvoice,ch,2))
 	                e.consume();
 	        }
 		});
@@ -512,7 +486,7 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 			@Override
 	        public void keyTyped(KeyEvent e) {
 				char ch = e.getKeyChar();
-				if(isNotCorrectDateNumberFormat(textFieldMonthNewInvoice,ch,4))
+				if(!isCorrectDateNumberFormat(textFieldYearNewInvoice,ch,4))
 	                e.consume();
 	        }
 		});
@@ -520,25 +494,27 @@ public class BalanceSwingView extends JFrame implements BalanceView {
 			@Override
 	        public void keyTyped(KeyEvent e) {
 				char ch = e.getKeyChar();
-	            if (isNotCorrectRevenueNumberFormat(textFieldRevenueNewInvoice,ch))
+	            if (!isCorrectRevenueNumberFormat(textFieldRevenueNewInvoice,ch))
 	                e.consume();
 	        }
 		});
 	}
 	
-	private boolean isNotCorrectDateNumberFormat(JTextField textfield, char character, int maxLenght) {
-		if (!isNumber(character) || textFieldMonthNewInvoice.getText().length() >= 2 ) {
-			return true;
+	private boolean isCorrectDateNumberFormat(JTextField textfield, char character, int maxLenght) {
+		boolean isCorrect=true;
+		if (!isNumber(character) || textfield.getText().length() >= maxLenght ) {
+			isCorrect=false;
 		}
-		return false;
+		return isCorrect;
 	}
-	private boolean isNotCorrectRevenueNumberFormat(JTextField textfield, char character) {
+	private boolean isCorrectRevenueNumberFormat(JTextField textfield, char character) {
+		boolean isCorrect=true;
         if ((!isNumber(character) && !isComma(character)) || 
         		numberSignificantFigures(textfield.getText())>=2 ||
         		(isComma(character) && containsComma(textfield.getText()))) {
-    		return true;
+        	isCorrect=false;
         }
-        return false;
+        return isCorrect;
 	}
 	private boolean isNumber(char ch){
         return ch >= '0' && ch <= '9';
