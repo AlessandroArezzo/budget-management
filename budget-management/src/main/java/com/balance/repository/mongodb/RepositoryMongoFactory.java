@@ -1,8 +1,8 @@
 package com.balance.repository.mongodb;
 
-import com.balance.repository.Repository;
+import com.balance.repository.ClientRepository;
+import com.balance.repository.InvoiceRepository;
 import com.balance.repository.RepositoryFactory;
-import com.balance.repository.TypeRepository;
 import com.mongodb.MongoClient;
 import com.mongodb.client.ClientSession;
 
@@ -23,30 +23,18 @@ public class RepositoryMongoFactory implements RepositoryFactory {
 		this.collectionClientsName=collectionClientsName;
 		this.collectionInvoicesName=collectionInvoicesName;
 	}
-	
-	@Override
-	public Repository<?> createRepository(TypeRepository type) {
-		switch(type) {
-			case CLIENT:
-				return createClientRepository();
 
-			case INVOICE:
-				return createInvoiceRepository();
-				
-			default:
-				return null;
-		}
-	}
-	
-	private ClientMongoRepository createClientRepository() {
+	@Override
+	public ClientRepository createClientRepository() {
 		return new ClientMongoRepository(client,
 				clientSession,databaseName,collectionClientsName);
 	}
 
-
-	private  InvoiceMongoRepository createInvoiceRepository() {
+	@Override
+	public InvoiceRepository createInvoiceRepository() {
 		return new InvoiceMongoRepository(client,
-			clientSession,databaseName,collectionInvoicesName, createClientRepository());
+				clientSession,databaseName,collectionInvoicesName, 
+					(ClientMongoRepository) createClientRepository());
 	}
 
 }

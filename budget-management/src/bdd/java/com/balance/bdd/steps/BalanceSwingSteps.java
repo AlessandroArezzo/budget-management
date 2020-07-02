@@ -5,12 +5,10 @@ import javax.swing.JFrame;
 import org.assertj.swing.core.BasicRobot;
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.core.matcher.JButtonMatcher;
-import org.assertj.swing.exception.ComponentLookupException;
 import org.assertj.swing.finder.WindowFinder;
 import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.launcher.ApplicationLauncher;
 
-import com.balance.model.Client;
 import com.balance.model.Invoice;
 import com.balance.utils.DateTestsUtil;
 

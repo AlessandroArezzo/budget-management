@@ -6,7 +6,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-import java.awt.Dimension;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;

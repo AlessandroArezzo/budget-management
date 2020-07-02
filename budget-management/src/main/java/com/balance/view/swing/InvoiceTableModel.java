@@ -13,7 +13,7 @@ import com.balance.model.Invoice;
 public class InvoiceTableModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = 1L;
-	private List<Invoice> invoices;
+	private transient List<Invoice> invoices;
     private static final String[] columnNames = {"Cliente", "Data", "Importo (€)"};
 
 
@@ -28,10 +28,7 @@ public class InvoiceTableModel extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
-    	int result=0;
-    	if(invoices!=null)
-    		result=invoices.size();
-        return result;
+		return invoices.size();
     }
     
     @Override
@@ -48,18 +45,12 @@ public class InvoiceTableModel extends AbstractTableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
         Object value="";
         Invoice invoice = invoices.get(rowIndex);
-        switch (columnIndex) {
-            case 0:
-                value = invoice.getClient().getIdentifier();
-                break;
-            case 1:
-                value = invoice.getDateInString();
-                break;
-            case 2:
-                value = invoice.getRevenueInString();
-                break;
-        }
-
+        if(columnIndex==0) 
+        	value = invoice.getClient().getIdentifier();
+        else if (columnIndex==1)
+        	value = invoice.getDateInString();
+        else if (columnIndex==2)
+        	value = invoice.getRevenueInString();
         return value;
     }
     
