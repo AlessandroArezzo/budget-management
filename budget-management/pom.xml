@@ -273,9 +273,33 @@
 				    </execution>
 			  </executions>
 			</plugin>
+			<plugin>
+	          <groupId>org.apache.maven.plugins</groupId>
+	          <artifactId>maven-assembly-plugin</artifactId>
+	          <version>3.1.1</version>
+	          <executions>
+	            <execution>
+	              <phase>package</phase>
+	              <goals>
+	                <goal>single</goal>
+	              </goals>
+	              <configuration>
+	                <descriptorRefs>
+	                  <descriptorRef>jar-with-dependencies</descriptorRef>
+	                </descriptorRefs>
+	                <archive>
+	                  <manifest>
+	                    <mainClass>com.balance.app.swing.BalanceSwingApp</mainClass>
+	                  </manifest>
+	                </archive>
+	              </configuration>
+	            </execution>
+	          </executions>
+      		</plugin>
 		</plugins>
 		
 		<pluginManagement>
+		
 		  	<plugins>
 		  		<plugin>
 		  			<groupId>org.sonarsource.scanner.maven</groupId>
