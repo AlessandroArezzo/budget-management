@@ -38,11 +38,7 @@ public class TransactionMongoManager implements TransactionManager {
 		try {
 			RepositoryMongoFactory repositoryManager= new RepositoryMongoFactory(mongoClient, 
 					clientSession, databaseName,clientsCollectionName, invoicesCollectionName);
-			TransactionBody<R> transactionBody = new TransactionBody<R>() {
-				 public R execute() {
-					 return code.apply(repositoryManager);
-				 }
-			};
+			TransactionBody<R> transactionBody = (() -> code.apply(repositoryManager));
 			return clientSession.withTransaction(transactionBody , transactionOptions);
 		} 
 		catch(MongoException ex){
