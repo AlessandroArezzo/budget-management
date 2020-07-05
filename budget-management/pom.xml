@@ -26,14 +26,14 @@
     <jacoco.version>0.8.5</jacoco.version>
     <coveralls.version>4.3.0</coveralls.version>
     <pittest.version>1.4.10</pittest.version>
-    <docker-maven-plugin.version>0.33.0</docker-maven-plugin.version>
+    <docker-maven-plugin.version>d</docker-maven-plugin.version>
     <sonar.coverage.exclusions>
    		**/model/*.*,
    		**/app/swing/*.*,
    		**/repository/mongodb/RepositoryMongoFactory.java
    	</sonar.coverage.exclusions>
    	
-	<sonar.issue.ignore.multicriteria>e1,e2,e3,e4,e5</sonar.issue.ignore.multicriteria>
+	<sonar.issue.ignore.multicriteria>e1,e2,e3,e4</sonar.issue.ignore.multicriteria>
 	<!--Disable rule for "Tests should include assertions" in swing view tests-->
 	<sonar.issue.ignore.multicriteria.e1.ruleKey>
 		java:S2699
@@ -60,7 +60,7 @@
 		**/view/swing/*.java
 	</sonar.issue.ignore.multicriteria.e3.resourceKey>
 	
-	<!--Disable rule for "Local variable and method parameter names should comply with a naming convention""
+	<!--Disable rule for "Local variable and method parameter names should comply with a naming convention"
 	 in BalanceSwingView-->
 	<sonar.issue.ignore.multicriteria.e4.ruleKey>
 		java:S117
@@ -68,16 +68,7 @@
 	<sonar.issue.ignore.multicriteria.e4.resourceKey>
 		**/BalanceSwingView.java
 	</sonar.issue.ignore.multicriteria.e4.resourceKey>
-	
-	<!--Disable rule for "Conditionally executed blocks should be reachables"
-	 in InvoiceMongoRepository. Is a false positive-->
- 	<sonar.issue.ignore.multicriteria.e5.ruleKey>
-		java:S2583
-	</sonar.issue.ignore.multicriteria.e5.ruleKey>
-	<sonar.issue.ignore.multicriteria.e5.resourceKey>
-		**/InvoiceMongoRepository.java
-	</sonar.issue.ignore.multicriteria.e5.resourceKey> 
-	
+
   </properties>
   
   
