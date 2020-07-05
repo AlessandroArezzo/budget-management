@@ -26,7 +26,7 @@
     <jacoco.version>0.8.5</jacoco.version>
     <coveralls.version>4.3.0</coveralls.version>
     <pittest.version>1.4.10</pittest.version>
-    <docker-maven-plugin.version>d</docker-maven-plugin.version>
+    <docker-maven-plugin.version>0.33.0</docker-maven-plugin.version>
     <sonar.coverage.exclusions>
    		**/model/*.*,
    		**/app/swing/*.*,
@@ -60,7 +60,7 @@
 		**/view/swing/*.java
 	</sonar.issue.ignore.multicriteria.e3.resourceKey>
 	
-	<!--Disable rule for "Local variable and method parameter names should comply with a naming convention"
+	<!--Disable rule for "Local variable and method parameter names should comply with a naming convention""
 	 in BalanceSwingView-->
 	<sonar.issue.ignore.multicriteria.e4.ruleKey>
 		java:S117
@@ -68,7 +68,7 @@
 	<sonar.issue.ignore.multicriteria.e4.resourceKey>
 		**/BalanceSwingView.java
 	</sonar.issue.ignore.multicriteria.e4.resourceKey>
-
+	
   </properties>
   
   
