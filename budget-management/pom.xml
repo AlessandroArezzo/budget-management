@@ -33,7 +33,7 @@
    		**/repository/mongodb/RepositoryMongoFactory.java
    	</sonar.coverage.exclusions>
    	
-	<sonar.issue.ignore.multicriteria>e1,e2,e3,e4,e5</sonar.issue.ignore.multicriteria>
+	<sonar.issue.ignore.multicriteria>e1,e2,e3,e4</sonar.issue.ignore.multicriteria>
 	<!--Disable rule for "Tests should include assertions" in swing view tests-->
 	<sonar.issue.ignore.multicriteria.e1.ruleKey>
 		java:S2699
@@ -68,15 +68,6 @@
 	<sonar.issue.ignore.multicriteria.e4.resourceKey>
 		**/BalanceSwingView.java
 	</sonar.issue.ignore.multicriteria.e4.resourceKey>
-	
-	<!--Disable rule for "Conditionally executed blocks should be reachables"
-	 in InvoiceMongoRepository. Is a false positive-->
- 	<sonar.issue.ignore.multicriteria.e5.ruleKey>
-		java:S2583
-	</sonar.issue.ignore.multicriteria.e5.ruleKey>
-	<sonar.issue.ignore.multicriteria.e5.resourceKey>
-		**/InvoiceMongoRepository.java
-	</sonar.issue.ignore.multicriteria.e5.resourceKey> 
 	
   </properties>
   
