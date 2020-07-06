@@ -3,7 +3,6 @@ package com.balance.view.swing;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.regex.Pattern;
 
 import org.assertj.swing.annotation.GUITest;
