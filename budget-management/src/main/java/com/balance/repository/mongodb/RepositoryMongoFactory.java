@@ -11,9 +11,9 @@ public class RepositoryMongoFactory implements RepositoryFactory {
 	
 	 private MongoClient client;
 	 private ClientSession clientSession;
-	 String databaseName;
-	 String collectionClientsName;
-	 String collectionInvoicesName;
+	 private String databaseName;
+	 private String collectionClientsName;
+	 private String collectionInvoicesName;
 	
 	public RepositoryMongoFactory(MongoClient client, ClientSession clientSession, String databaseName, 
 			String collectionClientsName, String collectionInvoicesName) {

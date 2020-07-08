@@ -122,7 +122,7 @@ public class ClientMongoRepositoryTest {
 	}
 	
 	@Test
-	public void testDeleteWhenClientIsPresentInDatabase() {
+	public void testDeleteWhenClientExistingInDatabase() {
 		String idClientToRemove=addTestClientToDatabase("Client to remove"); 
 		Client clientRemoved=clientRepository.delete(idClientToRemove); 
 		assertThat(clientRemoved).isEqualTo(new Client("Client to remove"));
@@ -131,7 +131,7 @@ public class ClientMongoRepositoryTest {
 	}
 	
 	@Test
-	public void testDeleteWhenClientIsNotPresentInDatabase() {
+	public void testDeleteWhenClientNotExistingInDatabase() {
 		Client clientRemoved=clientRepository.delete(new ObjectId().toString());
 		assertThat(clientRemoved).isNull();
 	}

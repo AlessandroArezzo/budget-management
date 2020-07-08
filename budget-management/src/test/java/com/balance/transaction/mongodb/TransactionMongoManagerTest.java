@@ -90,7 +90,6 @@ public class TransactionMongoManagerTest {
 				COLLECTION_INVOICES_NAME);
 		clientSession=mongoClient.startSession();
 		when(mongoClient.startSession()).thenReturn(clientSession);
-		
 	}
 	
 	@After

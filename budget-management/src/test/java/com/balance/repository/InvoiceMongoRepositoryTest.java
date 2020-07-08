@@ -177,7 +177,7 @@ public class InvoiceMongoRepositoryTest {
 	}
 	
 	@Test
-	public void testFindInvoicesByYearWhenThereAreInvoicesAllSameYearInDatabase() {
+	public void testFindInvoicesByYearWhenThereAreInvoicesOfTheSameYearInDatabase() {
 		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_YEAR_FIXTURE, 10);
 		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_YEAR_FIXTURE, 20);
 		List<Invoice> invoicesOfYear=invoiceRepository.findInvoicesByYear(YEAR_FIXTURE);
@@ -187,7 +187,7 @@ public class InvoiceMongoRepositoryTest {
 	}
 	
 	@Test
-	public void testFindAllInvoicesByYearWhenThereAreInvoicesAllDifferentYearsInDatabase() {
+	public void testFindAllInvoicesByYearWhenThereAreInvoicesOfDifferentYearsInDatabase() {
 		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_YEAR_FIXTURE, 10);
 		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_PREVIOUS_YEAR_FIXTURE, 20);
 		when(clientRepository.findById(CLIENT_FIXTURE_1.getId())).thenReturn(CLIENT_FIXTURE_1);
@@ -254,7 +254,7 @@ public class InvoiceMongoRepositoryTest {
 	}
 	
 	@Test
-	public void testGetInvoicesOfClientAndYearWhenThereAreInvoicesOfTheDifferentClientsInDatabase() {
+	public void testGetInvoicesOfClientAndYearWhenThereAreInvoicesOfDifferentClientsAndYearsInDatabase() {
 		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_YEAR_FIXTURE, 10);
 		addTestInvoiceToDatabase(CLIENT_FIXTURE_1.getId(), DATE_OF_THE_PREVIOUS_YEAR_FIXTURE, 20);
 		addTestInvoiceToDatabase(CLIENT_FIXTURE_2.getId(), DATE_OF_THE_YEAR_FIXTURE, 30);

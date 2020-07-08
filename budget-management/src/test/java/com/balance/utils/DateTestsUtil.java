@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Random;
 
 public class DateTestsUtil {
+	
 	private DateTestsUtil() { }
 	
 	public static Date getFirstDayOfYear(int year) {

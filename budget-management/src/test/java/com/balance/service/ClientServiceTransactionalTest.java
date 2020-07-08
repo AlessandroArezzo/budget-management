@@ -86,7 +86,7 @@ public class ClientServiceTransactionalTest {
 		when(clientRepository.findById(idClientToRemove)).thenReturn(null);
 		try {
 			clientService.removeClient(idClientToRemove);
-			fail("Excpected a ClientNotFoundException to be thrown");
+			fail("Expected a ClientNotFoundException to be thrown");
 		}
 		catch(ClientNotFoundException e) {
 			assertThat("Il cliente con id "+idClientToRemove+" non è presente nel database")

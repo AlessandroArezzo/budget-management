@@ -20,10 +20,7 @@ public class ClientServiceTransactional implements ClientService {
 	@Override
 	public List<Client> findAllClients() {
 		return transactionManager.doInTransaction(
-			factory -> { 
-				ClientRepository clientRepository=factory.createClientRepository();
-			    return clientRepository.findAll();
-			});
+			factory ->  factory.createClientRepository().findAll() );
 	}
 	
 	@Override
@@ -38,7 +35,8 @@ public class ClientServiceTransactional implements ClientService {
 			factory -> { 
 				ClientRepository clientRepository=factory.createClientRepository();
 				if(clientRepository.findById(clientId)==null) {
-					throw new ClientNotFoundException(String.format(ERROR_MESSAGE_CLIENT_NOT_FOUND,clientId));
+					throw new ClientNotFoundException(String.format(ERROR_MESSAGE_CLIENT_NOT_FOUND,
+							clientId));
 
 				}
 				InvoiceRepository invoiceRepository=factory.createInvoiceRepository();

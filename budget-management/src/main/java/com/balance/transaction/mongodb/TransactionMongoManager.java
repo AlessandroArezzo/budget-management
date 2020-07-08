@@ -20,7 +20,8 @@ public class TransactionMongoManager implements TransactionManager {
 
 	private MongoClient mongoClient;
 	
-	public TransactionMongoManager(MongoClient mongoClient, String databaseName, String clientsCollectionName, String invoicesCollectionName) {
+	public TransactionMongoManager(MongoClient mongoClient, String databaseName, 
+			String clientsCollectionName, String invoicesCollectionName) {
 		this.mongoClient=mongoClient;
 		this.databaseName=databaseName;
 		this.clientsCollectionName=clientsCollectionName;
@@ -31,7 +32,7 @@ public class TransactionMongoManager implements TransactionManager {
 	public <R> R doInTransaction(TransactionCode<R> code) {
 		TransactionOptions transactionOptions = TransactionOptions.builder()
 	            .readPreference(ReadPreference.primary())
-	            .readConcern(ReadConcern.SNAPSHOT)
+	            .readConcern(ReadConcern.LOCAL)
 	            .writeConcern(WriteConcern.MAJORITY)
 	            .build();
 		ClientSession clientSession=mongoClient.startSession();

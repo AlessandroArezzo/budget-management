@@ -14,8 +14,10 @@ public class InvoiceServiceTransactional implements InvoiceService{
 
 	private TransactionManager transactionManager;
 	
-	private static final String ERROR_MESSAGE_CLIENT_NOT_FOUND="Il cliente con id %s non è presente nel database";
-	private static final String ERROR_MESSAGE_INVOICE_NOT_FOUND="La fattura con id %s non è presente nel database";
+	private static final String ERROR_MESSAGE_CLIENT_NOT_FOUND=
+			"Il cliente con id %s non è presente nel database";
+	private static final String ERROR_MESSAGE_INVOICE_NOT_FOUND=
+			"La fattura con id %s non è presente nel database";
 	
 	public InvoiceServiceTransactional(TransactionManager transactionManager) {
 		this.transactionManager=transactionManager;
@@ -24,19 +26,13 @@ public class InvoiceServiceTransactional implements InvoiceService{
 	@Override
 	public List<Invoice> findAllInvoicesByYear(int year) {
 		return transactionManager.doInTransaction(
-				factory -> { 
-					InvoiceRepository invoiceRepository=factory.createInvoiceRepository();
-				    return invoiceRepository.findInvoicesByYear(year);
-		});
+			factory -> factory.createInvoiceRepository().findInvoicesByYear(year) );
 	}
 
 	@Override
 	public List<Integer> findYearsOfTheInvoices() {
 		return transactionManager.doInTransaction(
-				factory -> { 
-					InvoiceRepository invoiceRepository=factory.createInvoiceRepository();
-				    return invoiceRepository.getYearsOfInvoicesInDatabase();
-		});
+			factory -> factory.createInvoiceRepository().getYearsOfInvoicesInDatabase() );
 	}
 
 	@Override
@@ -56,31 +52,32 @@ public class InvoiceServiceTransactional implements InvoiceService{
 
 	public Invoice addInvoice(Invoice invoice) {
 		return transactionManager.doInTransaction(
-				factory -> { 
-					ClientRepository clientRepository=factory.createClientRepository();
-					if(clientRepository.findById(invoice.getClient().getId())==null) {
-						throw new ClientNotFoundException(String.format(ERROR_MESSAGE_CLIENT_NOT_FOUND,
-								invoice.getClient().getId()));
-					}
-					return factory.createInvoiceRepository().save(invoice);
-				});
+			factory -> { 
+				ClientRepository clientRepository=factory.createClientRepository();
+				if(clientRepository.findById(invoice.getClient().getId())==null) {
+					throw new ClientNotFoundException(String.format(ERROR_MESSAGE_CLIENT_NOT_FOUND,
+							invoice.getClient().getId()));
+				}
+				return factory.createInvoiceRepository().save(invoice);
+			});
 	}
 
 	public void removeInvoice(Invoice invoice) {
 		transactionManager.doInTransaction(
-				factory -> {
-					String clientId=invoice.getClient().getId();
-					if (factory.createClientRepository().findById(clientId)==null) {
-						throw new ClientNotFoundException(String.format(ERROR_MESSAGE_CLIENT_NOT_FOUND,clientId));
-					}
-					String invoiceId=invoice.getId();
-					InvoiceRepository invoiceRepository=factory.createInvoiceRepository();
-					if(invoiceRepository.findById(invoiceId)==null) {
-						throw new InvoiceNotFoundException(String.format(ERROR_MESSAGE_INVOICE_NOT_FOUND,
-								invoiceId));
-					}
-					return invoiceRepository.delete(invoiceId);
-				});
+			factory -> {
+				String clientId=invoice.getClient().getId();
+				if (factory.createClientRepository().findById(clientId)==null) {
+					throw new ClientNotFoundException(String.format(ERROR_MESSAGE_CLIENT_NOT_FOUND,
+													clientId));
+				}
+				String invoiceId=invoice.getId();
+				InvoiceRepository invoiceRepository=factory.createInvoiceRepository();
+				if(invoiceRepository.findById(invoiceId)==null) {
+					throw new InvoiceNotFoundException(String.format(ERROR_MESSAGE_INVOICE_NOT_FOUND,
+							invoiceId));
+				}
+				return invoiceRepository.delete(invoiceId);
+			});
 	}
 	
 }

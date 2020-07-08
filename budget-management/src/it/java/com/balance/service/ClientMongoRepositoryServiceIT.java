@@ -67,7 +67,7 @@ public class ClientMongoRepositoryServiceIT {
 	}
 	
 	@Test
-	public void testRemoveClientWhenClientNotExistingInDatabase() {
+	public void testRemoveClientWhenClientExistingInDatabase() {
 		Client clientToRemove=clientRepository.save(CLIENT_FIXTURE_1);
 		clientRepository.save(CLIENT_FIXTURE_2);
 		clientService.removeClient(clientToRemove.getId());
