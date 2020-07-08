@@ -6,11 +6,13 @@
   <name>budget-management</name>
   
   <properties>
+  
  	<!-- Java version: Java 8 -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <!-- Dependencies version -->
+    
+    <!-- Dependencies versions -->
     <cucumber.version>4.2.2</cucumber.version>
     <junit.version>4.13</junit.version>
     <mockito.version>3.3.3</mockito.version>
@@ -21,12 +23,17 @@
     <mongo-java-server.version>1.29.1</mongo-java-server.version>
     <picocli.version>4.3.0</picocli.version>
     
-    <!-- Plugin version -->
+    <!-- Plugin versions -->
     <sonarqube.version>3.7.0.1746</sonarqube.version>
     <jacoco.version>0.8.5</jacoco.version>
     <coveralls.version>4.3.0</coveralls.version>
     <pittest.version>1.4.10</pittest.version>
     <docker-maven-plugin.version>0.33.0</docker-maven-plugin.version>
+    <maven-failsafe-plugin.version>2.22.1</maven-failsafe-plugin.version>
+    <build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
+    <maven-assembly-plugin.version>3.1.1</maven-assembly-plugin.version>
+    
+    <!-- Configuration of sonarqube -->
     <sonar.coverage.exclusions>
    		**/model/*.*,
    		**/app/swing/*.*,
@@ -71,8 +78,25 @@
 	
   </properties>
   
-  
+  <!-- Dependencies configuration -->
   <dependencies>
+		<dependency>
+			<groupId>ch.qos.logback</groupId> 
+			<artifactId>logback-classic</artifactId> 
+			<version>${logback-classic.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mongodb</groupId> 
+			<artifactId>mongo-java-driver</artifactId> 
+			<version>${mongo-java-driver.version}</version>
+		</dependency>
+		<dependency>
+		  	<groupId>info.picocli</groupId>
+		  	<artifactId>picocli</artifactId>
+		  	<version>${picocli.version}</version>
+	    </dependency>
+		  
+		<!-- Test dependencies -->  
  		<dependency>
 	      <groupId>junit</groupId>
 	      <artifactId>junit</artifactId>
@@ -110,34 +134,21 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>ch.qos.logback</groupId> 
-			<artifactId>logback-classic</artifactId> 
-			<version>${logback-classic.version}</version>
-		</dependency>
-		<dependency>
 	    	  <groupId>de.bwaldvogel</groupId>
 		      <artifactId>mongo-java-server</artifactId>
 		      <version>${mongo-java-server.version}</version>
 		      <scope>test</scope>
 	    </dependency>
-	    <dependency>
-			<groupId>org.mongodb</groupId> 
-			<artifactId>mongo-java-driver</artifactId> 
-			<version>${mongo-java-driver.version}</version>
-		</dependency>
-		<dependency>
-		  	<groupId>info.picocli</groupId>
-		  	<artifactId>picocli</artifactId>
-		  	<version>${picocli.version}</version>
-		  </dependency>
 	</dependencies>
 	
 	<build>
+		<!-- Plugins configuration -->
 	  	<plugins>
+	  		<!-- Configuration of maven-failsafe-plugin -->
 		  	<plugin> 
 		  		<groupId>org.apache.maven.plugins</groupId> 
 		  		<artifactId>maven-failsafe-plugin</artifactId> 
-		  		<version>2.22.1</version>
+		  		<version>${maven-failsafe-plugin.version}</version>
 			<executions>
 			    <execution>
 			      <id>default-it</id>
@@ -164,10 +175,11 @@
 			  </executions>
 			</plugin>
 			
+			<!-- Configuration of build-helper-maven-plugin -->
 		    <plugin>
 			  <groupId>org.codehaus.mojo</groupId> 
 				<artifactId>build-helper-maven-plugin</artifactId> 
-				<version>3.0.0</version>
+				<version>${build-helper-maven-plugin.version}</version>
 				<executions>
 					<execution>
 						<id>add-test-source</id> 
@@ -198,6 +210,8 @@
 			    	</execution>
 			 	 </executions>
 			</plugin>
+			
+			<!-- Configuration of docker-maven-plugin -->
 			<plugin>
 				<groupId>io.fabric8</groupId> 
 				<artifactId>docker-maven-plugin</artifactId> 
@@ -249,10 +263,12 @@
 				    </execution>
 			  </executions>
 			</plugin>
+			
+			<!-- Configuration of maven-assembly-plugin -->
 			<plugin>
 	          <groupId>org.apache.maven.plugins</groupId>
 	          <artifactId>maven-assembly-plugin</artifactId>
-	          <version>3.1.1</version>
+	          <version>${maven-assembly-plugin.version}</version>
 	          <executions>
 	            <execution>
 	              <phase>package</phase>
@@ -272,16 +288,20 @@
 	            </execution>
 	          </executions>
       		</plugin>
+      		
 		</plugins>
 		
 		<pluginManagement>
 		
 		  	<plugins>
+		  		<!-- Configuration of sonar-maven-plugin -->
 		  		<plugin>
 		  			<groupId>org.sonarsource.scanner.maven</groupId>
 		  			<artifactId>sonar-maven-plugin</artifactId>
 		  			<version>${sonarqube.version}</version>
 		  		</plugin>
+		  		
+		  		<!-- Configuration of jacoco-maven-plugin -->
 	  			<plugin>
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
@@ -307,6 +327,8 @@
 					 <artifactId>coveralls-maven-plugin</artifactId> 
 					 <version>${coveralls.version}</version>
 	      		</plugin>
+	      		
+	      		<!-- Configuration of pitest-maven plugin -->
 	      		<plugin>
 				<groupId>org.pitest</groupId>
 				<artifactId>pitest-maven</artifactId>
@@ -329,43 +351,47 @@
 					<mutators>
 						<mutator>DEFAULTS</mutator> 
 					</mutators>
-					<mutationThreshold>100</mutationThreshold>
+					<mutationThreshold>98</mutationThreshold>
 				</configuration>
 			</plugin>
       		</plugins>
      	</pluginManagement>
 	</build>
 	
+	<!-- Profiles configuration -->
 	<profiles>
+		  <!-- Configuration of jacoco profile to execute code coverage-->
 		  <profile>
-			<id>jacoco</id> 
-			<build>
-		        <plugins>
-		        	<plugin>
-						<groupId>org.jacoco</groupId>
-						<artifactId>jacoco-maven-plugin</artifactId> 
-					</plugin>
-		      	</plugins>
-		   	</build>
+				<id>jacoco</id> 
+				<build>
+			        <plugins>
+			        	<plugin>
+							<groupId>org.jacoco</groupId>
+							<artifactId>jacoco-maven-plugin</artifactId> 
+						</plugin>
+			      	</plugins>
+			   	</build>
 		  </profile>
+		  
+		  <!-- Configuration of PIT profile to execute mutation-testing-->
 		  <profile>
-	  	<id>mutation-testing</id> 
-		<build>
-	        <plugins>
-	        	<plugin>
-					<groupId>org.pitest</groupId>
-					<artifactId>pitest-maven</artifactId> 
-					<executions>
-						<execution>
-							<goals>
-								<goal>mutationCoverage</goal>
-							</goals>
-							<phase>verify</phase>
-						</execution>
-					</executions>
-				</plugin>
-	      	</plugins>
-	   	</build>
-	  </profile>
+			  	<id>mutation-testing</id> 
+				<build>
+			        <plugins>
+			        	<plugin>
+							<groupId>org.pitest</groupId>
+							<artifactId>pitest-maven</artifactId> 
+							<executions>
+								<execution>
+									<goals>
+										<goal>mutationCoverage</goal>
+									</goals>
+									<phase>verify</phase>
+								</execution>
+							</executions>
+						</plugin>
+			      	</plugins>
+			   	</build>
+	  	</profile>
 	 </profiles>
 </project>
