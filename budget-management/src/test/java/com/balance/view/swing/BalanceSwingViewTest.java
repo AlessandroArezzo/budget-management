@@ -296,11 +296,11 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		GuiActionRunner.execute(() -> balanceSwingView.getClientListModel()
 				.addElement(new Client("1","test identifier"))); 
 		window.list("clientsList").selectItem(0); 
-		JButtonFixture deleteButton = 
+		JButtonFixture showInvoicesButton = 
 				window.button(JButtonMatcher.withText(Pattern.compile(".*Vedi tutte.*le fatture.*")));
-		deleteButton.requireVisible();
+		showInvoicesButton.requireVisible();
 		window.list("clientsList").clearSelection(); 
-		deleteButton.requireNotVisible();
+		showInvoicesButton.requireNotVisible();
 	}
 	
 	@Test @GUITest
@@ -377,10 +377,10 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 		GuiActionRunner.execute(() -> 
 			balanceSwingView.getClientListModel().addElement(new Client("1", "test identifier"))); 
 		window.list("clientsList").selectItem(0); 
-		JButtonFixture deleteButton = window.button(JButtonMatcher.withText("Rimuovi cliente"));
-		deleteButton.requireEnabled();
+		JButtonFixture deleteClientButton = window.button(JButtonMatcher.withText("Rimuovi cliente"));
+		deleteClientButton.requireEnabled();
 		window.list("clientsList").clearSelection(); 
-		deleteButton.requireDisabled(); 
+		deleteClientButton.requireDisabled(); 
 	}
 	
 	@Test @GUITest
