@@ -816,8 +816,6 @@ public class BalanceSwingViewTest extends AssertJSwingJUnitTestCase{
 	public void testUpdateTotalRevenueWhenInvoiceOfTheYearSelectedAndOfTheClientSelectedIsAdded() {
 		Client client1=new Client("1","test identifier 1"); 
 		Client client2=new Client("2","test identifier 2"); 
-		Invoice invoiceOfClient1=new Invoice(
-				"1",client1, DateTestsUtil.getDateFromYear(CURRENT_YEAR), 10);
 		Invoice invoiceOfClient2=new Invoice(
 				"2",client2, DateTestsUtil.getDateFromYear(CURRENT_YEAR), 20);
 		GuiActionRunner.execute(() -> {
