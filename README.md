@@ -10,18 +10,18 @@ Project developed for the advanced programming techniques exam of the university
 <p>
   
   <a>[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com%3Abudget-management&metric=alert_status)](https://sonarcloud.io/dashboard?id=com%3Abudget-management)</a>
-  <a>[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=com%3Abudget-management&metric=bugs)](https://sonarcloud.io/dashboard?id=com%3Abudget-management)</a>
-  <a>[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=com%3Abudget-management&metric=code_smells)](https://sonarcloud.io/dashboard?id=com%3Abudget-management)</a>
-  <a>[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=com%3Abudget-management&metric=sqale_index)](https://sonarcloud.io/dashboard?id=com%3Abudget-management)</a>
-  <a>[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=com%3Abudget-management&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=com%3Abudget-management)</a>
+    <a>[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=com%3Abudget-management&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=com%3Abudget-management)</a>
+  <a>[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=com%3Abudget-management&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=com%3Abudget-management)</a>
+  <a>[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=com%3Abudget-management&metric=security_rating)](https://sonarcloud.io/dashboard?id=com%3Abudget-management)</a>
 </p>
 
 <p>
-  
-  <a>[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=com%3Abudget-management&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=com%3Abudget-management)</a>
-  <a>[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=com%3Abudget-management&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=com%3Abudget-management)</a>
-  <a>[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=com%3Abudget-management&metric=security_rating)](https://sonarcloud.io/dashboard?id=com%3Abudget-management)</a>
+ 
+  <a>[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=com%3Abudget-management&metric=bugs)](https://sonarcloud.io/dashboard?id=com%3Abudget-management)</a>
+  <a>[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=com%3Abudget-management&metric=code_smells)](https://sonarcloud.io/dashboard?id=com%3Abudget-management)</a>
+  <a>[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=com%3Abudget-management&metric=sqale_index)](https://sonarcloud.io/dashboard?id=com%3Abudget-management)</a>
   <a>[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=com%3Abudget-management&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=com%3Abudget-management)</a>
+  <a>[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=com%3Abudget-management&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=com%3Abudget-management)</a>
 </p>
 
 <h2>Prerequisites</h2>
