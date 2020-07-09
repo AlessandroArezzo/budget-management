@@ -20,7 +20,6 @@
     <testcontainers.version>1.14.3</testcontainers.version>
     <logback-classic.version>1.2.3</logback-classic.version>
     <mongo-java-driver.version>3.12.5</mongo-java-driver.version>
-    <mongo-java-server.version>1.29.1</mongo-java-server.version>
     <picocli.version>4.3.0</picocli.version>
     
     <!-- Plugin versions -->
@@ -133,12 +132,6 @@
 			<version>${testcontainers.version}</version> 
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-	    	  <groupId>de.bwaldvogel</groupId>
-		      <artifactId>mongo-java-server</artifactId>
-		      <version>${mongo-java-server.version}</version>
-		      <scope>test</scope>
-	    </dependency>
 	</dependencies>
 	
 	<build>
