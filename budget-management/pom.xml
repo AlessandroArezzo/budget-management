@@ -14,7 +14,7 @@
     
     <!-- Dependencies versions -->
     <cucumber.version>4.2.2</cucumber.version>
-    <junit.version>4.13</junit.version>
+    <junit.version>4.13.1</junit.version>
     <mockito.version>3.3.3</mockito.version>
     <assertj-swing.version>3.9.2</assertj-swing.version>
     <testcontainers.version>1.14.3</testcontainers.version>
